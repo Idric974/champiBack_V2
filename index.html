@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Champi</title>
+    <link rel="icon" type="image/png" href="./images/champignon.ico" />
+    <link rel="stylesheet" type="text/css" href="./Styles/globaleStyles.css" />
+    <link rel="stylesheet" type="text/css" href="./Styles/style.css" />
+  </head>
+  <body>
+    <!-- BOX 1 -->
+    <div class="box">
+      <div class="box1">
+        <button class="boutonAccueil">Accueil</button>
+        <button class="boutonAccueil">Gestion Relay</button>
+        <button class="boutonAccueil">Etalonnage</button>
+        <button class="boutonAccueil">Courbe</button>
+        <button class="boutonAccueil">Log</button>
+      </div>
+      <!-- FIN BOX 1 -->
+
+      <!-- BOX 2 -->
+      <div class="box2">
+        <div class="box2Title">Accueil</div>
+        <div class="box2Content">
+          <!-- Température Air -->
+          <div class="boxCard">
+            <div class="boxCardData1">
+              <div class="boxCardDataTitle">Température Air</div>
+              <!-- TEST -->
+              <div id="temperatureAir" class="boxCardDataValue">30 °C</div>
+              <!-- TEST -->
+              <div class="boxCardDataParams">
+                <div class="boxCardDataItem">Consigne : 30°C</div>
+                <div class="boxCardDataItem">Delta : 10°C</div>
+              </div>
+            </div>
+            <div class="boxCardData2">
+              <div class="boxCardData2Title">Descente Air</div>
+              <div class="boxCardData2Form">
+                <form action="/ma-page-de-traitement" method="post">
+                  <div class="modifBlocForm">
+                    <label for="consigneAir">Consigne</label>
+                    <input
+                      type="number"
+                      id="consigneAir"
+                      name="consigneAir"
+                      required
+                    />
+                  </div>
+
+                  <div class="modifBlocForm">
+                    <label for="pasAir">Pas</label>
+                    <input type="number" id="pasAir" name="pasAir" />
+                  </div>
+
+                  <div class="modifBlocForm">
+                    <label for="objectiAir">Objectif</label>
+                    <input type="number" id="objectiAir" name="objectiAir" />
+                  </div>
+                </form>
+              </div>
+              <button class="boxCardData2Button">Valider descente</button>
+              <div class="boxCardData2DaysHeures">2 Jours et 3 heures</div>
+            </div>
+          </div>
+          <!-- --------------------- -->
+
+          <!-- Tauc de Humidité -->
+          <div class="boxCard">
+            <div class="boxCardData1">
+              <div class="boxCardDataTitle">Taux Humidité</div>
+              <div class="boxCardDataValue">30 °C</div>
+              <div class="boxCardDataParams">
+                <div class="boxCardDataItem">Consigne : 30°C</div>
+                <div class="boxCardDataItem">Delta : 10°C</div>
+                <div class="boxCardDataItem">Temp Sec : 30°C</div>
+                <div class="boxCardDataItem">Temp Hum : 10°C</div>
+              </div>
+            </div>
+            <div class="boxCardData2">
+              <div class="boxCardData2Title">Descente Humidité</div>
+              <div class="boxCardData2Form">
+                <form action="/ma-page-de-traitement" method="post">
+                  <div class="modifBlocForm">
+                    <label for="consigneAir">Consigne</label>
+                    <input
+                      type="number"
+                      id="consigneAir"
+                      name="consigneAir"
+                      required
+                    />
+                  </div>
+
+                  <div class="modifBlocForm">
+                    <label for="pasAir">Pas</label>
+                    <input type="number" id="pasAir" name="pasAir" />
+                  </div>
+
+                  <div class="modifBlocForm">
+                    <label for="objectiAir">Objectif</label>
+                    <input type="number" id="objectiAir" name="objectiAir" />
+                  </div>
+                </form>
+              </div>
+              <button class="boxCardData2Button">Valider descente</button>
+              <div class="boxCardData2DaysHeures">2 Jours et 3 heures</div>
+            </div>
+          </div>
+          <!-- --------------------- -->
+
+          <!-- Tauc de Co2 -->
+          <div class="boxCard">
+            <div class="boxCardData1">
+              <div class="boxCardDataTitle">Taux de Co2</div>
+              <div class="boxCardDataValue">2000 ppm</div>
+              <div class="boxCardDataParams">
+                <div class="boxCardDataItem">Consigne : 30°C</div>
+                <div class="boxCardDataItem">Delta : 10°C</div>
+              </div>
+            </div>
+            <div class="boxCardData2">
+              <div class="boxCardData2Title">Descente Co2</div>
+              <div class="boxCardData2Form">
+                <form action="/ma-page-de-traitement" method="post">
+                  <div class="modifBlocForm">
+                    <label for="consigneAir">Consigne</label>
+                    <input
+                      type="number"
+                      id="consigneAir"
+                      name="consigneAir"
+                      required
+                    />
+                  </div>
+
+                  <div class="modifBlocForm">
+                    <label for="pasAir">Pas</label>
+                    <input type="number" id="pasAir" name="pasAir" />
+                  </div>
+
+                  <div class="modifBlocForm">
+                    <label for="objectiAir">Objectif</label>
+                    <input type="number" id="objectiAir" name="objectiAir" />
+                  </div>
+                </form>
+              </div>
+              <button class="boxCardData2Button">Valider descente</button>
+              <div class="boxCardData2DaysHeures">2 Jours et 3 heures</div>
+            </div>
+          </div>
+          <!-- --------------------- -->
+        </div>
+      </div>
+      <!-- FIN BOX 2 -->
+    </div>
+
+    <script type="JavaScript" src="./main.js"></script>
+  </body>
+</html>
