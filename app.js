@@ -60,4 +60,10 @@ app.use('/api/logsBackRoutes', gestionLogs);
 app.use('/api/relayRoutes', relayRoutes);
 app.use('/api/broche', brocheRoutes);
 
+//! Les images.
+app.use('/images', express.static('/home/pi/Desktop/champiBack_V2/images'));
+
+//! Le CSS.
+app.use('/styles', express.static('/home/pi/Desktop/champiBack_V2/styles'));
+
 module.exports = app;

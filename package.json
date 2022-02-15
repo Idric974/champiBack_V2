@@ -1,0 +1,48 @@
+{
+  "name": "champiback_v2",
+  "version": "1.0.0",
+  "description": "Version 2 sans React",
+  "main": "server.js",
+  "scripts": {
+    "start": "concurrently -n ' Serveur Back , Cron Tab     ' -c 'green' \" nodemon server.js\" \" node /home/pi/Desktop/champiBack_V2/cronTab.js\"   ",
+    "✔️_gestionAir": " node /home/pi/Desktop/champiBack/gestion/gestionAir/gestionAir.js",
+    "✔️_gestionHum": " node /home/pi/Desktop/champiBack/gestion/gestionHum/gestionHum.js",
+    "✔️_gestionCo2": " node /home/pi/Desktop/champiBack/gestion/gestionCo2/gestionCo2.js",
+    "✔️_gestionConsigne Auto": " node /home/pi/Desktop/champiBack/gestion/gestionAir/consigneAirAuto.js",
+    "⚡_AfficherTable": " node /home/pi/Desktop/champiBack/SQL/lireBaseDeDonnee/afficherTable.js ",
+    "⚡_AfficherListeTable": " node /home/pi/Desktop/champiBack/SQL/lireBaseDeDonnee/afficherListeTable.js",
+    "⚡_AfficherListeUser": " node /home/pi/Desktop/champiBack/SQL/lireBaseDeDonnee/afficherListUser.js",
+    "⚡_AfficherListeBase": " node /home/pi/Desktop/champiBack/SQL/lireBaseDeDonnee/afficherListeBase.js",
+    "⚡_CreerTable": " node /home/pi/Desktop/champiBack/SQL/creerBaseDeDonnee/creerTable.js",
+    "⚡_CreerBase": " node /home/pi/Desktop/champiBack/SQL/creerBaseDeDonnee/creerBaseDonnées.js",
+    "⚡_CreerUser": " node /home/pi/Desktop/champiBack/SQL/creerBaseDeDonnee/creerUtilisateur.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Idric974/champiBack_V2.git"
+  },
+  "author": "Idric Evarne",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Idric974/champiBack_V2/issues"
+  },
+  "homepage": "https://github.com/Idric974/champiBack_V2#readme",
+  "dependencies": {
+    "axios": "^0.26.0",
+    "concurrently": "^7.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.2",
+    "fs": "^0.0.1-security",
+    "gpio": "^0.2.10",
+    "mcp-spi-adc": "^3.2.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
+    "node-schedule": "^2.1.0",
+    "nodemon": "^2.0.15",
+    "sequelize": "^6.16.1",
+    "socket.io": "^4.4.1",
+    "socket.io-client": "^4.4.1",
+    "winston": "^3.6.0"
+  }
+}
