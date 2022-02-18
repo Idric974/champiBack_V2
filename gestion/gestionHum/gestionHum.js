@@ -10,7 +10,6 @@ const gestionHumModels = db.gestionHum;
 const gestionHumDataModels = db.gestionHumData;
 const gestionHumEtallonnageModels = db.etalonnageHum;
 const gestionSecEtallonnageModels = db.etalonnageSec;
-const io = require('socket.io-client');
 //-----------------------------------------------------------
 
 // Les variables.
@@ -39,17 +38,6 @@ let valeurEtalonnageHum;
 listValSec = [];
 listValHum = [];
 //-----------------------------------------------------------
-
-//* I) Initialisation socket.io Client
-
-const socket = io('http://localhost:3003', {
-  reconnection: true,
-});
-
-socket.on('connect', () => {
-  // console.log('[ SOCKET IO        ] Client gestion Hum connecté', socket.id);
-});
-//* -----------------------------------------------------------
 
 // Récupération de la consigne
 
@@ -80,44 +68,6 @@ let recuperationConsigneAir = () => {
 
           objectif = result['objectifHum'];
           // console.log('Objectif : ', objectif);
-        })
-        .then(() => {
-          // Calcule des jours et des heures
-
-          let CalculeNombreJour = () => {
-            if (
-              consigne == 0 ||
-              consigne == '' ||
-              consigne == null ||
-              objectif == 0 ||
-              objectif == '' ||
-              objectif == null ||
-              pas == 0 ||
-              pas == '' ||
-              pas == null
-            ) {
-              // console.log('Pas de paramètre pas de calcule des jours');
-              return;
-            } else {
-              let dureeDescenteAir = ((consigne - objectif) / pas) * 12;
-
-              // console.log('Durée Descente Air', dureeDescenteAir);
-
-              let totalHeures = dureeDescenteAir;
-
-              days = Math.floor(totalHeures / 24);
-
-              totalHeures %= 360;
-
-              heures = Math.floor(totalHeures / 36);
-
-              // console.log(days + ' Jours ' + heures + ' Heures ');
-            }
-          };
-
-          CalculeNombreJour();
-
-          // ------------------------------------------------------------
         });
     });
 };
@@ -3980,8 +3930,6 @@ resultatsHum()
         deltaHum: deltaHum,
         valeursMesureSec180: valeursMesureSec180Corrigee,
         valeursMesureHum90: valeursMesureHum90Corrigee,
-        daysHum: days,
-        heuresHum: heures,
       })
 
       .then(() => {
@@ -4014,16 +3962,4 @@ resultatsHum()
     };
 
     newDelta();
-  })
-
-  .then(() => {
-    socket.emit('affichageTauxHumidite', {
-      valeureTauxHumidite: tauxHumidite,
-      valeureConsigneHum: consigne,
-      valeureDeltaHum: deltaHum,
-      valeureTempSec: valeursMesureSec180Corrigee,
-      valeureTempHum: valeursMesureHum90Corrigee,
-      valeureDaysHum: days,
-      valeureHeuresHum: heures,
-    });
   });

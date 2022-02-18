@@ -1,10 +1,4 @@
-const jaune = '\x1b[33m';
-const bleu = '\x1b[34m';
-const magenta = '\x1b[35m';
-const cyan = '\x1b[36m';
 const schedule = require('node-schedule');
-
-var childProcess = require('child_process');
 
 //*! 1) ➖ ➖ ➖ ➖ ➖ ➖ GESTION AIR ➖ ➖ ➖ ➖ ➖ ➖ //
 
@@ -88,8 +82,8 @@ const consigneAirAuto = schedule.scheduleJob('  */30 * * * * *', () => {
 
 //* Calcules.
 
-const gestionHum = schedule.scheduleJob(' 0 * * * * ', () => {
-  //const gestionHum = schedule.scheduleJob(' */5 * * * * ', () => {
+// const gestionHum = schedule.scheduleJob(' 0 * * * * ', () => {
+const gestionHum = schedule.scheduleJob(' */10 * * * * ', () => {
   var childProcess = require('child_process');
 
   function runScript(scriptPath, callback) {
@@ -167,8 +161,8 @@ const consigneHumAuto = schedule.scheduleJob('  */30 * * * * *', () => {
 
 //* Calcules.
 
-const gestionCo2 = schedule.scheduleJob(' 0 * * * * ', () => {
-  //const gestionCo2 = schedule.scheduleJob(' */5 * * * * ', () => {
+// const gestionCo2 = schedule.scheduleJob(' 0 * * * * ', () => {
+const gestionCo2 = schedule.scheduleJob(' */10 * * * * ', () => {
   var childProcess = require('child_process');
 
   function runScript(scriptPath, callback) {

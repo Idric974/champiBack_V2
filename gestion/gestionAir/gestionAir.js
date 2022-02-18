@@ -10,9 +10,7 @@ const gestionAirModels = db.gestionAir;
 const gestionAirsDataModels = db.gestionAirData;
 const gestionAirEtalonnageModels = db.etalonnageAir;
 const gestionLogsModels = db.gestionLogsBack;
-const io = require('socket.io-client');
 const logger = require('../../src/logger');
-const fs = require('fs');
 //-------------------------------------
 
 // Les variables.
@@ -34,21 +32,6 @@ let heures;
 
 listValAir = [];
 //-------------------------------------
-
-//* I) Initialisation socket.io Client
-
-const socket = io('http://localhost:3003', {
-  reconnection: true,
-});
-
-socket.on('connect', () => {
-  // console.log(
-  //   jaune,
-  //   '[ GESTION AIR SOCKET IO ] Client gestion Air connecté',
-  //   socket.id
-  // );
-});
-//* -----------------------------------------------------------
 
 // Récupération de la consigne
 
@@ -80,50 +63,6 @@ let recuperationConsigneAir = () => {
 
             objectif = result['objectifAir'];
             // console.log('Objectif : ', objectif);
-          })
-          .then(() => {
-            // Calcule des jours et des heures
-
-            let CalculeNombreJour = () => {
-              if (
-                consigne == 0 ||
-                consigne == '' ||
-                consigne == null ||
-                objectif == 0 ||
-                objectif == '' ||
-                objectif == null ||
-                pas == 0 ||
-                pas == '' ||
-                pas == null
-              ) {
-                // console.log('Pas de paramètre pas de calcule des jours');
-                return;
-              } else {
-                let dureeDescenteAir = ((consigne - objectif) / pas) * 12;
-
-                // console.log('Durée Descente Air', dureeDescenteAir);
-
-                let totalHeures = dureeDescenteAir;
-
-                days = Math.floor(totalHeures / 24);
-
-                totalHeures %= 360;
-
-                heures = Math.floor(totalHeures / 36);
-
-                // console.log(
-                //   'La durée de la descente Air est de  : ' +
-                //     days +
-                //     ' Jours ' +
-                //     heures +
-                //     ' Heures '
-                // );
-              }
-            };
-
-            CalculeNombreJour();
-
-            //------------------------------------------------------------
           });
       });
   } catch (error) {
@@ -404,8 +343,6 @@ resultats()
         .create({
           temperatureAir: temperatureCorrigée,
           deltaAir: delta,
-          days: days,
-          heures: heures,
         })
 
         .then(() => {
@@ -458,29 +395,4 @@ resultats()
         error
       );
     }
-  })
-
-  // .then(() => {
-  //   socket.emit('affichageTemperatureAir', {
-  //     valeureTemperatureAir: temperatureCorrigée,
-  //     valeureDeltaAir: delta,
-  //     valeureDays: days,
-  //     valeureHeures: heures,
-  //     valeureConsigne: consigne,
-  //   });
-  // })
-  .then(() => {
-    socket.emit(
-      'affichageTemperatureAir',
-      {
-        valeureTemperatureAir: temperatureCorrigée,
-        valeureDeltaAir: delta,
-        valeureDays: days,
-        valeureHeures: heures,
-        valeureConsigne: consigne,
-      },
-      (response) => {
-        console.log('==========> Response', response.status);
-      }
-    );
   });
