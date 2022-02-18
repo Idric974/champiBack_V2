@@ -144,7 +144,7 @@ let gestionConsigne = () => {
 //! 3) ➖➖➖➖➖➖ Fonction qui décide de la consigne automatique ou manuelle ➖➖➖➖➖➖
 
 setTimeout(() => {
-  palier = pasCo2 / 1440;
+  palier = pasCo2 / 12;
 
   if (
     pasCo2 == 0 ||
