@@ -216,7 +216,9 @@ resultatsSec()
       valeursMesureSec180
     );
 
-    valeursMesureSec180Corrigee = valeursMesureSec180 + valeurEtalonnageSec;
+    valeursMesureSec180Corrigee = parseFloat(
+      valeursMesureSec180 + valeurEtalonnageSec
+    ).toFixed(1);
 
     console.log(
       magenta,
@@ -2074,7 +2076,9 @@ resultatsHum()
       valeursMesureHum90
     );
 
-    valeursMesureHum90Corrigee = valeurEtalonnageHum + valeursMesureHum90;
+    valeursMesureHum90Corrigee = parseFloat(
+      valeurEtalonnageHum + valeursMesureHum90
+    ).toFixed(1);
 
     console.log(
       magenta,
