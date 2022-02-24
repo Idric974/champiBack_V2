@@ -183,32 +183,32 @@ resultats()
   .then((temperatureMoyenneAir) => {
     // Calcule de la température.
 
-    console.log(
-      jaune,
-      "[ GESTION AIR CALCULES  ] Temperature Moyenne de l'air : ",
-      parseFloat(temperatureMoyenneAir).toFixed(1)
-    );
+    // console.log(
+    //   jaune,
+    //   "[ GESTION AIR CALCULES  ] Temperature Moyenne de l'air : ",
+    //   parseFloat(temperatureMoyenneAir).toFixed(1)
+    // );
     temperatureCorrigée =
       parseFloat(temperatureMoyenneAir.toFixed(1)) + etalonnage;
     ValTemp = temperatureCorrigée;
-    console.log(
-      jaune,
-      "[ GESTION AIR CALCULES  ] Temperature Moyenne de l'air corrigée affichée : ",
-      ValTemp
-    );
+    // console.log(
+    //   jaune,
+    //   "[ GESTION AIR CALCULES  ] Temperature Moyenne de l'air corrigée affichée : ",
+    //   ValTemp
+    // );
 
     // Affichage de la consigne.
-    console.log(
-      jaune,
-      '[ GESTION AIR CALCULES  ] La consigne est de',
-      consigne
-    );
+    // console.log(
+    //   jaune,
+    //   '[ GESTION AIR CALCULES  ] La consigne est de',
+    //   consigne
+    // );
 
     // Calcule du delta.
 
     delta = parseFloat((ValTemp - consigne).toFixed(1));
 
-    console.log(jaune, '[ GESTION AIR CALCULES  ] Le delta est de : ', delta);
+    // console.log(jaune, '[ GESTION AIR CALCULES  ] Le delta est de : ', delta);
   })
   //
   // Définition des actions.
@@ -218,18 +218,18 @@ resultats()
         const realy22On = new Gpio(22, 'out');
         const realy23On = new Gpio(23, 'out');
 
-        console.log(
-          jaune,
-          '[ GESTION AIR CALCULES  ] Ouverture du froid pour 40 secondes'
-        );
+        // console.log(
+        //   jaune,
+        //   '[ GESTION AIR CALCULES  ] Ouverture du froid pour 40 secondes'
+        // );
 
         setTimeout(() => {
           const realy22Off = new Gpio(22, 'in');
           const realy23Off = new Gpio(23, 'in');
-          console.log(
-            jaune,
-            '[ GESTION AIR CALCULES  ] Fin action ouverture  40 secondes'
-          );
+          // console.log(
+          //   jaune,
+          //   '[ GESTION AIR CALCULES  ] Fin action ouverture  40 secondes'
+          // );
         }, 40000);
 
         //
@@ -237,93 +237,93 @@ resultats()
         const realy22On = new Gpio(22, 'out');
         const realy23On = new Gpio(23, 'out');
 
-        console.log(
-          jaune,
-          '[ GESTION AIR CALCULES  ] Ouverture du froid pour 15 secondes'
-        );
+        // console.log(
+        //   jaune,
+        //   '[ GESTION AIR CALCULES  ] Ouverture du froid pour 15 secondes'
+        // );
 
         setTimeout(() => {
           const realy22Off = new Gpio(22, 'in');
           const realy23Off = new Gpio(23, 'in');
 
-          console.log(
-            jaune,
-            '[ GESTION AIR CALCULES  ] Fin action ouverture 15 secondes'
-          );
+          // console.log(
+          //   jaune,
+          //   '[ GESTION AIR CALCULES  ] Fin action ouverture 15 secondes'
+          // );
         }, 15000);
         //
       } else if (delta <= 0.5 && delta >= 0.4) {
         const realy22On = new Gpio(22, 'out');
         const realy23On = new Gpio(23, 'out');
 
-        console.log(
-          jaune,
-          '[ GESTION AIR CALCULES  ] Ouverture du froid pour 5 secondes'
-        );
+        // console.log(
+        //   jaune,
+        //   '[ GESTION AIR CALCULES  ] Ouverture du froid pour 5 secondes'
+        // );
 
         setTimeout(() => {
           const realy22Off = new Gpio(22, 'in');
           const realy23Off = new Gpio(23, 'in');
-          console.log(
-            jaune,
-            '[ GESTION AIR CALCULES  ] Fin action ouverture 5 secondes'
-          );
+          // console.log(
+          //   jaune,
+          //   '[ GESTION AIR CALCULES  ] Fin action ouverture 5 secondes'
+          // );
         }, 5000);
         //
       } else if (delta <= 0.3 && delta >= -0.3) {
-        console.log(
-          jaune,
-          "[ GESTION AIR CALCULES  ] Pas d'action car interval entre -0.3 et 0.3"
-        );
+        // console.log(
+        //   jaune,
+        //   "[ GESTION AIR CALCULES  ] Pas d'action car interval entre -0.3 et 0.3"
+        // );
         //
       } else if (delta <= -0.4 && delta >= -0.5) {
         const realy22On = new Gpio(22, 'out');
-        console.log(
-          jaune,
-          '[ GESTION AIR CALCULES  ] Fermeture du froid pour 5 secondes'
-        );
+        // console.log(
+        //   jaune,
+        //   '[ GESTION AIR CALCULES  ] Fermeture du froid pour 5 secondes'
+        // );
 
         setTimeout(() => {
           const realy22Off = new Gpio(22, 'in');
 
-          console.log(
-            jaune,
-            '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture  5 secondes'
-          );
+          // console.log(
+          //   jaune,
+          //   '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture  5 secondes'
+          // );
         }, 5000);
 
         //
       } else if (delta <= -0.6 && delta >= -1) {
         const realy22On = new Gpio(22, 'out');
 
-        console.log(
-          jaune,
-          '[ GESTION AIR CALCULES  ] Fermeture du froid pour 15 secondes'
-        );
+        // console.log(
+        //   jaune,
+        //   '[ GESTION AIR CALCULES  ] Fermeture du froid pour 15 secondes'
+        // );
 
         setTimeout(() => {
           const realy22Off = new Gpio(22, 'in');
-          console.log(
-            jaune,
-            '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture 15 secondes'
-          );
+          // console.log(
+          //   jaune,
+          //   '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture 15 secondes'
+          // );
         }, 15000);
         //
       } else if (delta <= -1.1) {
         const realy22On = new Gpio(22, 'out');
 
-        console.log(
-          jaune,
-          '[ GESTION AIR CALCULES  ] Fermeture du froid pour 40 secondes'
-        );
+        // console.log(
+        //   jaune,
+        //   '[ GESTION AIR CALCULES  ] Fermeture du froid pour 40 secondes'
+        // );
 
         setTimeout(() => {
           const realy22Off = new Gpio(22, 'in');
 
-          console.log(
-            jaune,
-            '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture 40 secondes'
-          );
+          // console.log(
+          //   jaune,
+          //   '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture 40 secondes'
+          // );
         }, 40000);
       }
     } catch (error) {
@@ -346,10 +346,10 @@ resultats()
         })
 
         .then(() => {
-          console.log(
-            jaune,
-            '[ GESTION AIR CALCULES  ] Données transférées à la base de données.'
-          );
+          // console.log(
+          //   jaune,
+          //   '[ GESTION AIR CALCULES  ] Données transférées à la base de données.'
+          // );
         })
         .catch((error) => {
           console.log(
@@ -381,12 +381,12 @@ resultats()
             { deltaAir: delta, days: days, heures: heures },
             { where: { id: lastId } }
           )
-          .then((result) =>
-            console.log(
-              jaune,
-              '[ GESTION AIR CALCULES  ] Le delta à été mis à jour'
-            )
-          )
+          // .then((result) =>
+          //   console.log(
+          //     jaune,
+          //     '[ GESTION AIR CALCULES  ] Le delta à été mis à jour'
+          //   )
+          // )
           .catch((err) => console.log(err));
       };
 
