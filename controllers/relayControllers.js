@@ -72,14 +72,6 @@ exports.relayEau = (req, res, next) => {
     };
     relay27On();
     // console.log('Le relayEau est ON');
-
-    setTimeout(() => {
-      const realyOff = new Gpio(eauAuSol, 'in');
-
-      socket.emit('gestionRelay', {
-        setRelayEau: 0,
-      });
-    }, 120000);
   }
   if (relayEau == 0) {
     let relay27Off = () => {

@@ -10,14 +10,18 @@
     <link rel="stylesheet" type="text/css" href="./styles/style.css" />
   </head>
   <body>
-    <!-- BOX 1 -->
+    <!-- NAVIGATION -->
     <div class="box">
       <div class="box1">
-        <button class="boutonAccueil">Accueil</button>
-        <button class="boutonAccueil">Gestion Relay</button>
-        <button class="boutonAccueil">Courbe</button>
+        <button class="boutonAccueil"><a href="/">Accueil</a></button>
+        <button class="boutonAccueil">
+          <a href="/pageRelay.html">Gestion Relay</a>
+        </button>
+        <button class="boutonAccueil">
+          <a href="/pageCourbes.html">Courbe</a>
+        </button>
       </div>
-      <!-- FIN BOX 1 -->
+      <!-- FIN NAVIGATION -->
 
       <!-- BOX 2 -->
       <div class="box2">
@@ -72,7 +76,7 @@
                   </div>
                 </form>
               </div>
-              <button onclick="validationdataAir()" class="boxCardData2Button">
+              <button onclick="validationdataAir()" class="boutonActivation">
                 Valider descente
               </button>
               <div id="descenteAir" class="boxCardData2DaysHeures"></div>
@@ -134,7 +138,7 @@
                   </div>
                 </form>
               </div>
-              <button onclick="validationdataHum()" class="boxCardData2Button">
+              <button onclick="validationdataHum()" class="boutonActivation">
                 Valider descente
               </button>
               <div id="descenteHum" class="boxCardData2DaysHeures"></div>
@@ -192,7 +196,7 @@
                 </form>
               </div>
 
-              <button onclick="validationdataCo2()" class="boxCardData2Button">
+              <button onclick="validationdataCo2()" class="boutonActivation">
                 Valider descente
               </button>
               <div id="descenteCo2" class="boxCardData2DaysHeures"></div>

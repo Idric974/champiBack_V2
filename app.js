@@ -14,11 +14,15 @@ const gestionLogs = require('./routes/logsBackRoutes');
 const relayRoutes = require('./routes/relayRoutes');
 const brocheRoutes = require('./routes/broche');
 
-// Utilisation de cors pour les connexions
+//! Utilisation de cors pour les connexions
+
 const cors = require('cors');
 app.use(cors());
 
-// Header pour les Cross Origine
+//! --------------------------------------------------
+
+//! Header pour les Cross Origine
+
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader(
@@ -32,21 +36,51 @@ app.use((req, res, next) => {
   next();
 });
 
-// Module de connexion à la base de données.
+//! --------------------------------------------------
+
+//! Module de connexion à la base de données.
 const db = require('./models');
 db.sequelize.sync({
   force: false,
 });
 
-// Utilisation de body parser
+//! --------------------------------------------------
+
+//! Utilisation de body parser
+
 app.use(bodyParser.json());
 
-// Socket IO pour html.
+//! --------------------------------------------------
+
+//! Génération des pages html.
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-// Liste des routes.
+app.get('/pageCourbes.html', (req, res) => {
+  res.sendFile(__dirname + '/pageCourbes.html');
+});
+
+app.get('/pageRelay.html', (req, res) => {
+  res.sendFile(__dirname + '/pageRelay.html');
+});
+
+//! --------------------------------------------------
+
+//! Les images.
+
+app.use('/images', express.static('/home/pi/Desktop/champiBack_V2/images'));
+
+//! --------------------------------------------------
+
+//! Le CSS.
+
+app.use('/styles', express.static('/home/pi/Desktop/champiBack_V2/styles'));
+
+//! --------------------------------------------------
+
+//! Liste des routes.
 
 // Gestion
 app.use('/api/gestionAirRoutes', gestionAirRoutes);
@@ -60,10 +94,6 @@ app.use('/api/logsBackRoutes', gestionLogs);
 app.use('/api/relayRoutes', relayRoutes);
 app.use('/api/broche', brocheRoutes);
 
-//! Les images.
-app.use('/images', express.static('/home/pi/Desktop/champiBack_V2/images'));
-
-//! Le CSS.
-app.use('/styles', express.static('/home/pi/Desktop/champiBack_V2/styles'));
+//! --------------------------------------------------
 
 module.exports = app;

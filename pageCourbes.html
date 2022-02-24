@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Champi</title>
+    <link rel="icon" type="image/png" href="./images/champignon.ico" />
+    <link rel="stylesheet" type="text/css" href="./styles/globaleStyles.css" />
+    <link rel="stylesheet" type="text/css" href="./styles/style.css" />
+  </head>
+  <body>
+    <!-- NAVIGATION -->
+    <div class="box">
+      <div class="box1">
+        <button class="boutonAccueil"><a href="/">Accueil</a></button>
+        <button class="boutonAccueil">
+          <a href="/pageRelay.html">Gestion Relay</a>
+        </button>
+        <button class="boutonAccueil">
+          <a href="/pageCourbes.html">Courbe</a>
+        </button>
+      </div>
+      <!-- FIN NAVIGATION -->
+
+      <!-- MAIN -->
+      <h1>PAge Courbe</h1>
+      <!-- FIN MAIN -->
+    </div>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.25.0/axios.js"
+      integrity="sha512-II/TvxJGs27N3NEu/WWRFtyhBdSByZwS5ovX1vHXVsi2JXj0I5hRvHwgBPKbzZDk0wsKVDoEUEI8rAYGEF394A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script>
+      // Actualiser la page actuelle.
+
+      setInterval(() => {
+        window.location.reload();
+      }, 1800000);
+
+      let myDate = new Date();
+      let date = myDate.toLocaleString();
+
+      console.log('Page actualisée le : ' + date);
+    </script>
+
+    <script>
+      console.log('Pages courbes');
+    </script>
+  </body>
+</html>

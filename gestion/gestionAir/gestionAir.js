@@ -366,6 +366,9 @@ resultats()
       );
     }
   })
+  .then(() => {
+    listValAir = [];
+  })
 
   .then(() => {
     //

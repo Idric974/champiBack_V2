@@ -3966,4 +3966,9 @@ resultatsHum()
     };
 
     newDelta();
+  })
+
+  .then(() => {
+    listValSec = [];
+    listValHum = [];
   });

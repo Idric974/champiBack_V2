@@ -85,7 +85,7 @@ video {
   padding: 0;
   border: 0;
   vertical-align: baseline;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Roboto', sans-serif;
   color: #1f2527;
 }
 
@@ -132,13 +132,7 @@ p {
   line-height: 22px;
 }
 
-.fas {
-  font-size: 1.6rem;
-  color: var(--orange);
-  cursor: pointer;
-}
-
-/*🔶👉 Réinitialisation du rôle d'affichage HTML5 pour les navigateurs plus anciens */
+/* Réinitialisation du rôle d'affichage HTML5 pour les navigateurs plus anciens */
 article,
 aside,
 details,
@@ -185,12 +179,15 @@ table {
 }
 
 a:hover {
-  font-size: 2rem;
   font-weight: bolder;
 }
 
 a {
   cursor: pointer;
+}
+
+a:link {
+  text-decoration: none;
 }
 
 input {

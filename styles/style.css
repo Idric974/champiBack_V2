@@ -61,6 +61,7 @@
   align-items: center;
   justify-content: center;
   justify-content: space-around;
+  /* border: solid red 1px; */
 }
 
 .boxCard {
@@ -92,7 +93,8 @@
 .boxCardData2Title,
 .boxCardData2Form,
 .boxCardData2DaysHeures,
-.boxCardData2Button {
+.boutonActivation,
+.boutonDeactivation {
   width: 95%;
   display: flex;
   flex-direction: column;
@@ -136,7 +138,8 @@
   justify-content: center;
 }
 
-.boxCardData2Button {
+.boutonActivation,
+.boutonDeactivation {
   height: 5vh;
 }
 
@@ -153,24 +156,92 @@
   margin: auto;
 }
 
-.boxCardData2Button {
-  color: black;
+.boutonActivation,
+.boutonDeactivation {
   width: 60%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: black;
   font-size: 1.5rem;
   margin-left: auto;
   margin-right: auto;
   background-color: green;
-
+  border-radius: 10px;
   border: none;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  box-shadow: 0 6px black;
+}
+
+.boutonDeactivation {
+  background-color: red;
+}
+
+.boutonActivation:hover,
+.boutonDeactivation:hover {
+  box-shadow: 0 4px black;
+  top: 2px;
+  color: white;
+}
+
+.boutonActivation:active,
+.boutonDeactivation:active {
+  box-shadow: 0 0px black;
+  top: 6px;
+  color: white;
+}
+
+/*! ➖➖➖➖➖➖➖➖➖➖ page Relay ➖➖➖➖➖➖➖➖➖➖ */
+
+.boxRelayContent {
+  width: 85%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  justify-content: space-around;
+  /* border: solid yellow 1px; */
+}
+
+.boxCardRelay {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  /* border: solid green 1px; */
+}
+
+.boxCardRelay {
+  width: 30%;
+  height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  cursor: pointer;
 }
 
-.boxCardData2Button:hover {
-  box-shadow: 0px 0px 10px 1px black;
-  color: white;
+.boxCardRelayTitle {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  /* border: solid blue 1px; */
 }
+
+.boxCardRelayData {
+  width: 95%;
+  height: 300px;
+  box-shadow: 0px 0px 10px 1px black;
+  border-radius: 10px;
+  background-color: white;
+  /* border: solid green 1px; */
+}
+
+/*! ➖➖➖➖➖➖➖➖➖➖ page Courbes ➖➖➖➖➖➖➖➖➖➖ */

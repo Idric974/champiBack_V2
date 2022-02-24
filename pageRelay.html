@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Champi</title>
+    <link rel="icon" type="image/png" href="./images/champignon.ico" />
+    <link rel="stylesheet" type="text/css" href="./styles/globaleStyles.css" />
+    <link rel="stylesheet" type="text/css" href="./styles/style.css" />
+  </head>
+  <body>
+    <!-- NAVIGATION -->
+    <div class="box">
+      <div class="box1">
+        <button class="boutonAccueil"><a href="/">Accueil</a></button>
+        <button class="boutonAccueil">
+          <a href="/pageRelay.html">Gestion Relay</a>
+        </button>
+        <button class="boutonAccueil">
+          <a href="/pageCourbes.html">Courbe</a>
+        </button>
+      </div>
+      <!-- FIN NAVIGATION -->
+
+      <!-- MAIN -->
+      <div class="box2">
+        <div class="box2Title">Gestion des relays</div>
+
+        <div class="boxRelayContent">
+          <div class="boxCardRelay">
+            <div class="boxCardRelayData">
+              <div class="boxCardRelayTitle">Eaux au sols</div>
+              <button
+                id="btnRelayEauSol"
+                onclick="toggleRalayEauSol()"
+                class="boutonActivation"
+              >
+                Activation
+              </button>
+            </div>
+          </div>
+
+          <div class="boxCardRelay">
+            <div class="boxCardRelayData">
+              <div class="boxCardRelayTitle">Ventilateur humidité</div>
+              <button
+                onclick="ventilateurHumiditeOn()"
+                class="boutonActivation"
+              >
+                Activation
+              </button>
+              <button
+                onclick="ventilateurHumiditeOff()"
+                class="boutonDeactivation"
+              >
+                Déactivation
+              </button>
+            </div>
+          </div>
+
+          <div class="boxCardRelay">
+            <div class="boxCardRelayData">
+              <div class="boxCardRelayTitle">Vanne froid état</div>
+              <button class="boutonActivation">Activation</button>
+              <button class="boutonDeactivation">Déactivation</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FIN MAIN -->
+    </div>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.25.0/axios.js"
+      integrity="sha512-II/TvxJGs27N3NEu/WWRFtyhBdSByZwS5ovX1vHXVsi2JXj0I5hRvHwgBPKbzZDk0wsKVDoEUEI8rAYGEF394A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script>
+      // Actualiser la page actuelle.
+
+      setInterval(() => {
+        window.location.reload();
+      }, 1800000);
+
+      let myDate = new Date();
+      let date = myDate.toLocaleString();
+
+      console.log('Page actualisée le : ' + date);
+    </script>
+
+    <script>
+      // 1) Gestion ralay eau au sol.
+
+      let boutonToggleEauSol = 0;
+
+      let toggleRalayEauSol = () => {
+        if (boutonToggleEauSol === 0) {
+          boutonToggleEauSol = 1;
+          console.log('valeur du bouton' + boutonToggleEauSol);
+
+          let element = document.getElementById('btnRelayEauSol');
+
+          element.style.backgroundColor = 'green';
+
+          element.innerHTML = 'Activation';
+
+          axios
+            .post('http://localhost:3003/api/relayRoutes/relayEau/', {
+              relayEau: boutonToggleEauSol,
+            })
+            .then(function (response) {
+              console.log(response);
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+
+          setTimeout(() => {
+            boutonToggleEauSol = 0;
+            console.log('valeur du bouton' + boutonToggleEauSol);
+
+            let element = document.getElementById('btnRelayEauSol');
+
+            element.style.backgroundColor = 'red';
+
+            element.innerHTML = 'Déactivation';
+
+            axios
+              .post('http://localhost:3003/api/relayRoutes/relayEau/', {
+                relayEau: boutonToggleEauSol,
+              })
+              .then(function (response) {
+                console.log(response);
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+          }, 120000);
+        } else {
+          boutonToggleEauSol = 0;
+          console.log('valeur du bouton' + boutonToggleEauSol);
+
+          let element = document.getElementById('btnRelayEauSol');
+
+          element.style.backgroundColor = 'red';
+
+          element.innerHTML = 'Déactivation';
+
+          axios
+            .post('http://localhost:3003/api/relayRoutes/relayEau/', {
+              relayEau: boutonToggleEauSol,
+            })
+            .then(function (response) {
+              console.log(response);
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        }
+      };
+
+      // FIN Gestion ralay eau au sol.
+
+      // 2) Gestion Ventilateur humidité.
+
+      let ventilateurHumidite = 0;
+
+      let ventilateurHumiditeOn = () => {
+        //
+        // console.log('Ventilateur Humidite ON');
+
+        ventilateurHumidite = 1;
+
+        axios
+          .post('http://localhost:3003/api/relayRoutes/relayVentilo/', {
+            relayVentilo: ventilateurHumidite,
+          })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+
+      let ventilateurHumiditeOff = () => {
+        //
+        // console.log('Ventilateur Humidite OFF');
+        ventilateurHumidite = 0;
+
+        axios
+          .post('http://localhost:3003/api/relayRoutes/relayVentilo/', {
+            relayVentilo: ventilateurHumidite,
+          })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+
+      // FIN Gestion Ventilateur humidité.
+
+      // 3) Gestion Vanne froid état.
+      // FIN Gestion Vanne froid état.
+    </script>
+  </body>
+</html>

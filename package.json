@@ -5,17 +5,17 @@
   "main": "server.js",
   "scripts": {
     "start": "concurrently -n ' Serveur Back , Cron Tab     ' -c 'green' \" nodemon server.js\" \" node /home/pi/Desktop/champiBack_V2/cronTab.js\"   ",
-    "✔️_gestionAir": " node /home/pi/Desktop/champiBack/gestion/gestionAir/gestionAir.js",
-    "✔️_gestionHum": " node /home/pi/Desktop/champiBack/gestion/gestionHum/gestionHum.js",
-    "✔️_gestionCo2": " node /home/pi/Desktop/champiBack/gestion/gestionCo2/gestionCo2.js",
-    "✔️_gestionConsigne Auto": " node /home/pi/Desktop/champiBack/gestion/gestionAir/consigneAirAuto.js",
-    "⚡_AfficherTable": " node /home/pi/Desktop/champiBack/SQL/lireBaseDeDonnee/afficherTable.js ",
-    "⚡_AfficherListeTable": " node /home/pi/Desktop/champiBack/SQL/lireBaseDeDonnee/afficherListeTable.js",
-    "⚡_AfficherListeUser": " node /home/pi/Desktop/champiBack/SQL/lireBaseDeDonnee/afficherListUser.js",
-    "⚡_AfficherListeBase": " node /home/pi/Desktop/champiBack/SQL/lireBaseDeDonnee/afficherListeBase.js",
-    "⚡_CreerTable": " node /home/pi/Desktop/champiBack/SQL/creerBaseDeDonnee/creerTable.js",
-    "⚡_CreerBase": " node /home/pi/Desktop/champiBack/SQL/creerBaseDeDonnee/creerBaseDonnées.js",
-    "⚡_CreerUser": " node /home/pi/Desktop/champiBack/SQL/creerBaseDeDonnee/creerUtilisateur.js"
+    "✔️_gestionAir": " node /home/pi/Desktop/champiBack_V2/gestion/gestionAir/gestionAir.js",
+    "✔️_gestionHum": " node /home/pi/Desktop/champiBack_V2/gestion/gestionHum/gestionHum.js",
+    "✔️_gestionCo2": " node /home/pi/Desktop/champiBack_V2/gestion/gestionCo2/gestionCo2.js",
+    "✔️_gestionConsigne Auto": " node /home/pi/Desktop/champiBack_V2/gestion/gestionAir/consigneAirAuto.js",
+    "⚡_AfficherTable": " node /home/pi/Desktop/champiBack_V2/SQL/lireBaseDeDonnee/afficherTable.js ",
+    "⚡_AfficherListeTable": " node /home/pi/Desktop/champiBack_V2/SQL/lireBaseDeDonnee/afficherListeTable.js",
+    "⚡_AfficherListeUser": " node /home/pi/Desktop/champiBack_V2/SQL/lireBaseDeDonnee/afficherListUser.js",
+    "⚡_AfficherListeBase": " node /home/pi/Desktop/champiBack_V2/SQL/lireBaseDeDonnee/afficherListeBase.js",
+    "⚡_CreerTable": " node /home/pi/Desktop/champiBack_V2/SQL/creerBaseDeDonnee/creerTable.js",
+    "⚡_CreerBase": " node /home/pi/Desktop/champiBack_V2/SQL/creerBaseDeDonnee/creerBaseDonnées.js",
+    "⚡_CreerUser": " node /home/pi/Desktop/champiBack_V2/SQL/creerBaseDeDonnee/creerUtilisateur.js"
   },
   "repository": {
     "type": "git",
