@@ -15,6 +15,18 @@
 
 /* Setting CSS page accueil. */
 
+.laDate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+  font-size: 3rem;
+  margin: 10px 0px 10px 0px;
+  color: white;
+}
+
 .box {
   display: flex;
   flex-direction: row;
@@ -45,7 +57,7 @@
 
 .box2Title {
   width: 100%;
-  height: 8vh;
+  height: 7vh;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -81,10 +93,17 @@
   box-shadow: 0px 0px 10px 1px black;
   border-radius: 10px;
   background-color: white;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center;
+  justify-content: center; */
+
+  /* border: solid red 1px; */
 }
 
 .boxCardData1 {
   height: 33vh;
+  padding-top: 10px;
 }
 
 .boxCardDataTitle,
@@ -99,13 +118,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 10px;
+}
+
+.boxCardDataTitle {
+  margin: 10px 0px 10px 0px;
 }
 
 .boxCardDataTitle,
 .boxCardData2Title,
 .boxCardData2DaysHeures {
   font-size: 2rem;
+}
+
+.boxCardData2Title {
+  margin-bottom: 10px;
 }
 
 .boxCardDataValue {
@@ -123,7 +149,8 @@
 
 .boxCardData2 {
   width: 95%;
-  height: 50vh;
+  height: 55vh;
+  padding-top: 20px;
 }
 
 .boxCardData2Title {
@@ -131,11 +158,13 @@
 }
 
 .boxCardData2Form {
-  height: 30vh;
+  height: 24vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  /* align-items: center;
+  justify-content: center; */
+
+  /* border: solid red 1px; */
 }
 
 .boutonActivation,
@@ -144,6 +173,8 @@
 }
 
 .boxCardData2DaysHeures {
+  margin-top: 20px;
+  margin-bottom: 20px;
   height: 5vh;
 }
 

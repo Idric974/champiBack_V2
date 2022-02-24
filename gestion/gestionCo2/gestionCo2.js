@@ -1,8 +1,7 @@
-//* Les constantes.
+//! Les constantes.
 
 require('dotenv').config();
 const cyan = '\x1b[36m';
-
 const http = require('http');
 const sequelize = require('sequelize');
 const db = require('../../models');
@@ -12,14 +11,14 @@ const gestionCo2DataModels = db.gestionCo2Data;
 
 //* Les variables.
 
-let tauxCO2 = 2500;
+let tauxCO2;
 let consigne;
-let deltaCo2 = 1000;
+let deltaCo2;
 let daysCo2;
 let heuresCo2;
 //* ----------------------------------
 
-//* 2) Demande de mesure à la master.
+//! 2) Demande de mesure à la master.
 
 async function updateTimeVariateur() {
   new Promise((resolve, reject) => {
@@ -29,19 +28,19 @@ async function updateTimeVariateur() {
 
         resp.on('data', (chunk) => {
           data += chunk;
-          console.log(
-            cyan,
-            '[ GESTION CO2 CALCULES  ] Valeur CO2 de la master',
-            data
-          );
+          // console.log(
+          //   cyan,
+          //   '[ GESTION CO2 CALCULES  ] Valeur CO2 de la master',
+          //   data
+          // );
 
           // Taux de Co2.
           tauxCO2 = parseFloat(data).toFixed(2);
-          console.log(
-            cyan,
-            '[ GESTION CO2 CALCULES  ] Le taux de CO2 est de : ',
-            tauxCO2
-          );
+          // console.log(
+          //   cyan,
+          //   '[ GESTION CO2 CALCULES  ] Le taux de CO2 est de : ',
+          //   tauxCO2
+          // );
         });
       })
 
@@ -102,7 +101,7 @@ updateTimeVariateur()
     //------------------------------------------------------------
   })
 
-  //* 3) Calcule du delta Co2
+  //! 3) Calcule du delta Co2.
 
   // .then(() => {
   //   let calcDelta = () => {
@@ -118,7 +117,7 @@ updateTimeVariateur()
   // })
   // ---------------------------------
 
-  //* 4) Enregistrement en basez de donnes.
+  //! 4) Enregistrement en base de donnes.
 
   .then(() => {
     let enregistrament = () => {
@@ -128,10 +127,10 @@ updateTimeVariateur()
           deltaCo2: deltaCo2,
         })
         .then(() => {
-          console.log(
-            cyan,
-            '[ GESTION CO2 CALCULES  ] Données transférées à la base de données gestion_co2s.'
-          );
+          // console.log(
+          //   cyan,
+          //   '[ GESTION CO2 CALCULES  ] Données transférées à la base de données gestion_co2s.'
+          // );
         })
         .catch((error) => {
           console.log(

@@ -48,9 +48,9 @@ exports.getDataAir = (req, res) => {
     });
 };
 
-//* ➖ ➖ ➖ ➖ ➖ ➖ POST Data  Air ➖ ➖ ➖ ➖ ➖ ➖ //
+//* ➖ ➖ ➖ ➖ ➖ ➖ POST Consigne Air ➖ ➖ ➖ ➖ ➖ ➖ //
 
-exports.postDataAir = (req, res) => {
+exports.postConsigneAir = (req, res) => {
   let data = req.body;
 
   // console.log('Les datas Air ', data);
@@ -58,17 +58,52 @@ exports.postDataAir = (req, res) => {
   const newData = gestionAirsDataModels
     .create({
       consigneAir: req.body.consigneAir,
-      pasAir: req.body.pasAir,
-      objectifAir: req.body.objectifAir,
     })
     .then(() =>
       res.status(200).json({
-        message: 'Data Air enregitres dans la base gestion_airs_datas',
+        message: 'Consigne Air enregitres dans la base gestion_airs',
       })
     )
     .catch((error) => {
       console.log(error);
 
       return res.status(400).json({ error });
+    });
+};
+
+//* ➖ ➖ ➖ ➖ ➖ ➖ POST Data Air ➖ ➖ ➖ ➖ ➖ ➖ //
+
+exports.postDataAir = (req, res) => {
+  let pasAir = req.body.pasAir;
+  console.log('Le pas Air : ' + pasAir);
+
+  let objectifAir = req.body.objectifAir;
+  console.log('L objectif Air : ' + objectifAir);
+
+  let lastId;
+
+  gestionAirsDataModels
+    .findOne({
+      attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+      raw: true,
+    })
+    .then((id) => {
+      // console.log('Le dernier id de gestionAir est : ', id);
+      // console.log(id.maxid);
+      lastId = id.maxid;
+
+      gestionAirsDataModels
+        .update(
+          { pasAir: pasAir, objectifAir: objectifAir },
+          { where: { id: lastId } }
+        )
+
+        .then(() =>
+          res.status(200).json({
+            message: 'Data Air enregitrées dans la base gestion_airs_data',
+          })
+        )
+
+        .catch((err) => console.log(err));
     });
 };

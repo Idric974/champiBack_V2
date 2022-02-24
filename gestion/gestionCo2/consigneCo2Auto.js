@@ -67,10 +67,10 @@ let gestionConsigne = () => {
 
   if (consigne === objectifCo2) {
     newConsigne = objectifCo2;
-    console.log(
-      cyan,
-      '[ GESTION CO2 CONS AUTO ] Action ======> Consigne = ObjectifCo2 | On ne fait rien'
-    );
+    // console.log(
+    //   cyan,
+    //   '[ GESTION CO2 CONS AUTO ] Action ======> Consigne = ObjectifCo2 | On ne fait rien'
+    // );
   }
 
   //* Condition 2 ===> si consigne < objectifCo2.
@@ -98,12 +98,12 @@ let gestionConsigne = () => {
 
     newConsigneValue();
 
-    console.log(
-      cyan,
-      '[ GESTION CO2 CONS AUTO ] Action ======> Gestion automatique de la consigne | On augmente la consigne à : ' +
-        newConsigne +
-        '°C'
-    );
+    // console.log(
+    //   cyan,
+    //   '[ GESTION CO2 CONS AUTO ] Action ======> Gestion automatique de la consigne | On augmente la consigne à : ' +
+    //     newConsigne +
+    //     '°C'
+    // );
   }
 
   //* Condition 3 ===> si consigne > objectifCo2.
@@ -131,12 +131,12 @@ let gestionConsigne = () => {
 
     newConsigneValue();
 
-    console.log(
-      cyan,
-      '[ GESTION CO2 CONS AUTO ] Action ======> Gestion automatique de la consigne | On diminue la consigne à : ' +
-        newConsigne +
-        '°C'
-    );
+    // console.log(
+    //   cyan,
+    //   '[ GESTION CO2 CONS AUTO ] Action ======> Gestion automatique de la consigne | On diminue la consigne à : ' +
+    //     newConsigne +
+    //     '°C'
+    // );
   }
 };
 //-------------------------------------

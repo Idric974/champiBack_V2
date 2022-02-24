@@ -86,7 +86,7 @@ recuperationConsigneAir();
 
 //------------------------------------------------------------
 
-// Récupération de l'étalonage
+//! Récupération de l'étalonage
 
 let recuperationEtalonnage = () => {
   try {
@@ -211,7 +211,7 @@ resultats()
     // console.log(jaune, '[ GESTION AIR CALCULES  ] Le delta est de : ', delta);
   })
   //
-  // Définition des actions.
+  //! Définition des actions.
   .then(() => {
     try {
       if (delta >= 1.1) {
@@ -336,7 +336,7 @@ resultats()
   //
   //
   .then(() => {
-    // Enregistrement des datas dans la base
+    //! Enregistrement des datas dans la base.
     try {
       //
       const newVal = gestionAirModels
@@ -373,7 +373,7 @@ resultats()
   .then(() => {
     //
     try {
-      // Mise à jour du delta.
+      //! Mise à jour du delta.
 
       let newDelta = () => {
         gestionAirModels

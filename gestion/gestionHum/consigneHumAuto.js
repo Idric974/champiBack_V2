@@ -67,10 +67,10 @@ let gestionConsigne = () => {
 
   if (consigne === objectifHum) {
     newConsigne = objectifHum;
-    console.log(
-      magenta,
-      '[ GESTION HUM CONS AUTO ] Action ======> Consigne = ObjectifHum | On ne fait rien'
-    );
+    // console.log(
+    //   magenta,
+    //   '[ GESTION HUM CONS AUTO ] Action ======> Consigne = ObjectifHum | On ne fait rien'
+    // );
   }
 
   //* Condition 2 ===> si consigne < objectifHum.
@@ -98,12 +98,12 @@ let gestionConsigne = () => {
 
     newConsigneValue();
 
-    console.log(
-      magenta,
-      '[ GESTION HUM CONS AUTO ] Action ======> Gestion automatique de la consigne | On augmente la consigne à : ' +
-        newConsigne +
-        '°C'
-    );
+    // console.log(
+    //   magenta,
+    //   '[ GESTION HUM CONS AUTO ] Action ======> Gestion automatique de la consigne | On augmente la consigne à : ' +
+    //     newConsigne +
+    //     '°C'
+    // );
   }
 
   //* Condition 3 ===> si consigne > objectifHum.
@@ -131,12 +131,12 @@ let gestionConsigne = () => {
 
     newConsigneValue();
 
-    console.log(
-      magenta,
-      '[ GESTION HUM CONS AUTO ] Action ======> Gestion automatique de la consigne | On diminue la consigne à : ' +
-        newConsigne +
-        '°C'
-    );
+    // console.log(
+    //   magenta,
+    //   '[ GESTION HUM CONS AUTO ] Action ======> Gestion automatique de la consigne | On diminue la consigne à : ' +
+    //     newConsigne +
+    //     '°C'
+    // );
   }
 };
 //-------------------------------------

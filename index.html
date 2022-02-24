@@ -21,11 +21,14 @@
           <a href="/pageCourbes.html">Courbe</a>
         </button>
       </div>
+
       <!-- FIN NAVIGATION -->
 
       <!-- BOX 2 -->
       <div class="box2">
-        <div class="box2Title">Accueil</div>
+        <div id="afficheDate" class="laDate"></div>
+
+        <!-- <div class="box2Title">Accueil</div> -->
         <div class="box2Content">
           <!-- Température Air -->
           <div class="boxCard">
@@ -60,10 +63,26 @@
                       required
                     />
                   </div>
+                </form>
 
+                <button
+                  onclick="validationConsigneAir()"
+                  class="boutonActivation"
+                >
+                  Valider Consigne
+                </button>
+              </div>
+
+              <div class="boxCardData2Form">
+                <form>
                   <div class="modifBlocForm">
                     <label for="pasAir">Pas</label>
-                    <input type="number" id="pasAirForm" name="pasAir" />
+                    <input
+                      type="number"
+                      id="pasAirForm"
+                      name="pasAir"
+                      required
+                    />
                   </div>
 
                   <div class="modifBlocForm">
@@ -72,13 +91,16 @@
                       type="number"
                       id="objectiAirForm"
                       name="objectiAir"
+                      required
                     />
                   </div>
                 </form>
+
+                <button onclick="validationdataAir()" class="boutonActivation">
+                  Valider Descente
+                </button>
               </div>
-              <button onclick="validationdataAir()" class="boutonActivation">
-                Valider descente
-              </button>
+
               <div id="descenteAir" class="boxCardData2DaysHeures"></div>
             </div>
 
@@ -108,6 +130,7 @@
             <!-- BOX SAISIE -->
             <div class="boxCardData2">
               <div class="boxCardData2Title">Descente Humidité</div>
+
               <div class="boxCardData2Form">
                 <form>
                   <div class="modifBlocForm">
@@ -120,11 +143,27 @@
                       required
                     />
                   </div>
+                </form>
 
+                <button
+                  onclick="validationConsigneHum()"
+                  class="boutonActivation"
+                >
+                  Valider Consigne
+                </button>
+              </div>
+
+              <div class="boxCardData2Form">
+                <form>
                   <div class="modifBlocForm">
                     <label for="pasHum">Pas</label>
 
-                    <input type="number" id="pasHumForm" name="pasHum" />
+                    <input
+                      type="number"
+                      id="pasHumForm"
+                      name="pasHum"
+                      required
+                    />
                   </div>
 
                   <div class="modifBlocForm">
@@ -134,13 +173,16 @@
                       type="number"
                       id="objectifHumForm"
                       name="objectiHum"
+                      required
                     />
                   </div>
                 </form>
+
+                <button onclick="validationdataHum()" class="boutonActivation">
+                  Valider Descente
+                </button>
               </div>
-              <button onclick="validationdataHum()" class="boutonActivation">
-                Valider descente
-              </button>
+
               <div id="descenteHum" class="boxCardData2DaysHeures"></div>
             </div>
 
@@ -179,10 +221,26 @@
                       required
                     />
                   </div>
+                </form>
 
+                <button
+                  onclick="validationConsigneCo2()"
+                  class="boutonActivation"
+                >
+                  Valider Consigne
+                </button>
+              </div>
+
+              <div class="boxCardData2Form">
+                <form>
                   <div class="modifBlocForm">
                     <label for="pasCo2">Pas</label>
-                    <input type="number" id="pasCo2Form" name="pasCo2" />
+                    <input
+                      type="number"
+                      id="pasCo2Form"
+                      name="pasCo2"
+                      required
+                    />
                   </div>
 
                   <div class="modifBlocForm">
@@ -191,14 +249,16 @@
                       type="number"
                       id="objectifCo2Form"
                       name="objectiCo2"
+                      required
                     />
                   </div>
                 </form>
+
+                <button onclick="validationdataCo2()" class="boutonActivation">
+                  Valider descente
+                </button>
               </div>
 
-              <button onclick="validationdataCo2()" class="boutonActivation">
-                Valider descente
-              </button>
               <div id="descenteCo2" class="boxCardData2DaysHeures"></div>
             </div>
             <!-- FIN BOX SAISIE -->
@@ -216,16 +276,36 @@
       referrerpolicy="no-referrer"
     ></script>
     <script>
-      // Actualiser la page actuelle.
+      // Afficher la date.
+      function pause(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
 
-      setInterval(() => {
-        window.location.reload();
-      }, 1800000);
-
-      let myDate = new Date();
-      let date = myDate.toLocaleString();
-
-      console.log('Page actualisée le : ' + date);
+      async function afficherDate() {
+        while (true) {
+          await pause(1000);
+          var cejour = new Date();
+          var options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: '2-digit',
+          };
+          var date = cejour.toLocaleDateString('fr-RU', options);
+          var heure =
+            ('0' + cejour.getHours()).slice(-2) +
+            ':' +
+            ('0' + cejour.getMinutes()).slice(-2) +
+            ':' +
+            ('0' + cejour.getSeconds()).slice(-2);
+          var dateheure = date + ' ' + heure;
+          var dateheure = dateheure.replace(/(^\w{1})|(\s+\w{1})/g, (lettre) =>
+            lettre.toUpperCase()
+          );
+          document.getElementById('afficheDate').innerHTML = dateheure;
+        }
+      }
+      afficherDate();
     </script>
 
     <script>
@@ -408,13 +488,31 @@
 
       // ******************************************************
 
-      // 3 Post des datas air dans la base.
+      // 3 Post consigne air dans la base.
 
-      let validationdataAir = () => {
+      let validationConsigneAir = () => {
         // console.log('Clic sur bouton validation Etal Hum');
 
         let consigneAirForm = document.getElementById('consigneAirForm').value;
         // console.log('consigneAirForm', consigneAirForm);
+
+        const boutonValiderEtalHum = axios
+          .post('http://localhost:3003/api/gestionAirRoutes/postConsigneAir/', {
+            consigneAir: consigneAirForm,
+          })
+          .then(function (response) {
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+
+      // 4 Post des datas air dans la base.
+
+      let validationdataAir = () => {
+        // console.log('Clic sur bouton validation Etal Hum');
+
         let pasAirForm = document.getElementById('pasAirForm').value;
         // console.log('pasAirForm', pasAirForm);
         let objectiAirForm = document.getElementById('objectiAirForm').value;
@@ -422,7 +520,6 @@
 
         const boutonValiderEtalHum = axios
           .post('http://localhost:3003/api/gestionAirRoutes/postDataAir/', {
-            consigneAir: consigneAirForm,
             pasAir: pasAirForm,
             objectifAir: objectiAirForm,
           })
@@ -432,8 +529,6 @@
           .catch(function (error) {
             console.log(error);
           });
-
-        // history.go(0);
       };
       // ******************************************************
 

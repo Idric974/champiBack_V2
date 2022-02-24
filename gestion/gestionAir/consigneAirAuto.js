@@ -66,10 +66,10 @@ let gestionConsigne = () => {
 
   if (consigne === objectifAir) {
     newConsigne = objectifAir;
-    console.log(
-      jaune,
-      '[ GESTION AIR CONS AUTO ] Action ======> Consigne = ObjectifAir | On ne fait rien'
-    );
+    // console.log(
+    //   jaune,
+    //   '[ GESTION AIR CONS AUTO ] Action ======> Consigne = ObjectifAir | On ne fait rien'
+    // );
   }
 
   //* Condition 2 ===> si consigne < objectifAir.
@@ -97,12 +97,12 @@ let gestionConsigne = () => {
 
     newConsigneValue();
 
-    console.log(
-      jaune,
-      '[ GESTION AIR CONS AUTO ] Action ======> Gestion automatique de la consigne | On augmente la consigne à : ' +
-        newConsigne +
-        '°C'
-    );
+    // console.log(
+    //   jaune,
+    //   '[ GESTION AIR CONS AUTO ] Action ======> Gestion automatique de la consigne | On augmente la consigne à : ' +
+    //     newConsigne +
+    //     '°C'
+    // );
   }
 
   //* Condition 3 ===> si consigne > objectifAir.
@@ -130,12 +130,12 @@ let gestionConsigne = () => {
 
     newConsigneValue();
 
-    console.log(
-      jaune,
-      '[ GESTION AIR CONS AUTO ] Action ======> Gestion automatique de la consigne | On diminue la consigne à : ' +
-        newConsigne +
-        '°C'
-    );
+    // console.log(
+    //   jaune,
+    //   '[ GESTION AIR CONS AUTO ] Action ======> Gestion automatique de la consigne | On diminue la consigne à : ' +
+    //     newConsigne +
+    //     '°C'
+    // );
   }
 };
 //-------------------------------------
