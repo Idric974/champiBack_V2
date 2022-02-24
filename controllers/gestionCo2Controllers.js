@@ -49,16 +49,13 @@ exports.getDataCo2 = (req, res) => {
 };
 
 //* ➖ ➖ ➖ ➖ ➖ ➖ POST Data ➖ ➖ ➖ ➖ ➖ ➖ //
-exports.postDataCo2 = (req, res) => {
+exports.postConsigneCo2 = (req, res) => {
   let data = req.body;
-
-  // console.log('Les datas de postDataCo2 ', data);
+  console.log('Les datas de postDataCo2 ', data);
 
   const newData = gestionCo2DataModels
     .create({
       consigneCo2: req.body.consigneCo2,
-      pasCo2: req.body.pasCo2,
-      objectifCo2: req.body.objectifCo2,
     })
     .then(() =>
       res
@@ -68,5 +65,42 @@ exports.postDataCo2 = (req, res) => {
     .catch((error) => {
       console.log(error);
       return res.status(400).json({ error });
+    });
+};
+
+//* ➖ ➖ ➖ ➖ ➖ ➖ POST Data Co2 ➖ ➖ ➖ ➖ ➖ ➖ //
+
+exports.postDataCo2 = (req, res) => {
+  let pasCo2 = req.body.pasCo2;
+  console.log('Le pas Co2 : ' + pasCo2);
+
+  let objectifCo2 = req.body.objectifCo2;
+  console.log('L objectif Co2 : ' + objectifCo2);
+
+  let lastId;
+
+  gestionCo2DataModels
+    .findOne({
+      attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+      raw: true,
+    })
+    .then((id) => {
+      // console.log('Le dernier id de gestionCo2 est : ', id);
+      // console.log(id.maxid);
+      lastId = id.maxid;
+
+      gestionCo2DataModels
+        .update(
+          { pasCo2: pasCo2, objectifCo2: objectifCo2 },
+          { where: { id: lastId } }
+        )
+
+        .then(() =>
+          res.status(200).json({
+            message: 'Data Co2 enregitrées dans la base gestion_co2s_data',
+          })
+        )
+
+        .catch((err) => console.log(err));
     });
 };

@@ -9,6 +9,9 @@ const affichageConsigne = require('../controllers/gestionHumiditeControllers');
 router.get('/getConsigneHumidite', affichageConsigne.getConsigneHumidite);
 
 // POST
+const postConsigneHum = require('../controllers/gestionHumiditeControllers');
+router.post('/postConsigneHum', postConsigneHum.postConsigneHum);
+
 const postDataHum = require('../controllers/gestionHumiditeControllers');
 router.post('/postDataHum', postDataHum.postDataHum);
 

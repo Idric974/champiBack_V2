@@ -496,7 +496,7 @@
         let consigneAirForm = document.getElementById('consigneAirForm').value;
         // console.log('consigneAirForm', consigneAirForm);
 
-        const boutonValiderEtalHum = axios
+        const boutonValiderEtalAir = axios
           .post('http://localhost:3003/api/gestionAirRoutes/postConsigneAir/', {
             consigneAir: consigneAirForm,
           })
@@ -749,13 +749,33 @@
       }, 15000);
       //*******************************************************
 
-      // 3 Post des datas hum dans la base.
+      // 3 Post consigne hum dans la base.
 
-      let validationdataHum = () => {
+      let validationConsigneHum = () => {
         // console.log('Clic sur bouton validation Etal Hum');
 
         let consigneHumForm = document.getElementById('consigneHumForm').value;
         // console.log('consigneHumForm', consigneHumForm);
+
+        const boutonValiderEtatHum = axios
+          .post(
+            'http://localhost:3003/api/gestionHumiditeRoutes/postConsigneHum/',
+            {
+              consigneHum: consigneHumForm,
+            }
+          )
+          .then(function (response) {
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+
+      // 4 Post des datas hum dans la base.
+
+      let validationdataHum = () => {
+        // console.log('Clic sur bouton validation Etal Hum');
 
         let pasHumForm = document.getElementById('pasHumForm').value;
         // console.log('pasHumForm', pasHumForm);
@@ -767,7 +787,6 @@
           .post(
             'http://localhost:3003/api/gestionHumiditeRoutes/postDataHum/',
             {
-              consigneHum: consigneHumForm,
               pasHum: pasHumForm,
               objectifHum: objectifHumForm,
             }
@@ -778,9 +797,8 @@
           .catch(function (error) {
             console.log(error);
           });
-
-        // history.go(0);
       };
+
       // ******************************************************
 
       //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ FIN Gestion Hum ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
@@ -961,13 +979,31 @@
       }, 15000);
 
       // ******************************************************
-      // 3 Post des datas Co2 dans la base.
 
-      let validationdataCo2 = () => {
+      // 3 Post consigne Co2 dans la base.
+
+      let validationConsigneCo2 = () => {
         // console.log('Clic sur bouton validation Etal Co2');
 
         let consigneCo2Form = document.getElementById('consigneCo2Form').value;
-        // console.log('consigneCo2Form', consigneCo2Form);
+        console.log('consigneCo2Form', consigneCo2Form);
+
+        const boutonValiderEtatco2 = axios
+          .post('http://localhost:3003/api/gestionCo2Routes/postConsigneCo2/', {
+            consigneCo2: consigneCo2Form,
+          })
+          .then(function (response) {
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+
+      // 4 Post des datas Co2 dans la base.
+
+      let validationdataCo2 = () => {
+        // console.log('Clic sur bouton validation Etal Co2');
 
         let pasCo2Form = document.getElementById('pasCo2Form').value;
         // console.log('pasCo2Form', pasCo2Form);
@@ -977,7 +1013,6 @@
 
         const boutonValiderEtalCo2 = axios
           .post('http://localhost:3003/api/gestionCo2Routes/postDataCo2/', {
-            consigneCo2: consigneCo2Form,
             pasCo2: pasCo2Form,
             objectifCo2: objectifCo2Form,
           })
