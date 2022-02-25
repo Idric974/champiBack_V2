@@ -51,10 +51,9 @@ async function updateTimeVariateur() {
           updateTimeVariateur();
         }, 10000);
 
-        reject(
-          cyan,
-          '[ GESTION CO2 CALCULES  ] Acces au Serveur Co2 Master impossible (Mesure Co2)'
-        );
+        reject();
+        cyan,
+          '[ GESTION CO2 CALCULES  ] Acces au Serveur Co2 Master impossible (Mesure Co2)';
       });
   }).catch((err) => {
     console.log(cyan, '[ GESTION CO2 CALCULES  ] Erreur Co2', err);
@@ -133,11 +132,11 @@ updateTimeVariateur()
           // );
         })
         .catch((error) => {
-          console.log(
-            cyan,
-            '[ GESTION CO2 CALCULES  ] Erreur dans le processus d’enregistrement dans la base gestion_co2s',
-            error
-          );
+          // console.log(
+          //   cyan,
+          //   '[ GESTION CO2 CALCULES  ] Erreur dans le processus d’enregistrement dans la base gestion_co2s',
+          //   error
+          // );
         });
     };
 

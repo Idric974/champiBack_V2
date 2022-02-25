@@ -50,8 +50,8 @@ exports.getDataCo2 = (req, res) => {
 
 //* ➖ ➖ ➖ ➖ ➖ ➖ POST Data ➖ ➖ ➖ ➖ ➖ ➖ //
 exports.postConsigneCo2 = (req, res) => {
-  let data = req.body;
-  console.log('Les datas de postDataCo2 ', data);
+  // let data = req.body;
+  // console.log('Les datas de postDataCo2 ', data);
 
   const newData = gestionCo2DataModels
     .create({
@@ -72,10 +72,10 @@ exports.postConsigneCo2 = (req, res) => {
 
 exports.postDataCo2 = (req, res) => {
   let pasCo2 = req.body.pasCo2;
-  console.log('Le pas Co2 : ' + pasCo2);
+  // console.log('Le pas Co2 : ' + pasCo2);
 
   let objectifCo2 = req.body.objectifCo2;
-  console.log('L objectif Co2 : ' + objectifCo2);
+  // console.log('L objectif Co2 : ' + objectifCo2);
 
   let lastId;
 
