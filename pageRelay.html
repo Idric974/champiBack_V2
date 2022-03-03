@@ -27,10 +27,11 @@
       <div class="box2">
         <div class="box2Title">Gestion des relays</div>
 
+        <!-- EAU AU SOL -->
         <div class="boxRelayContent">
-          <div class="boxCardRelay">
+          <div class="boxCardRelay_1">
             <div class="boxCardRelayData">
-              <div class="boxCardRelayTitle">Eaux au sols</div>
+              <div class="boxCardRelayTitle">Eau au sol</div>
               <button
                 id="btnRelayEauSol"
                 onclick="toggleRalayEauSol()"
@@ -40,8 +41,10 @@
               </button>
             </div>
           </div>
+          <!-- FIN EAU AU SOL -->
 
-          <div class="boxCardRelay">
+          <!-- VENTILATEUR HUMIDITÉ -->
+          <div class="boxCardRelay_2">
             <div class="boxCardRelayData">
               <div class="boxCardRelayTitle">Ventilateur humidité</div>
               <button
@@ -58,14 +61,49 @@
               </button>
             </div>
           </div>
+          <!-- FIN VENTILATEUR HUMIDITÉ -->
 
-          <div class="boxCardRelay">
+          <!-- ETAT VANNE FROID -->
+          <div class="boxCardRelay_3">
             <div class="boxCardRelayData">
-              <div class="boxCardRelayTitle">Vanne froid état</div>
-              <button class="boutonActivation">Activation</button>
-              <button class="boutonDeactivation">Déactivation</button>
+              <div id="etatRelay" class="boxCardRelayTitle"></div>
+
+              <div class="boxCardRelay_3Box">
+                <div class="buttonBox">
+                  <div class="buttonBoxTitle">Action à 5 secondes</div>
+                  <button
+                    onclick="vanneFroid5SesoncdesOn()"
+                    class="boutonActivation"
+                  >
+                    Activation
+                  </button>
+                  <button
+                    onclick="vanneFroid5SesoncdesOff()"
+                    class="boutonDeactivation"
+                  >
+                    Déactivation
+                  </button>
+                </div>
+
+                <div class="buttonBox">
+                  <div class="buttonBoxTitle">Action à 40 secondes</div>
+                  <button
+                    onclick="vanneFroid40SesoncdesOn()"
+                    class="boutonActivation"
+                  >
+                    Activation
+                  </button>
+                  <button
+                    onclick="vanneFroid40SesoncdesOff()"
+                    class="boutonDeactivation"
+                  >
+                    Déactivation
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
+          <!-- FIN ETAT VANNE FROID -->
         </div>
       </div>
 
@@ -93,7 +131,7 @@
     </script>
 
     <script>
-      // 1) Gestion ralay eau au sol.
+      // 1) GESTION RELAY EAU AU SOL.
 
       let boutonToggleEauSol = 0;
 
@@ -165,7 +203,7 @@
 
       // FIN Gestion ralay eau au sol.
 
-      // 2) Gestion Ventilateur humidité.
+      // 2)  GESTION VENTILATEUR HUMIDITÉ.
 
       let ventilateurHumidite = 0;
 
@@ -193,7 +231,7 @@
         ventilateurHumidite = 0;
 
         axios
-          .post('http://localhost:3003/api/relayRoutes/relayVentilo/', {
+          .post('   http://localhost:3003/api/relayRoutes/relayVentilo/', {
             relayVentilo: ventilateurHumidite,
           })
           .then(function (response) {
@@ -206,7 +244,250 @@
 
       // FIN Gestion Ventilateur humidité.
 
-      // 3) Gestion Vanne froid état.
+      // III) GESTION VANNE FROID ÉTAT.
+
+      // 1) Affichage de l'état de la vanne froid.
+
+      let etatRelay;
+
+      let afficheEtatRelay = () => {
+        axios
+          .get('http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/')
+          .then(function (response) {
+            // console.log(response.data.temperatureAir.etatRelay);
+
+            etatRelay = JSON.stringify(response.data.temperatureAir.etatRelay);
+            // console.log('*****' + etatRelay);
+
+            localStorage.setItem('Etat relay : ', etatRelay);
+
+            document.getElementById('etatRelay').innerHTML =
+              'Etat Vanne froid, ouvert pour ' + etatRelay + 's';
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+      afficheEtatRelay();
+
+      // 1) Gestion de vanne frois à 5 secondes.
+
+      let vanneFroid5SesoncdesOn = () => {
+        let valeurEtatVanne;
+
+        let captureEtatRelay = () => {
+          axios
+            .get(
+              'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/'
+            )
+            .then(function (response) {
+              console.log(response.data.temperatureAir.etatRelay);
+
+              valeurEtatVanne = response.data.temperatureAir.etatRelay;
+              // console.log(
+              //   'Valeur de la vanne au clic' + typeof valeurEtatVanne
+              // );
+              // console.log(
+              //   'TYPE de valeur de la vanne au clic' + valeurEtatVanne
+              // );
+            })
+
+            .then(() => {
+              if (valeurEtatVanne > 0) {
+                afficheEtatRelay();
+                alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
+                return;
+              } else {
+                console.log('Vanne froid à 5 secondes ON');
+                let etatVanne = 'ON';
+
+                axios
+                  .post(
+                    'http://localhost:3003/api/relayRoutes/relayVanneFroid5SecondesOn/',
+                    {
+                      etatRelay: etatVanne,
+                    }
+                  )
+                  .then(function (response) {
+                    console.log(response.data);
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        };
+        captureEtatRelay();
+        afficheEtatRelay();
+      };
+
+      let vanneFroid5SesoncdesOff = () => {
+        let valeurEtatVanne;
+
+        let captureEtatRelay = () => {
+          axios
+            .get(
+              'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/'
+            )
+            .then(function (response) {
+              console.log(response.data.temperatureAir.etatRelay);
+
+              valeurEtatVanne = response.data.temperatureAir.etatRelay;
+              // console.log(
+              //   'Valeur de la vanne au clic' + typeof valeurEtatVanne
+              // );
+              // console.log(
+              //   'TYPE de valeur de la vanne au clic' + valeurEtatVanne
+              // );
+            })
+
+            .then(() => {
+              if (valeurEtatVanne > 0) {
+                afficheEtatRelay();
+                alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
+                return;
+              } else {
+                // console.log('Vanne froid à 5 secondes OFF');
+                let etatVanne = 'OFF';
+
+                axios
+                  .post(
+                    'http://localhost:3003/api/relayRoutes/relayVanneFroid5SecondesOn/',
+                    {
+                      etatRelay: etatVanne,
+                    }
+                  )
+                  .then(function (response) {
+                    console.log(response.data);
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        };
+        captureEtatRelay();
+        afficheEtatRelay();
+      };
+
+      // -----------------------------------------------------------------
+
+      // 1) Gestion de vanne frois à 40 secondes.
+
+      let vanneFroid40SesoncdesOn = () => {
+        console.log('Vanne froid à 40 secondes ON');
+
+        let valeurEtatVanne;
+
+        let captureEtatRelay = () => {
+          axios
+            .get(
+              'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/'
+            )
+            .then(function (response) {
+              console.log(response.data.temperatureAir.etatRelay);
+
+              valeurEtatVanne = response.data.temperatureAir.etatRelay;
+              // console.log(
+              //   'Valeur de la vanne au clic' + typeof valeurEtatVanne
+              // );
+              // console.log(
+              //   'TYPE de valeur de la vanne au clic' + valeurEtatVanne
+              // );
+            })
+
+            .then(() => {
+              if (valeurEtatVanne > 0) {
+                afficheEtatRelay();
+                alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
+                return;
+              } else {
+                console.log('Vanne froid à 40 secondes ON');
+                let etatVanne = 'ON';
+
+                axios
+                  .post(
+                    'http://localhost:3003/api/relayRoutes/relayVanneFroid40SecondesOn/',
+                    {
+                      etatRelay: etatVanne,
+                    }
+                  )
+                  .then(function (response) {
+                    console.log(response.data);
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        };
+        captureEtatRelay();
+        afficheEtatRelay();
+      };
+
+      let vanneFroid40SesoncdesOff = () => {
+        let valeurEtatVanne;
+
+        let captureEtatRelay = () => {
+          axios
+            .get(
+              'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/'
+            )
+            .then(function (response) {
+              console.log(response.data.temperatureAir.etatRelay);
+
+              valeurEtatVanne = response.data.temperatureAir.etatRelay;
+              // console.log(
+              //   'Valeur de la vanne au clic' + typeof valeurEtatVanne
+              // );
+              // console.log(
+              //   'TYPE de valeur de la vanne au clic' + valeurEtatVanne
+              // );
+            })
+
+            .then(() => {
+              if (valeurEtatVanne > 0) {
+                afficheEtatRelay();
+                alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
+                return;
+              } else {
+                console.log('Vanne froid à 5 secondes OFF');
+
+                let etatVanne = 'OFF';
+
+                axios
+                  .post(
+                    'http://localhost:3003/api/relayRoutes/relayVanneFroid40SecondesOn/',
+                    {
+                      etatRelay: etatVanne,
+                    }
+                  )
+                  .then(function (response) {
+                    console.log(response.data);
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        };
+        captureEtatRelay();
+        afficheEtatRelay();
+      };
+      // -----------------------------------------------------------------
+
       // FIN Gestion Vanne froid état.
     </script>
   </body>

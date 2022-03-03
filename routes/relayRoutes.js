@@ -4,12 +4,17 @@ const express = require('express');
 const router = express.Router();
 const relayCtrl = require('../controllers/relayControllers');
 
-// router.delete('/:id', auth, stuffCtrl.deleteThing);
-
 router.post('/relay', relayCtrl.relay);
 router.post('/relayEau', relayCtrl.relayEau);
 router.post('/relayVentilo', relayCtrl.relayVentilo);
-router.post('/relayVanneFroid', relayCtrl.relayVanneFroid);
-router.post('/relayVanneFroid2', relayCtrl.relayVanneFroid2);
+router.post(
+  '/relayVanneFroid5SecondesOn',
+  relayCtrl.relayVanneFroid5SecondesOn
+);
+
+router.post(
+  '/relayVanneFroid40SecondesOn',
+  relayCtrl.relayVanneFroid40SecondesOn
+);
 
 module.exports = router;

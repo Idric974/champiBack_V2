@@ -31,3 +31,7 @@
 2022-02-11T10:04:21.273Z - [INFO   ] - Fchier source : gestionAir | Module : recuperationConsigneAir | Type erreur :  gestionAirsDataModel is not defined  
 2022-02-11T10:05:13.916Z - [INFO   ] - Fchier source : gestionAir | Module : recuperationConsigneAir | Type erreur :  gestionAirsDataModel is not defined  
 2022-02-11T10:05:34.739Z - [INFO   ] - Fchier source : gestionAir | Module : recuperationConsigneAir | Type erreur :  gestionAirsDataModel is not defined  
+2022-03-03T12:10:12.546Z - [INFO   ] - Fchier source : gestionAir | Module : Mise à jour de etat relay dans la base de donnée | Type erreur :  gestionAirModels_etat_relay is not defined  
+2022-03-03T12:28:50.447Z - [INFO   ] - Fchier source : gestionAir | Module : Mise à jour de etat relay dans la base de donnée | Type erreur :  gestionAirModels_etat_relay is not defined  
+2022-03-03T17:03:41.520Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  location is not defined  
+2022-03-03T17:05:31.366Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  history is not defined  

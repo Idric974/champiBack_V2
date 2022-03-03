@@ -24,6 +24,10 @@ module.exports = (sequelize, Sequelize) => {
     heures: {
       type: Sequelize.FLOAT,
     },
+
+    etatRelay: {
+      type: Sequelize.FLOAT,
+    },
   });
 
   return gestionAirModels;

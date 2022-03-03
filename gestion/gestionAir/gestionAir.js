@@ -5,11 +5,14 @@ const mcpadc = require('mcp-spi-adc');
 const Gpio = require('onoff').Gpio;
 const jaune = '\x1b[33m';
 const sequelize = require('sequelize');
+const Sequelize = require('sequelize');
 const db = require('../../models');
 const gestionAirModels = db.gestionAir;
 const gestionAirsDataModels = db.gestionAirData;
 const gestionAirEtalonnageModels = db.etalonnageAir;
+const gestionAirEtatRelayModels = db.gestionAirEtatRelay;
 const gestionLogsModels = db.gestionLogsBack;
+
 const logger = require('../../src/logger');
 //-------------------------------------
 
@@ -26,6 +29,8 @@ let objectif;
 let delta;
 let days;
 let heures;
+let etatRelay;
+let miseAjourEtatRelay;
 //-------------------------------------
 
 // Les tableaux.
@@ -215,27 +220,31 @@ resultats()
   .then(() => {
     try {
       if (delta >= 1.1) {
-        const realy22On = new Gpio(22, 'out');
-        const realy23On = new Gpio(23, 'out');
+        const relay_22_ON = new Gpio(22, 'out');
+        const relay_23_ON = new Gpio(23, 'out');
+        etatRelay = 40;
 
-        // console.log(
-        //   jaune,
-        //   '[ GESTION AIR CALCULES  ] Ouverture du froid pour 40 secondes'
-        // );
+        console.log(
+          jaune,
+          '[ GESTION AIR CALCULES  ] Ouverture du froid pour 40 secondes'
+        );
 
         setTimeout(() => {
-          const realy22Off = new Gpio(22, 'in');
-          const realy23Off = new Gpio(23, 'in');
-          // console.log(
-          //   jaune,
-          //   '[ GESTION AIR CALCULES  ] Fin action ouverture  40 secondes'
-          // );
+          const relay_22_OFF = new Gpio(22, 'in');
+          etatRelay = 0;
+          miseAjourEtatRelay();
+
+          console.log(
+            jaune,
+            '[ GESTION AIR CALCULES  ] Fin action ouverture  40 secondes'
+          );
         }, 40000);
 
         //
       } else if (delta <= 1 && delta >= 0.6) {
-        const realy22On = new Gpio(22, 'out');
-        const realy23On = new Gpio(23, 'out');
+        const relay_22_ON = new Gpio(22, 'out');
+        const relay_23_ON = new Gpio(23, 'out');
+        etatRelay = 15;
 
         // console.log(
         //   jaune,
@@ -243,8 +252,8 @@ resultats()
         // );
 
         setTimeout(() => {
-          const realy22Off = new Gpio(22, 'in');
-          const realy23Off = new Gpio(23, 'in');
+          const relay_22_OFF = new Gpio(22, 'in');
+          etatRelay = 0;
 
           // console.log(
           //   jaune,
@@ -253,8 +262,9 @@ resultats()
         }, 15000);
         //
       } else if (delta <= 0.5 && delta >= 0.4) {
-        const realy22On = new Gpio(22, 'out');
-        const realy23On = new Gpio(23, 'out');
+        const relay_22_ON = new Gpio(22, 'out');
+        const relay_23_ON = new Gpio(23, 'out');
+        etatRelay = 5;
 
         // console.log(
         //   jaune,
@@ -262,8 +272,9 @@ resultats()
         // );
 
         setTimeout(() => {
-          const realy22Off = new Gpio(22, 'in');
-          const realy23Off = new Gpio(23, 'in');
+          const relay_22_OFF = new Gpio(22, 'in');
+          etatRelay = 0;
+
           // console.log(
           //   jaune,
           //   '[ GESTION AIR CALCULES  ] Fin action ouverture 5 secondes'
@@ -275,16 +286,19 @@ resultats()
         //   jaune,
         //   "[ GESTION AIR CALCULES  ] Pas d'action car interval entre -0.3 et 0.3"
         // );
-        //
       } else if (delta <= -0.4 && delta >= -0.5) {
-        const realy22On = new Gpio(22, 'out');
+        const relay_22_ON = new Gpio(22, 'out');
+        const relay_23_ON = new Gpio(23, 'out');
+        etatRelay = 5;
+
         // console.log(
         //   jaune,
         //   '[ GESTION AIR CALCULES  ] Fermeture du froid pour 5 secondes'
         // );
 
         setTimeout(() => {
-          const realy22Off = new Gpio(22, 'in');
+          const relay_22_OFF = new Gpio(22, 'in');
+          etatRelay = 0;
 
           // console.log(
           //   jaune,
@@ -294,7 +308,9 @@ resultats()
 
         //
       } else if (delta <= -0.6 && delta >= -1) {
-        const realy22On = new Gpio(22, 'out');
+        const relay_22_ON = new Gpio(22, 'out');
+        const relay_23_ON = new Gpio(23, 'out');
+        etatRelay = 15;
 
         // console.log(
         //   jaune,
@@ -302,7 +318,9 @@ resultats()
         // );
 
         setTimeout(() => {
-          const realy22Off = new Gpio(22, 'in');
+          const relay_22_OFF = new Gpio(22, 'in');
+          etatRelay = 0;
+
           // console.log(
           //   jaune,
           //   '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture 15 secondes'
@@ -310,7 +328,9 @@ resultats()
         }, 15000);
         //
       } else if (delta <= -1.1) {
-        const realy22On = new Gpio(22, 'out');
+        const relay_22_ON = new Gpio(22, 'out');
+        const relay_23_ON = new Gpio(23, 'out');
+        etatRelay = 40;
 
         // console.log(
         //   jaune,
@@ -318,7 +338,8 @@ resultats()
         // );
 
         setTimeout(() => {
-          const realy22Off = new Gpio(22, 'in');
+          const relay_22_OFF = new Gpio(22, 'in');
+          etatRelay = 0;
 
           // console.log(
           //   jaune,
@@ -339,25 +360,37 @@ resultats()
     //! Enregistrement des datas dans la base.
     try {
       //
-      const newVal = gestionAirModels
-        .create({
-          temperatureAir: temperatureCorrigée,
-          deltaAir: delta,
-        })
 
-        .then(() => {
-          // console.log(
-          //   jaune,
-          //   '[ GESTION AIR CALCULES  ] Données transférées à la base de données.'
-          // );
-        })
-        .catch((error) => {
-          console.log(
-            jaune,
-            '[ GESTION AIR CALCULES  ] Erreur dans le processus d’enregistrement',
-            error
-          );
-        });
+      const enregistrementTemperature = () => {
+        gestionAirModels
+          .create({
+            temperatureAir: temperatureCorrigée,
+            deltaAir: delta,
+            etatRelay: etatRelay,
+          })
+
+          // .then(function (result) {
+          //   console.log(
+          //     'Enregistrement des datas dans la base =======> ' + result
+          //   );
+          // })
+
+          .then(() => {
+            // console.log(
+            //   jaune,
+            //   '[ GESTION AIR CALCULES  ] Données transférées à la base de données.'
+            // );
+          })
+          .catch((error) => {
+            console.log(
+              jaune,
+              '[ GESTION AIR CALCULES  ] Erreur dans le processus d’enregistrement',
+              error
+            );
+          });
+      };
+      enregistrementTemperature();
+
       //
     } catch (error) {
       logger.info(
@@ -378,7 +411,11 @@ resultats()
       let newDelta = () => {
         gestionAirModels
           .update(
-            { deltaAir: delta, days: days, heures: heures },
+            {
+              deltaAir: delta,
+              days: days,
+              heures: heures,
+            },
             { where: { id: lastId } }
           )
           // .then((result) =>
@@ -387,11 +424,49 @@ resultats()
           //     '[ GESTION AIR CALCULES  ] Le delta à été mis à jour'
           //   )
           // )
+
+          // .then(function (result) {
+          //   console.log('Mise à jour du delta =======> ' + result);
+          // })
+
           .catch((err) => console.log(err));
       };
 
       newDelta();
       //
+    } catch (error) {
+      logger.info(
+        'Fchier source : gestionAir | Module : Mise à jour des informations dans la base de donnée | Type erreur : ',
+        error
+      );
+    }
+  })
+
+  .then(() => {
+    //
+
+    try {
+      miseAjourEtatRelay = () => {
+        gestionAirModels
+          .findOne({
+            attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+            raw: true,
+          })
+          .then((id) => {
+            // console.log('Le dernier id de gestionAir est : ', id);
+            // console.log(id.maxid);
+            lastId = id.maxid;
+
+            gestionAirModels
+              .update({ etatRelay: etatRelay }, { where: { id: lastId } })
+
+              // .then(function (result) {
+              //   console.log('result etat relay =======> ' + result);
+              // })
+
+              .catch((err) => console.log(err));
+          });
+      };
     } catch (error) {
       logger.info(
         'Fchier source : gestionAir | Module : Mise à jour des informations dans la base de donnée | Type erreur : ',

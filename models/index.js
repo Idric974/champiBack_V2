@@ -48,6 +48,12 @@ db.etalonnageAir = require('./gestionAir/gestionAirEtalonnageModels')(
   Sequelize
 );
 
+// Etat relay.
+db.gestionAirEtatRelay = require('./gestionAir/gestionAirEtatRelayModels')(
+  sequelize,
+  Sequelize
+);
+
 //* -----------------------------------------------------------------
 
 //? Gestion Humidité.

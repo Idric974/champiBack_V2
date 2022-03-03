@@ -14,12 +14,12 @@ db.connect(function (err) {
 
   //* gestion Air
 
-  // let sql =
-  //   'CREATE TABLE gestion_airs (id int auto_increment, temperatureAir FLOAT, deltaAir FLOAT, days FLOAT, heures FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
-  // db.query(sql, function (err, result) {
-  //   if (err) throw err;
-  //   console.log('Table gestion_airs créé', result);
-  // });
+  let sql =
+    'CREATE TABLE gestion_airs (id int auto_increment, temperatureAir FLOAT, deltaAir FLOAT, days FLOAT, heures FLOAT, etatRelay FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
+  db.query(sql, function (err, result) {
+    if (err) throw err;
+    console.log('Table gestion_airs créé', result);
+  });
 
   // let sql =
   //   'CREATE TABLE gestion_airs_data (id int auto_increment, consigneAir FLOAT, pasAir FLOAT, objectifAir FLOAT, deltaAir FLOAT, days INTEGER, heures INTEGER, createdAt DATE, updatedAt DATE, primary key(id))';
@@ -33,6 +33,13 @@ db.connect(function (err) {
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
   //   console.log('Table gestion_airs_etalonnage créé', result);
+  // });
+
+  // let sql =
+  //   'CREATE TABLE gestion_airs_etat_relays (id int auto_increment, etatRelay FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
+  // db.query(sql, function (err, result) {
+  //   if (err) throw err;
+  //   console.log('Table gestion_airs_etat_relays créé', result);
   // });
 
   //* -----------------------------------------------------------------

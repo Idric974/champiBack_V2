@@ -19,6 +19,19 @@ const db = require('../../models');
 //     console.log('Table non mise à jour', error);
 //   });
 
+const miseAJourGestionAirEtatRelay = db.gestionAirEtatRelay;
+
+const newEtatRelay = miseAJourGestionAirEtatRelay
+  .create({
+    etatRelay: 0,
+  })
+  .then((result) => {
+    console.log('Table mise à jour');
+  })
+  .catch((error) => {
+    console.log('Table non mise à jour', error);
+  });
+
 //* -----------------------------------------------------------------
 
 //* Gestion Humidité

@@ -111,13 +111,20 @@
 .boxCardDataParams,
 .boxCardData2Title,
 .boxCardData2Form,
-.boxCardData2DaysHeures,
+.boxCardData2DaysHeures {
+  width: 95%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .boutonActivation,
 .boutonDeactivation {
   width: 95%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 10px;
 }
 
 .boxCardDataTitle {
@@ -148,8 +155,13 @@
 }
 
 .boxCardData2 {
+  /* border: solid green 1px; */
   width: 95%;
   height: 55vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding-top: 20px;
 }
 
@@ -158,18 +170,17 @@
 }
 
 .boxCardData2Form {
-  height: 24vh;
+  /* border: solid red 1px; */
+  height: 26vh;
   display: flex;
   flex-direction: column;
   /* align-items: center;
   justify-content: center; */
-
-  /* border: solid red 1px; */
 }
 
 .boutonActivation,
 .boutonDeactivation {
-  height: 5vh;
+  height: 50px;
 }
 
 .boxCardData2DaysHeures {
@@ -244,14 +255,37 @@
   /* border: solid green 1px; */
 }
 
-.boxCardRelay {
-  width: 30%;
+.boxCardRelay_1,
+.boxCardRelay_2,
+.boxCardRelay_3 {
+  /* border: solid green 1px; */
   height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
+}
+
+.boxCardRelay_1 {
+  width: 24%;
+}
+
+.boxCardRelay_2 {
+  width: 24%;
+}
+
+.boxCardRelay_3 {
+  width: 50%;
+}
+
+.boxCardRelay_3Box {
+  /* border: solid red 1px; */
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 .boxCardRelayTitle {
@@ -266,9 +300,24 @@
   /* border: solid blue 1px; */
 }
 
+.buttonBox {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.buttonBoxTitle {
+  font-size: 1.5rem;
+}
+
 .boxCardRelayData {
   width: 95%;
   height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: center; */
   box-shadow: 0px 0px 10px 1px black;
   border-radius: 10px;
   background-color: white;
