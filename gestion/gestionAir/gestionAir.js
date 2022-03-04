@@ -147,7 +147,7 @@ let recuperationEtatRelay = () => {
             // console.log(result);
 
             etatVanne = result['etatRelay'] * 1000;
-            console.log('========> ValeuretatRelay : ', etatVanne);
+            console.log('etatVanne ========> ', etatVanne);
           });
       });
   } catch (error) {
@@ -256,18 +256,22 @@ resultats()
   .then(() => {
     try {
       if (delta >= 1.1) {
+        let dureeAction = 40000 - etatVanne;
         //
         if (etatVanne >= 40000) {
-          console.log('etatVanne > action préconisée');
+          console.log('etatVanne > action préconisée = pas d action');
           return;
         } else {
-          let dureeAction = 40000 - etatVanne;
-
           const relay_22_ON = new Gpio(22, 'out');
           const relay_23_ON = new Gpio(23, 'out');
 
           actionRelay = 1;
           etatRelay = 40;
+
+          setTimeout(() => {
+            const relay_22_OFF = new Gpio(22, 'in');
+            const relay_23_OFF = new Gpio(23, 'in');
+          }, dureeAction);
 
           console.log(
             jaune,
@@ -275,10 +279,19 @@ resultats()
           );
 
           setTimeout(() => {
-            const relay_22_OFF = new Gpio(22, 'in');
-            actionRelay = 0;
-            etatRelay = 0;
-            miseAjourEtatRelay();
+            const relay_22_OFF = new Gpio(22, 'out');
+            console.log('Debut fermeture');
+
+            setTimeout(() => {
+              const relay_22_OFF = new Gpio(22, 'in');
+
+              actionRelay = 0;
+              etatRelay = (40000 - dureeAction) / 1000;
+              miseAjourEtatRelay();
+              console.log('etatRelay : ' + etatRelay);
+              console.log('Fin fermeture');
+              console.log('dureeAction : ' + dureeAction);
+            }, dureeAction);
 
             console.log(
               jaune,
@@ -287,18 +300,22 @@ resultats()
           }, dureeAction);
         }
       } else if (delta <= 1 && delta >= 0.6) {
+        let dureeAction = 15000 - etatVanne;
         //
         if (etatVanne >= 15000) {
           console.log('etatVanne > action préconisée');
           return;
         } else {
-          let dureeAction = 15000 - etatVanne;
-
           const relay_22_ON = new Gpio(22, 'out');
           const relay_23_ON = new Gpio(23, 'out');
 
           actionRelay = 1;
           etatRelay = 15;
+
+          setTimeout(() => {
+            const relay_22_OFF = new Gpio(22, 'in');
+            const relay_23_OFF = new Gpio(23, 'in');
+          }, dureeAction);
 
           // console.log(
           //   jaune,
@@ -307,8 +324,13 @@ resultats()
 
           setTimeout(() => {
             const relay_22_OFF = new Gpio(22, 'in');
-            actionRelay = 0;
-            etatRelay = 0;
+
+            setTimeout(() => {
+              const relay_22_OFF = new Gpio(22, 'in');
+              actionRelay = 0;
+              etatRelay = dureeAction / 1000;
+              miseAjourEtatRelay();
+            }, dureeAction);
 
             // console.log(
             //   jaune,
@@ -318,18 +340,23 @@ resultats()
           //
         }
       } else if (delta <= 0.5 && delta >= 0.4) {
+        etatRelay = (5000 - dureeAction) / 1000;
+
         //
         if (etatVanne >= 5000) {
           console.log('etatVanne > action préconisée');
           return;
         } else {
-          let dureeAction = 5000 - etatVanne;
-
           const relay_22_ON = new Gpio(22, 'out');
           const relay_23_ON = new Gpio(23, 'out');
 
           actionRelay = 1;
           etatRelay = 5;
+
+          setTimeout(() => {
+            const relay_22_OFF = new Gpio(22, 'in');
+            const relay_23_OFF = new Gpio(23, 'in');
+          }, dureeAction);
 
           // console.log(
           //   jaune,
@@ -338,8 +365,13 @@ resultats()
 
           setTimeout(() => {
             const relay_22_OFF = new Gpio(22, 'in');
-            actionRelay = 0;
-            etatRelay = 0;
+
+            setTimeout(() => {
+              const relay_22_OFF = new Gpio(22, 'in');
+              actionRelay = 0;
+              etatRelay = (5000 - dureeAction) / 1000;
+              miseAjourEtatRelay();
+            }, dureeAction);
 
             // console.log(
             //   jaune,
@@ -354,18 +386,19 @@ resultats()
         //   "[ GESTION AIR CALCULES  ] Pas d'action car interval entre -0.3 et 0.3"
         // );
       } else if (delta <= -0.4 && delta >= -0.5) {
+        let dureeAction = 5000 - etatVanne;
         //
         if (etatVanne >= 5000) {
           console.log('etatVanne > action préconisée');
           return;
         } else {
-          let dureeAction = 5000 - etatVanne;
-
           const relay_22_ON = new Gpio(22, 'out');
           const relay_23_ON = new Gpio(23, 'out');
 
-          actionRelay = 1;
-          etatRelay = 5;
+          setTimeout(() => {
+            const relay_22_OFF = new Gpio(22, 'in');
+            const relay_23_OFF = new Gpio(23, 'in');
+          }, dureeAction);
 
           // console.log(
           //   jaune,
@@ -375,8 +408,12 @@ resultats()
           setTimeout(() => {
             const relay_22_OFF = new Gpio(22, 'in');
 
-            actionRelay = 0;
-            etatRelay = 0;
+            setTimeout(() => {
+              const relay_22_OFF = new Gpio(22, 'in');
+              actionRelay = 0;
+              etatRelay = (5000 - dureeAction) / 1000;
+              miseAjourEtatRelay();
+            }, dureeAction);
 
             // console.log(
             //   jaune,
@@ -387,17 +424,23 @@ resultats()
           //
         }
       } else if (delta <= -0.6 && delta >= -1) {
+        let dureeAction = 15000 - etatVanne;
+
         //
         if (etatVanne >= 15000) {
           console.log('etatVanne > action préconisée');
           return;
         } else {
-          let dureeAction = 15000 - etatVanne;
-
           const relay_22_ON = new Gpio(22, 'out');
           const relay_23_ON = new Gpio(23, 'out');
+
           actionRelay = 1;
           etatRelay = 15;
+
+          setTimeout(() => {
+            const relay_22_OFF = new Gpio(22, 'in');
+            const relay_23_OFF = new Gpio(23, 'in');
+          }, dureeAction);
 
           // console.log(
           //   jaune,
@@ -406,8 +449,13 @@ resultats()
 
           setTimeout(() => {
             const relay_22_OFF = new Gpio(22, 'in');
-            actionRelay = 0;
-            etatRelay = 0;
+
+            setTimeout(() => {
+              const relay_22_OFF = new Gpio(22, 'in');
+              actionRelay = 0;
+              etatRelay = (15000 - dureeAction) / 1000;
+              miseAjourEtatRelay();
+            }, dureeAction);
 
             // console.log(
             //   jaune,
@@ -417,17 +465,23 @@ resultats()
           //
         }
       } else if (delta <= -1.1) {
+        let dureeAction = 40000 - etatVanne;
+
         //
         if (etatVanne >= 40000) {
           console.log('etatVanne > action préconisée');
           return;
         } else {
-          let dureeAction = 40000 - etatVanne;
-
           const relay_22_ON = new Gpio(22, 'out');
           const relay_23_ON = new Gpio(23, 'out');
+
           actionRelay = 1;
           etatRelay = 40;
+
+          setTimeout(() => {
+            const relay_22_OFF = new Gpio(22, 'in');
+            const relay_23_OFF = new Gpio(23, 'in');
+          }, dureeAction);
 
           // console.log(
           //   jaune,
@@ -436,8 +490,13 @@ resultats()
 
           setTimeout(() => {
             const relay_22_OFF = new Gpio(22, 'in');
-            actionRelay = 0;
-            etatRelay = 0;
+
+            setTimeout(() => {
+              const relay_22_OFF = new Gpio(22, 'in');
+              actionRelay = 0;
+              etatRelay = (40000 - dureeAction) / 1000;
+              miseAjourEtatRelay();
+            }, dureeAction);
 
             // console.log(
             //   jaune,
@@ -558,7 +617,10 @@ resultats()
             lastId = id.maxid;
 
             gestionAirModels
-              .update({ actionRelay: actionRelay }, { where: { id: lastId } })
+              .update(
+                { actionRelay: actionRelay, etatRelay: etatRelay },
+                { where: { id: lastId } }
+              )
 
               // .then(function (result) {
               //   console.log('result etat relay =======> ' + result);
