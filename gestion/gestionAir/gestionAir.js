@@ -30,7 +30,9 @@ let delta;
 let days;
 let heures;
 let etatRelay;
+let actionRelay;
 let miseAjourEtatRelay;
+let etatVanne;
 //-------------------------------------
 
 // Les tableaux.
@@ -38,7 +40,7 @@ let miseAjourEtatRelay;
 listValAir = [];
 //-------------------------------------
 
-// Récupération de la consigne
+//! Récupération de la consigne
 
 let recuperationConsigneAir = () => {
   try {
@@ -122,6 +124,40 @@ let recuperationEtalonnage = () => {
   }
 };
 recuperationEtalonnage();
+
+//------------------------------------------------------------
+
+//! Récupération de l'état de la vanne froid.
+
+let recuperationEtatRelay = () => {
+  try {
+    gestionAirModels
+      .findOne({
+        attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
+        raw: true,
+      })
+      .then((id) => {
+        // console.log(id.maxid);
+
+        gestionAirModels
+          .findOne({
+            where: { id: id.maxid },
+          })
+          .then((result) => {
+            // console.log(result);
+
+            etatVanne = result['etatRelay'] * 1000;
+            console.log('========> ValeuretatRelay : ', etatVanne);
+          });
+      });
+  } catch (error) {
+    logger.info(
+      'Fchier source : gestionAir | Module : recuperationEtalonnage | Type erreur : ',
+      error
+    );
+  }
+};
+recuperationEtatRelay();
 
 //------------------------------------------------------------
 
@@ -220,132 +256,195 @@ resultats()
   .then(() => {
     try {
       if (delta >= 1.1) {
-        const relay_22_ON = new Gpio(22, 'out');
-        const relay_23_ON = new Gpio(23, 'out');
-        etatRelay = 40;
+        //
+        if (etatVanne >= 40000) {
+          console.log('etatVanne > action préconisée');
+          return;
+        } else {
+          let dureeAction = 40000 - etatVanne;
 
-        console.log(
-          jaune,
-          '[ GESTION AIR CALCULES  ] Ouverture du froid pour 40 secondes'
-        );
+          const relay_22_ON = new Gpio(22, 'out');
+          const relay_23_ON = new Gpio(23, 'out');
 
-        setTimeout(() => {
-          const relay_22_OFF = new Gpio(22, 'in');
-          etatRelay = 0;
-          miseAjourEtatRelay();
+          actionRelay = 1;
+          etatRelay = 40;
 
           console.log(
             jaune,
-            '[ GESTION AIR CALCULES  ] Fin action ouverture  40 secondes'
+            '[ GESTION AIR CALCULES  ] Ouverture du froid pour 40 secondes'
           );
-        }, 40000);
 
-        //
+          setTimeout(() => {
+            const relay_22_OFF = new Gpio(22, 'in');
+            actionRelay = 0;
+            etatRelay = 0;
+            miseAjourEtatRelay();
+
+            console.log(
+              jaune,
+              '[ GESTION AIR CALCULES  ] Fin action ouverture  40 secondes'
+            );
+          }, dureeAction);
+        }
       } else if (delta <= 1 && delta >= 0.6) {
-        const relay_22_ON = new Gpio(22, 'out');
-        const relay_23_ON = new Gpio(23, 'out');
-        etatRelay = 15;
+        //
+        if (etatVanne >= 15000) {
+          console.log('etatVanne > action préconisée');
+          return;
+        } else {
+          let dureeAction = 15000 - etatVanne;
 
-        // console.log(
-        //   jaune,
-        //   '[ GESTION AIR CALCULES  ] Ouverture du froid pour 15 secondes'
-        // );
+          const relay_22_ON = new Gpio(22, 'out');
+          const relay_23_ON = new Gpio(23, 'out');
 
-        setTimeout(() => {
-          const relay_22_OFF = new Gpio(22, 'in');
-          etatRelay = 0;
+          actionRelay = 1;
+          etatRelay = 15;
 
           // console.log(
           //   jaune,
-          //   '[ GESTION AIR CALCULES  ] Fin action ouverture 15 secondes'
+          //   '[ GESTION AIR CALCULES  ] Ouverture du froid pour 15 secondes'
           // );
-        }, 15000);
-        //
+
+          setTimeout(() => {
+            const relay_22_OFF = new Gpio(22, 'in');
+            actionRelay = 0;
+            etatRelay = 0;
+
+            // console.log(
+            //   jaune,
+            //   '[ GESTION AIR CALCULES  ] Fin action ouverture 15 secondes'
+            // );
+          }, dureeAction);
+          //
+        }
       } else if (delta <= 0.5 && delta >= 0.4) {
-        const relay_22_ON = new Gpio(22, 'out');
-        const relay_23_ON = new Gpio(23, 'out');
-        etatRelay = 5;
+        //
+        if (etatVanne >= 5000) {
+          console.log('etatVanne > action préconisée');
+          return;
+        } else {
+          let dureeAction = 5000 - etatVanne;
 
-        // console.log(
-        //   jaune,
-        //   '[ GESTION AIR CALCULES  ] Ouverture du froid pour 5 secondes'
-        // );
+          const relay_22_ON = new Gpio(22, 'out');
+          const relay_23_ON = new Gpio(23, 'out');
 
-        setTimeout(() => {
-          const relay_22_OFF = new Gpio(22, 'in');
-          etatRelay = 0;
+          actionRelay = 1;
+          etatRelay = 5;
 
           // console.log(
           //   jaune,
-          //   '[ GESTION AIR CALCULES  ] Fin action ouverture 5 secondes'
+          //   '[ GESTION AIR CALCULES  ] Ouverture du froid pour 5 secondes'
           // );
-        }, 5000);
-        //
+
+          setTimeout(() => {
+            const relay_22_OFF = new Gpio(22, 'in');
+            actionRelay = 0;
+            etatRelay = 0;
+
+            // console.log(
+            //   jaune,
+            //   '[ GESTION AIR CALCULES  ] Fin action ouverture 5 secondes'
+            // );
+          }, dureeAction);
+          //
+        }
       } else if (delta <= 0.3 && delta >= -0.3) {
         // console.log(
         //   jaune,
         //   "[ GESTION AIR CALCULES  ] Pas d'action car interval entre -0.3 et 0.3"
         // );
       } else if (delta <= -0.4 && delta >= -0.5) {
-        const relay_22_ON = new Gpio(22, 'out');
-        const relay_23_ON = new Gpio(23, 'out');
-        etatRelay = 5;
+        //
+        if (etatVanne >= 5000) {
+          console.log('etatVanne > action préconisée');
+          return;
+        } else {
+          let dureeAction = 5000 - etatVanne;
 
-        // console.log(
-        //   jaune,
-        //   '[ GESTION AIR CALCULES  ] Fermeture du froid pour 5 secondes'
-        // );
+          const relay_22_ON = new Gpio(22, 'out');
+          const relay_23_ON = new Gpio(23, 'out');
 
-        setTimeout(() => {
-          const relay_22_OFF = new Gpio(22, 'in');
-          etatRelay = 0;
+          actionRelay = 1;
+          etatRelay = 5;
 
           // console.log(
           //   jaune,
-          //   '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture  5 secondes'
+          //   '[ GESTION AIR CALCULES  ] Fermeture du froid pour 5 secondes'
           // );
-        }, 5000);
 
-        //
+          setTimeout(() => {
+            const relay_22_OFF = new Gpio(22, 'in');
+
+            actionRelay = 0;
+            etatRelay = 0;
+
+            // console.log(
+            //   jaune,
+            //   '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture  5 secondes'
+            // );
+          }, dureeAction);
+
+          //
+        }
       } else if (delta <= -0.6 && delta >= -1) {
-        const relay_22_ON = new Gpio(22, 'out');
-        const relay_23_ON = new Gpio(23, 'out');
-        etatRelay = 15;
-
-        // console.log(
-        //   jaune,
-        //   '[ GESTION AIR CALCULES  ] Fermeture du froid pour 15 secondes'
-        // );
-
-        setTimeout(() => {
-          const relay_22_OFF = new Gpio(22, 'in');
-          etatRelay = 0;
-
-          // console.log(
-          //   jaune,
-          //   '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture 15 secondes'
-          // );
-        }, 15000);
         //
-      } else if (delta <= -1.1) {
-        const relay_22_ON = new Gpio(22, 'out');
-        const relay_23_ON = new Gpio(23, 'out');
-        etatRelay = 40;
+        if (etatVanne >= 15000) {
+          console.log('etatVanne > action préconisée');
+          return;
+        } else {
+          let dureeAction = 15000 - etatVanne;
 
-        // console.log(
-        //   jaune,
-        //   '[ GESTION AIR CALCULES  ] Fermeture du froid pour 40 secondes'
-        // );
-
-        setTimeout(() => {
-          const relay_22_OFF = new Gpio(22, 'in');
-          etatRelay = 0;
+          const relay_22_ON = new Gpio(22, 'out');
+          const relay_23_ON = new Gpio(23, 'out');
+          actionRelay = 1;
+          etatRelay = 15;
 
           // console.log(
           //   jaune,
-          //   '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture 40 secondes'
+          //   '[ GESTION AIR CALCULES  ] Fermeture du froid pour 15 secondes'
           // );
-        }, 40000);
+
+          setTimeout(() => {
+            const relay_22_OFF = new Gpio(22, 'in');
+            actionRelay = 0;
+            etatRelay = 0;
+
+            // console.log(
+            //   jaune,
+            //   '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture 15 secondes'
+            // );
+          }, dureeAction);
+          //
+        }
+      } else if (delta <= -1.1) {
+        //
+        if (etatVanne >= 40000) {
+          console.log('etatVanne > action préconisée');
+          return;
+        } else {
+          let dureeAction = 40000 - etatVanne;
+
+          const relay_22_ON = new Gpio(22, 'out');
+          const relay_23_ON = new Gpio(23, 'out');
+          actionRelay = 1;
+          etatRelay = 40;
+
+          // console.log(
+          //   jaune,
+          //   '[ GESTION AIR CALCULES  ] Fermeture du froid pour 40 secondes'
+          // );
+
+          setTimeout(() => {
+            const relay_22_OFF = new Gpio(22, 'in');
+            actionRelay = 0;
+            etatRelay = 0;
+
+            // console.log(
+            //   jaune,
+            //   '[ GESTION AIR CALCULES  ] Fin action ouverture Fermeture 40 secondes'
+            // );
+          }, dureeAction);
+        }
       }
     } catch (error) {
       logger.info(
@@ -366,6 +465,7 @@ resultats()
           .create({
             temperatureAir: temperatureCorrigée,
             deltaAir: delta,
+            actionRelay: actionRelay,
             etatRelay: etatRelay,
           })
 
@@ -458,7 +558,7 @@ resultats()
             lastId = id.maxid;
 
             gestionAirModels
-              .update({ etatRelay: etatRelay }, { where: { id: lastId } })
+              .update({ actionRelay: actionRelay }, { where: { id: lastId } })
 
               // .then(function (result) {
               //   console.log('result etat relay =======> ' + result);

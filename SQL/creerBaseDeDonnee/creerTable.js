@@ -15,7 +15,7 @@ db.connect(function (err) {
   //* gestion Air
 
   let sql =
-    'CREATE TABLE gestion_airs (id int auto_increment, temperatureAir FLOAT, deltaAir FLOAT, days FLOAT, heures FLOAT, etatRelay FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
+    'CREATE TABLE gestion_airs (id int auto_increment, temperatureAir FLOAT, deltaAir FLOAT, days FLOAT, heures FLOAT, etatRelay FLOAT, actionRelay FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
   db.query(sql, function (err, result) {
     if (err) throw err;
     console.log('Table gestion_airs créé', result);

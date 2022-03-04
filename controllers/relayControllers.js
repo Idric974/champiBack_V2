@@ -1,37 +1,44 @@
-// Les constantes
+//! Les constantes
 
-const io = require('socket.io-client');
-const bleu = '\x1b[34m';
-//-------------------------------------
+const Sequelize = require('sequelize');
+const db = require('../models');
+const gestionAirModels = db.gestionAir;
+//⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐
 
-// Les variables.
+//! Les variables.
 
 let Gpio = require('onoff').Gpio;
 let test = 27;
 let eauAuSol = 16; // 16
 let ventilateur = 17; // 17
+let etatRelay;
+//⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐
 
-// Vanne Froid Etat :
+//! Les fonctions.
 
-let fermetureVanneFroid1 = 22;
-let ouvertureVanneFroid1 = 23;
+miseAjourEtatRelay = () => {
+  gestionAirModels
+    .findOne({
+      attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+      raw: true,
+    })
+    .then((id) => {
+      console.log('Le dernier id de gestionAir est : ', id);
+      // console.log(id.maxid);
+      lastId = id.maxid;
 
-//-------------------------------------
+      gestionAirModels
+        .update({ etatRelay: etatRelay }, { where: { id: lastId } })
 
-// Initialisation socket.io Client
+        .then(function (result) {
+          console.log('result etat relay =======> ' + result);
+        })
 
-const socket = io('http://localhost:3003', {
-  reconnection: true,
-});
+        .catch((err) => console.log(err));
+    });
+};
 
-socket.on('connect', () => {
-  // console.log(
-  //   bleu,
-  //   '[ SOCKET IO        ] Client Gestion des Relay connecté',
-  //   socket.id
-  // );
-});
-//-----------------------------------------------------------
+//⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐
 
 //* ➖ ➖ ➖ ➖ ➖ ➖ Testeur relay ➖ ➖ ➖ ➖ ➖ ➖ //
 
@@ -112,8 +119,6 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
   //
   let relayVanneFroid = req.body.etatRelay;
 
-  let etatRelay;
-
   if (relayVanneFroid == 'ON') {
     const relay_22_ON = new Gpio(22, 'out');
 
@@ -127,6 +132,7 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
 
     setTimeout(() => {
       const relay_22_OFF = new Gpio(22, 'in');
+      const relay_23_OFF = new Gpio(23, 'in');
 
       etatRelay = 0;
 
@@ -136,7 +142,11 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
     }, 5000);
   }
   if (relayVanneFroid == 'OFF') {
-    const relay_22_OFF = new Gpio(22, 'in');
+    const relay_22_OFF = new Gpio(22, 'out');
+
+    setTimeout(() => {
+      const relay_22_OFF = new Gpio(22, 'in');
+    }, 5000);
 
     etatRelay = 0;
 
@@ -154,40 +164,40 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
   //
   let relayVanneFroid = req.body.etatRelay;
 
-  let etatRelay;
-
   if (relayVanneFroid == 'ON') {
     const relay_22_ON = new Gpio(22, 'out');
 
     const relay_23_ON = new Gpio(23, 'out');
 
-    etatRelay = 5;
+    etatRelay = 40;
+
+    // console.log('etatRelay =====> ' + etatRelay);
+
+    miseAjourEtatRelay();
 
     res.status(200).json({ message: 'Relay Vanne Froid à 40 Secondes ON: OK' });
-
-    console.log('Vanne froid 40S ON');
 
     setTimeout(() => {
       const relay_22_OFF = new Gpio(22, 'in');
 
-      etatRelay = 0;
+      const relay_23_OFF = new Gpio(22, 'in');
 
-      // miseAjourEtatRelay();
-
-      console.log('Vanne froid 40S OFF');
+      // console.log('Vanne froid ouverte pour 40S ');
     }, 40000);
   }
   if (relayVanneFroid == 'OFF') {
-    const relay_22_OFF = new Gpio(22, 'in');
+    const relay_22_OFF = new Gpio(22, 'out');
+
+    setTimeout(() => {
+      const relay_22_OFF = new Gpio(22, 'in');
+    }, 40000);
 
     etatRelay = 0;
 
-    // miseAjourEtatRelay();
+    miseAjourEtatRelay();
 
-    res
-      .status(200)
-      .json({ message: 'Relay Vanne Froid à 40 Secondes OFF: OK' });
+    res.status(200).json({ message: 'Relay Vanne Froid à 40 Secondes fermée' });
 
-    console.log('Vanne froid 40S OFF');
+    // console.log('Vanne froid 40S OFF');
   }
 };

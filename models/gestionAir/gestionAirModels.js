@@ -25,6 +25,10 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.FLOAT,
     },
 
+    actionRelay: {
+      type: Sequelize.FLOAT,
+    },
+
     etatRelay: {
       type: Sequelize.FLOAT,
     },

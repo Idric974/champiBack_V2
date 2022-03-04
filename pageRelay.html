@@ -281,9 +281,9 @@
               'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/'
             )
             .then(function (response) {
-              console.log(response.data.temperatureAir.etatRelay);
+              // console.log(response.data.temperatureAir.actionRelay);
 
-              valeurEtatVanne = response.data.temperatureAir.etatRelay;
+              valeurEtatVanne = response.data.temperatureAir.actionRelay;
               // console.log(
               //   'Valeur de la vanne au clic' + typeof valeurEtatVanne
               // );
@@ -293,7 +293,7 @@
             })
 
             .then(() => {
-              if (valeurEtatVanne > 0) {
+              if (valeurEtatVanne == 1) {
                 afficheEtatRelay();
                 alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
                 return;
@@ -333,9 +333,9 @@
               'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/'
             )
             .then(function (response) {
-              console.log(response.data.temperatureAir.etatRelay);
+              // console.log(response.data.temperatureAir.actionRelay);
 
-              valeurEtatVanne = response.data.temperatureAir.etatRelay;
+              valeurEtatVanne = response.data.temperatureAir.actionRelay;
               // console.log(
               //   'Valeur de la vanne au clic' + typeof valeurEtatVanne
               // );
@@ -345,7 +345,7 @@
             })
 
             .then(() => {
-              if (valeurEtatVanne > 0) {
+              if (valeurEtatVanne == 1) {
                 afficheEtatRelay();
                 alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
                 return;
@@ -391,9 +391,9 @@
               'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/'
             )
             .then(function (response) {
-              console.log(response.data.temperatureAir.etatRelay);
+              // console.log(response.data.temperatureAir.actionRelay);
 
-              valeurEtatVanne = response.data.temperatureAir.etatRelay;
+              valeurEtatVanne = response.data.temperatureAir.actionRelay;
               // console.log(
               //   'Valeur de la vanne au clic' + typeof valeurEtatVanne
               // );
@@ -403,7 +403,7 @@
             })
 
             .then(() => {
-              if (valeurEtatVanne > 0) {
+              if (valeurEtatVanne == 1) {
                 afficheEtatRelay();
                 alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
                 return;
@@ -443,9 +443,9 @@
               'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/'
             )
             .then(function (response) {
-              console.log(response.data.temperatureAir.etatRelay);
+              // console.log(response.data.temperatureAir.actionRelay);
 
-              valeurEtatVanne = response.data.temperatureAir.etatRelay;
+              valeurEtatVanne = response.data.temperatureAir.actionRelay;
               // console.log(
               //   'Valeur de la vanne au clic' + typeof valeurEtatVanne
               // );
@@ -455,7 +455,7 @@
             })
 
             .then(() => {
-              if (valeurEtatVanne > 0) {
+              if (valeurEtatVanne == 1) {
                 afficheEtatRelay();
                 alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
                 return;
