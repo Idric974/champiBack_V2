@@ -275,6 +275,20 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+
+    <script>
+      // Actualiser la page actuelle.
+
+      setInterval(() => {
+        window.location.reload();
+      }, 1800000);
+
+      let myDate = new Date();
+      let date = myDate.toLocaleString();
+
+      console.log('Page actualisée le : ' + date);
+    </script>
+
     <script>
       // Afficher la date.
       function pause(ms) {

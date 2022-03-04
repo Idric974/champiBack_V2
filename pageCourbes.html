@@ -24,34 +24,82 @@
       <!-- FIN NAVIGATION -->
 
       <!-- MAIN -->
-      <div class="box2">
-        <div class="box2Title">Gestion des courbes</div>
+      <div class="courbePage">
+        <canvas id="graph1"></canvas>
       </div>
       <!-- FIN MAIN -->
     </div>
 
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.25.0/axios.js"
-      integrity="sha512-II/TvxJGs27N3NEu/WWRFtyhBdSByZwS5ovX1vHXVsi2JXj0I5hRvHwgBPKbzZDk0wsKVDoEUEI8rAYGEF394A=="
+      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"
+      integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
 
     <script>
-      // Actualiser la page actuelle.
+      let ctx = document.getElementById('graph1').getContext('2d');
 
-      setInterval(() => {
-        window.location.reload();
-      }, 1800000);
+      let data30 = [10, 20, 30, 40, 15, 26, 45, 21, 15, 10];
 
-      let myDate = new Date();
-      let date = myDate.toLocaleString();
+      let data = {
+        labels: [
+          'J-10',
+          'J-9',
+          'J-8',
+          'J-7',
+          'J-6',
+          'J-5',
+          'J-4',
+          'J-3',
+          'J-2',
+          'J-1',
+          'J-J',
+        ],
+        datasets: [
+          {
+            data: [10, 20, 30, 40, 15, 26, 45, 21, 15, 10, 33],
+            backgroundColor: 'rgba(75,192,192,0.4)',
+            borderColor: 'rgba(75,192,192,1)',
+            color: 'black',
+            label: 'Courbe 1',
+            lineTension: 0.2,
+          },
+          {
+            data: [20, 40, 10, 70, 15, 25, 15, 45, 65, 25, 25],
+            backgroundColor: 'green',
+            borderColor: 'balck',
+            lineTension: 0.2,
+            label: 'Courbe 2',
+          },
+        ],
+      };
 
-      console.log('Page actualisée le : ' + date);
-    </script>
+      let options = {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          labels: {
+            font: {
+              size: 30,
+            },
+          },
+          title: {
+            display: true,
+            text: 'Courbes',
+          },
+        },
+      };
 
-    <script>
-      console.log('Pages courbes');
+      const config = {
+        type: 'line',
+        data: data,
+        options: options,
+      };
+
+      let graph1 = new Chart(ctx, config);
     </script>
   </body>
 </html>

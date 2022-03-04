@@ -12,7 +12,8 @@
     "⚡_AfficherListeTable": " node /home/pi/Desktop/champiBack_V2/SQL/lireBaseDeDonnee/afficherListeTable.js",
     "⚡_AfficherListeBase": " node /home/pi/Desktop/champiBack_V2/SQL/lireBaseDeDonnee/afficherListeBase.js",
     "⚡_CreerTable": " node /home/pi/Desktop/champiBack_V2/SQL/creerBaseDeDonnee/creerTable.js",
-    "⚡_SupprimerTable": " node /home/pi/Desktop/champiBack_V2/SQL/supprimerBaseDeDonnee/supprimerTable.js"
+    "⚡_SupprimerTable": " node /home/pi/Desktop/champiBack_V2/SQL/supprimerBaseDeDonnee/supprimerTable.js",
+    "⚡_MiseAJourTable": " node /home/pi/Desktop/champiBack_V2/SQL/miseAJourBaseDeDonnee/miseAJourTable.js"
   },
   "repository": {
     "type": "git",
