@@ -23,7 +23,7 @@ miseAjourEtatRelay = () => {
       raw: true,
     })
     .then((id) => {
-      console.log('Le dernier id de gestionAir est : ', id);
+      // console.log('Le dernier id de gestionAir est : ', id);
       // console.log(id.maxid);
       lastId = id.maxid;
 
@@ -124,7 +124,9 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
 
     const relay_23_ON = new Gpio(23, 'out');
 
-    etatRelay = 5;
+    etatRelay = 5000;
+
+    miseAjourEtatRelay();
 
     res.status(200).json({ message: 'Relay Vanne Froid à 5 Secondes ON: OK' });
 
@@ -132,11 +134,8 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
 
     setTimeout(() => {
       const relay_22_OFF = new Gpio(22, 'in');
+
       const relay_23_OFF = new Gpio(23, 'in');
-
-      etatRelay = 0;
-
-      // miseAjourEtatRelay();
 
       console.log('Vanne froid 5S OFF');
     }, 5000);
@@ -146,9 +145,11 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
 
     setTimeout(() => {
       const relay_22_OFF = new Gpio(22, 'in');
-    }, 5000);
 
-    etatRelay = 0;
+      etatRelay = 0;
+
+      miseAjourEtatRelay();
+    }, 5000);
 
     // miseAjourEtatRelay();
 
@@ -169,7 +170,7 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
 
     const relay_23_ON = new Gpio(23, 'out');
 
-    etatRelay = 40;
+    etatRelay = 40000;
 
     // console.log('etatRelay =====> ' + etatRelay);
 
@@ -180,13 +181,14 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
     setTimeout(() => {
       const relay_22_OFF = new Gpio(22, 'in');
 
-      const relay_23_OFF = new Gpio(22, 'in');
+      const relay_23_OFF = new Gpio(23, 'in');
 
       // console.log('Vanne froid ouverte pour 40S ');
     }, 40000);
   }
   if (relayVanneFroid == 'OFF') {
     const relay_22_OFF = new Gpio(22, 'out');
+    console.log('relayVanneFroid == OFF');
 
     setTimeout(() => {
       const relay_22_OFF = new Gpio(22, 'in');

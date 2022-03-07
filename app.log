@@ -35,3 +35,31 @@
 2022-03-03T12:28:50.447Z - [INFO   ] - Fchier source : gestionAir | Module : Mise à jour de etat relay dans la base de donnée | Type erreur :  gestionAirModels_etat_relay is not defined  
 2022-03-03T17:03:41.520Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  location is not defined  
 2022-03-03T17:05:31.366Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  history is not defined  
+2022-03-04T18:38:58.149Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T18:43:01.087Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T18:45:00.679Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T18:46:49.192Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T18:55:23.436Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T18:56:23.041Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T18:58:15.411Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T19:01:47.389Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T19:04:01.891Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T19:06:50.081Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T19:07:52.433Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T19:10:26.206Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T19:11:28.296Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T19:17:48.614Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T19:19:13.084Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T19:22:49.701Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T19:24:00.007Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T19:28:12.705Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-04T19:30:44.500Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-06T16:14:15.979Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-06T16:15:55.185Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-06T16:17:14.662Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-06T16:19:25.217Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-06T16:21:36.437Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-06T16:22:35.784Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-06T16:24:20.188Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  (intermediate value).then is not a function  
+2022-03-06T16:26:15.939Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
+2022-03-06T16:38:01.004Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not defined  

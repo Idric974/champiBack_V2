@@ -75,13 +75,13 @@
                     onclick="vanneFroid5SesoncdesOn()"
                     class="boutonActivation"
                   >
-                    Activation
+                    Ouverture
                   </button>
                   <button
                     onclick="vanneFroid5SesoncdesOff()"
                     class="boutonDeactivation"
                   >
-                    Déactivation
+                    Fermeture
                   </button>
                 </div>
 
@@ -91,13 +91,13 @@
                     onclick="vanneFroid40SesoncdesOn()"
                     class="boutonActivation"
                   >
-                    Activation
+                    Ouverture
                   </button>
                   <button
                     onclick="vanneFroid40SesoncdesOff()"
                     class="boutonDeactivation"
                   >
-                    Déactivation
+                    Fermeture
                   </button>
                 </div>
               </div>
@@ -249,6 +249,7 @@
       // 1) Affichage de l'état de la vanne froid.
 
       let etatRelay;
+      let etatRelayLocalStorage;
 
       let afficheEtatRelay = () => {
         axios
@@ -256,13 +257,18 @@
           .then(function (response) {
             // console.log(response.data.temperatureAir.etatRelay);
 
-            etatRelay = JSON.stringify(response.data.temperatureAir.etatRelay);
-            // console.log('*****' + etatRelay);
+            etatRelayLocalStorage =
+              (response.data.temperatureAir.etatRelay / 1000 / 40) * 100;
+            console.log(
+              'etatRelayLocalStorage : ' + etatRelayLocalStorage + '%'
+            );
+
+            etatRelay = JSON.stringify(etatRelayLocalStorage);
 
             localStorage.setItem('Etat relay : ', etatRelay);
 
             document.getElementById('etatRelay').innerHTML =
-              'Etat Vanne froid, ouvert pour ' + etatRelay + 's';
+              'Etat Vanne froid, ouvert à : ' + etatRelay + '%';
           })
           .catch(function (error) {
             console.log(error);
@@ -310,6 +316,7 @@
                   )
                   .then(function (response) {
                     console.log(response.data);
+                    console.log('Clic sur bouton ouverture à 5s');
                   })
                   .catch(function (error) {
                     console.log(error);
@@ -321,7 +328,10 @@
             });
         };
         captureEtatRelay();
-        afficheEtatRelay();
+
+        setTimeout(() => {
+          afficheEtatRelay();
+        }, 1000);
       };
 
       let vanneFroid5SesoncdesOff = () => {
@@ -362,6 +372,7 @@
                   )
                   .then(function (response) {
                     console.log(response.data);
+                    console.log('Clic sur bouton fermeture à 5s');
                   })
                   .catch(function (error) {
                     console.log(error);
@@ -373,7 +384,10 @@
             });
         };
         captureEtatRelay();
-        afficheEtatRelay();
+
+        setTimeout(() => {
+          afficheEtatRelay();
+        }, 6000);
       };
 
       // -----------------------------------------------------------------
@@ -431,7 +445,10 @@
             });
         };
         captureEtatRelay();
-        afficheEtatRelay();
+
+        setTimeout(() => {
+          afficheEtatRelay();
+        }, 1000);
       };
 
       let vanneFroid40SesoncdesOff = () => {
@@ -460,7 +477,7 @@
                 alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
                 return;
               } else {
-                console.log('Vanne froid à 5 secondes OFF');
+                console.log('Vanne froid à 40 secondes OFF');
 
                 let etatVanne = 'OFF';
 
@@ -483,8 +500,12 @@
               console.log(error);
             });
         };
+
         captureEtatRelay();
-        afficheEtatRelay();
+
+        setTimeout(() => {
+          afficheEtatRelay();
+        }, 40500);
       };
       // -----------------------------------------------------------------
 
