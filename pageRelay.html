@@ -268,7 +268,7 @@
             localStorage.setItem('Etat relay : ', etatRelay);
 
             document.getElementById('etatRelay').innerHTML =
-              'Etat Vanne froid, ouvert à : ' + etatRelay + '%';
+              'Etat Vanne froid à : ' + etatRelay + '%';
           })
           .catch(function (error) {
             console.log(error);
@@ -301,7 +301,7 @@
             .then(() => {
               if (valeurEtatVanne == 1) {
                 afficheEtatRelay();
-                alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
+                alert('ATTENTION!! ACTION VANNE EN COURS');
                 return;
               } else {
                 console.log('Vanne froid à 5 secondes ON');
@@ -357,7 +357,7 @@
             .then(() => {
               if (valeurEtatVanne == 1) {
                 afficheEtatRelay();
-                alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
+                alert('ATTENTION!! ACTION VANNE EN COURS');
                 return;
               } else {
                 // console.log('Vanne froid à 5 secondes OFF');
@@ -419,7 +419,7 @@
             .then(() => {
               if (valeurEtatVanne == 1) {
                 afficheEtatRelay();
-                alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
+                alert('ATTENTION!! ACTION VANNE EN COURS');
                 return;
               } else {
                 console.log('Vanne froid à 40 secondes ON');
@@ -474,7 +474,7 @@
             .then(() => {
               if (valeurEtatVanne == 1) {
                 afficheEtatRelay();
-                alert('ATTENTION, OUVERTE VANNE FROID EN COURS');
+                alert('ATTENTION!! ACTION VANNE EN COURS');
                 return;
               } else {
                 console.log('Vanne froid à 40 secondes OFF');

@@ -1,35 +1,31 @@
-let etatVanneMax = 40000;
+const mysql = require('mysql');
 
-let etatVanne = 15000;
-let preconisation = 15000;
+const con = mysql.createConnection({
+  host: 'localhost',
+  user: 'idric',
+  password: 'Kup33uC4W6',
+  database: 'champyresi',
+});
 
-let tempOuvertureVanne;
+let table = 'gestion_hums';
+let dateDebut = '2022-02-01';
+let dateFin = '2022-02-28';
 
-let test = () => {
-  if (etatVanne >= etatVanneMax) {
-    // CAS 1.
-    console.log('CAS 1 : etatVanne >= etatVanneMax ===> return');
+//* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+con.connect(function (err) {
+  if (err) throw err;
+  console.log('Connecté à la base de données MySQL!');
 
-    return;
-    //
-  } else if (preconisation + etatVanne >= etatVanneMax) {
-    // CAS 2.
-    tempOuvertureVanne = etatVanneMax - preconisation;
-    console.log(
-      'CAS 2 : preconisation + etatVanne >= etatVanneMax : ' +
-        tempOuvertureVanne
-      //
-    );
-  } else {
-    // CAS 3.
-    tempOuvertureVanne = preconisation;
-    console.log(
-      'CAS 3 : etatVanneMax + preconisation < etatVanneMax : ' +
-        tempOuvertureVanne
-    );
+  con.query(
+    'SELECT * FROM ' +
+      table +
+      ' ' +
+      'WHERE DATE(createdAt)  BETWEEN 2022-02-01 AND  2022-02-28 ORDER BY createdAt ASC',
 
-    //
-  }
-};
-
-test();
+    function (err, result) {
+      if (err) throw err;
+      console.log(result);
+    }
+  );
+});
+//* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖

@@ -40,55 +40,172 @@
     <script>
       let ctx = document.getElementById('graph1').getContext('2d');
 
-      let data30 = [10, 20, 30, 40, 15, 26, 45, 21, 15, 10];
+      let xValues = [];
+      let yValues = [];
+
+      let dataTauxHumidité = [
+        12, 14, 16, 18, 23, 22, 12, 13, 14, 15, 16, 17, 15, 15, 16, 13, 13, 17,
+        15, 16, 12, 14, 15, 16, 13, 14, 15, 12, 13, 16, 14, 15, 16, 12, 13, 14,
+        15, 15, 14, 12, 15, 14, 14, 15, 16, 13, 17, 15, 13, 15, 14, 15, 12, 12,
+        12, 15, 14, 18, 16, 16,
+      ];
+      let dataConsigneHumidité = [10, 12, 14, 12, 13];
 
       let data = {
+        // Labels = informations de l'axe X.
         labels: [
-          'J-10',
-          'J-9',
-          'J-8',
-          'J-7',
-          'J-6',
-          'J-5',
-          'J-4',
-          'J-3',
-          'J-2',
           'J-1',
-          'J-J',
+          'J-2',
+          'J-3',
+          'J-4',
+          'J-5',
+          'J-6',
+          'J-7',
+          'J-8',
+          'J-9',
+          'J-10',
+          'J-11',
+          'J-12',
+          'J-13',
+          'J-14',
+          'J-15',
+          'J-16',
+          'J-17',
+          'J-18',
+          'J-19',
+          'J-20',
+          'J-21',
+          'J-22',
+          'J-23',
+          'J-24',
+          'J-25',
+          'J-26',
+          'J-27',
+          'J-28',
+          'J-29',
+          'J-30',
+          'J-31',
+          'J-32',
+          'J-33',
+          'J-34',
+          'J-35',
+          'J-36',
+          'J-37',
+          'J-38',
+          'J-39',
+          'J-40',
         ],
         datasets: [
           {
-            data: [10, 20, 30, 40, 15, 26, 45, 21, 15, 10, 33],
-            backgroundColor: 'rgba(75,192,192,0.4)',
-            borderColor: 'rgba(75,192,192,1)',
-            color: 'black',
-            label: 'Courbe 1',
+            label: 'Taux humidite',
+            data: dataTauxHumidité,
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
             lineTension: 0.2,
+            borderWidth: 2,
+            pointRadius: 1,
           },
           {
-            data: [20, 40, 10, 70, 15, 25, 15, 45, 65, 25, 25],
-            backgroundColor: 'green',
-            borderColor: 'balck',
+            label: 'Consigne Humidite',
+            data: dataConsigneHumidité,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
             lineTension: 0.2,
-            label: 'Courbe 2',
+            borderWidth: 2,
+            pointRadius: 1,
           },
         ],
       };
 
       let options = {
-        responsive: true,
+        scales: {
+          yAxes: [
+            {
+              display: true,
+              position: 'right',
+              ticks: {
+                beginAtZero: false,
+                min: 60,
+                max: 100,
+                stepSize: 1,
+              },
+            },
+            {
+              display: true,
+              position: 'left',
+              ticks: {
+                beginAtZero: false,
+                min: 60,
+                max: 100,
+                stepSize: 1,
+              },
+            },
+          ],
+
+          xAxes: [
+            {
+              id: 'xAxis1',
+              type: 'time',
+              display: false,
+              time: {
+                displayFormats: {
+                  quarter: 'HH:mm',
+                },
+              },
+              // ticks:{
+              //     callback:function(label){
+              //         return label.heure.hour() + ":" + label.heure.format("mm");
+              //     }
+              // }
+            },
+            {
+              id: 'xAxis2',
+              type: 'category',
+              display: true,
+              time: {
+                displayFormats: {
+                  quarter: 'HH:mm',
+                },
+              },
+              ticks: {
+                callback: function (label) {
+                  return label.heure.hour() + ':' + label.heure.format('mm');
+                },
+              },
+            },
+            {
+              id: 'xAxis3',
+              type: 'category',
+              gridLines: {
+                drawOnChartArea: false, // only want the grid lines for one axis to show up
+              },
+              ticks: {
+                callback: function (label) {
+                  return 'Jour ' + label.jour;
+                },
+              },
+            },
+          ],
+        },
+
         plugins: {
           legend: {
-            position: 'top',
-          },
-          labels: {
-            font: {
-              size: 30,
+            labels: {
+              // This more specific font property overrides the global property
+              font: {
+                size: 16,
+              },
             },
           },
-          title: {
-            display: true,
-            text: 'Courbes',
+        },
+
+        layout: {
+          padding: 10,
+        },
+
+        elements: {
+          point: {
+            radius: 0,
           },
         },
       };

@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const gestionAirRoutes = require('./routes/gestionAirRoutes');
 const gestionHumidite = require('./routes/gestionHumiditeRoutes');
 const gestionCo2 = require('./routes/gestionCo2Routes');
+const gestionCourbe = require('./routes/gestionCourbeRoutes');
 
 // Logs
 const gestionLogs = require('./routes/logsBackRoutes');
@@ -62,6 +63,10 @@ app.get('/pageCourbes.html', (req, res) => {
   res.sendFile(__dirname + '/pageCourbes.html');
 });
 
+app.get('/pageCourbes2.html', (req, res) => {
+  res.sendFile(__dirname + '/pageCourbes2.html');
+});
+
 app.get('/pageRelay.html', (req, res) => {
   res.sendFile(__dirname + '/pageRelay.html');
 });
@@ -71,13 +76,16 @@ app.get('/pageRelay.html', (req, res) => {
 //! Les images.
 
 app.use('/images', express.static('/home/pi/Desktop/champiBack_V2/images'));
-
 //! --------------------------------------------------
 
 //! Le CSS.
 
 app.use('/styles', express.static('/home/pi/Desktop/champiBack_V2/styles'));
+//! --------------------------------------------------
 
+//! Le Javascript.
+
+app.use('/mainsJs', express.static('/home/pi/Desktop/champiBack_V2/mainsJs'));
 //! --------------------------------------------------
 
 //! Liste des routes.
@@ -86,6 +94,7 @@ app.use('/styles', express.static('/home/pi/Desktop/champiBack_V2/styles'));
 app.use('/api/gestionAirRoutes', gestionAirRoutes);
 app.use('/api/gestionHumiditeRoutes', gestionHumidite);
 app.use('/api/gestionCo2Routes', gestionCo2);
+app.use('/api/gestionCourbeRoutes', gestionCourbe);
 
 // Logs
 app.use('/api/logsBackRoutes', gestionLogs);

@@ -5,6 +5,12 @@ const db = require('../../models');
 const gestionHumModels = db.gestionHum;
 const moment = require('moment');
 
+let dateDeDebut = moment().subtract(10, 'days').format('YYYY-MM-DD');
+console.log('Date de début : ', dateDeDebut);
+
+let dateDeFin = moment().format('YYYY-MM-DD');
+console.log('Date de fin : ', dateDeFin);
+
 let info = [];
 
 let selectData = () => {
