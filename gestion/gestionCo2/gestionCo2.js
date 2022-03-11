@@ -11,7 +11,7 @@ const gestionCo2DataModels = db.gestionCo2Data;
 
 //* Les variables.
 
-let tauxCO2;
+let tauxCO2 = 1500;
 let consigne;
 let deltaCo2;
 let daysCo2;
@@ -26,22 +26,107 @@ async function updateTimeVariateur() {
       .get('http://192.168.0.10:6000/getCO2/2', (resp) => {
         data = '';
 
-        resp.on('data', (chunk) => {
-          data += chunk;
-          // console.log(
-          //   cyan,
-          //   '[ GESTION CO2 CALCULES  ] Valeur CO2 de la master',
-          //   data
-          // );
+        resp
+          .on('data', (chunk) => {
+            data += chunk;
+            // console.log(
+            //   cyan,
+            //   '[ GESTION CO2 CALCULES  ] Valeur CO2 de la master',
+            //   data
+            // );
 
-          // Taux de Co2.
-          tauxCO2 = parseFloat(data).toFixed(2);
-          // console.log(
-          //   cyan,
-          //   '[ GESTION CO2 CALCULES  ] Le taux de CO2 est de : ',
-          //   tauxCO2
-          // );
-        });
+            // Taux de Co2.
+            tauxCO2 = parseFloat(data).toFixed(2);
+            // console.log(
+            //   cyan,
+            //   '[ GESTION CO2 CALCULES  ] Le taux de CO2 est de : ',
+            //   tauxCO2
+            // );
+          })
+          .then(() => {
+            //! Récupération de la consigne
+
+            let recuperationConsigneCo2 = () => {
+              gestionCo2DataModels
+                .findOne({
+                  attributes: [
+                    [sequelize.fn('max', sequelize.col('id')), 'maxid'],
+                  ],
+                  raw: true,
+                })
+                .then((id) => {
+                  // console.log(id.maxid);
+
+                  gestionCo2DataModels
+                    .findOne({
+                      where: { id: id.maxid },
+                    })
+                    .then((result) => {
+                      // console.log(result);
+
+                      lastId = result['id'];
+                      // console.log('LastId :   ', lastId);
+
+                      consigne = result['consigneCo2'];
+                      console.log('Consigne ===========> : ', consigne);
+
+                      pas = result['pasCo2'];
+                      // console.log('Pas :      ', pas);
+
+                      objectif = result['objectifCo2'];
+                      // console.log('Objectif : ', objectif);
+                    });
+                });
+            };
+
+            recuperationConsigneCo2();
+
+            //!------------------------------------------------------------
+          })
+          //! Calcule du delta.
+
+          .then(() => {
+            let calcDelta = () => {
+              deltaCo2 = tauxCO2 - consigne;
+              console.log(
+                cyan,
+                '[ GESTION CO2 CALCULES  ] Le delta de Co2 est de :',
+                deltaCo2
+              );
+            };
+
+            calcDelta();
+          });
+
+        //!----------------------------------------------
+      })
+      .then(() => {
+        //! 4) Enregistrement en base de donnes.
+
+        let enregistrament = () => {
+          const newVal = gestionCo2Models
+            .create({
+              tauxCo2: tauxCO2,
+              deltaCo2: deltaCo2,
+            })
+            .then(() => {
+              console.log(
+                cyan,
+                '[ GESTION CO2 CALCULES  ] Données transférées à la base de données gestion_co2s.'
+              );
+            })
+            .catch((error) => {
+              console.log(
+                cyan,
+                '[ GESTION CO2 CALCULES  ] Erreur dans le processus d’enregistrement dans la base gestion_co2s',
+                error
+              );
+            });
+        };
+
+        enregistrament();
+
+        //!----------------------------------------------
       })
 
       .on('error', (err) => {
@@ -60,85 +145,4 @@ async function updateTimeVariateur() {
   });
 }
 
-updateTimeVariateur()
-  .then(() => {
-    // Récupération de la consigne
-
-    let recuperationConsigneCo2 = () => {
-      gestionCo2DataModels
-        .findOne({
-          attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
-          raw: true,
-        })
-        .then((id) => {
-          // console.log(id.maxid);
-
-          gestionCo2DataModels
-            .findOne({
-              where: { id: id.maxid },
-            })
-            .then((result) => {
-              // console.log(result);
-
-              lastId = result['id'];
-              // console.log('LastId :   ', lastId);
-
-              consigne = result['consigneCo2'];
-              // console.log('Consigne : ', consigne);
-
-              pas = result['pasCo2'];
-              // console.log('Pas :      ', pas);
-
-              objectif = result['objectifCo2'];
-              // console.log('Objectif : ', objectif);
-            });
-        });
-    };
-
-    recuperationConsigneCo2();
-
-    //------------------------------------------------------------
-  })
-
-  //! 3) Calcule du delta Co2.
-
-  // .then(() => {
-  //   let calcDelta = () => {
-  //     deltaCo2 = parseFloat(tauxCO2 - consigne).toFixed(2);
-  //     console.log(
-  //       cyan,
-  //       '[ GESTION CO2 CALCULES  ] Le delta de Co2 est de :',
-  //       deltaCo2
-  //     );
-  //   };
-
-  //   calcDelta();
-  // })
-  // ---------------------------------
-
-  //! 4) Enregistrement en base de donnes.
-
-  .then(() => {
-    let enregistrament = () => {
-      const newVal = gestionCo2Models
-        .create({
-          tauxCo2: tauxCO2,
-          deltaCo2: deltaCo2,
-        })
-        .then(() => {
-          // console.log(
-          //   cyan,
-          //   '[ GESTION CO2 CALCULES  ] Données transférées à la base de données gestion_co2s.'
-          // );
-        })
-        .catch((error) => {
-          // console.log(
-          //   cyan,
-          //   '[ GESTION CO2 CALCULES  ] Erreur dans le processus d’enregistrement dans la base gestion_co2s',
-          //   error
-          // );
-        });
-    };
-
-    enregistrament();
-  });
+updateTimeVariateur();
