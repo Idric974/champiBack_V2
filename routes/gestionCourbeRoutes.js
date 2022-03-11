@@ -3,6 +3,12 @@ const router = express.Router();
 
 // GET
 const affichageDataCourbe = require('../controllers/gestionCourbeControllers');
-router.get('/getDataCourbe', affichageDataCourbe.getDataCourbe);
+router.get('/getTauxHumiditeCourbe', affichageDataCourbe.getTauxHumiditeCourbe);
+
+const affichageConsigneHumiditeCourbe = require('../controllers/gestionCourbeControllers');
+router.get(
+  '/getconsigneHumiditeCourbe',
+  affichageConsigneHumiditeCourbe.getconsigneHumiditeCourbe
+);
 
 module.exports = router;

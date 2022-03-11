@@ -28,6 +28,7 @@
   "homepage": "https://github.com/Idric974/champiBack_V2#readme",
   "dependencies": {
     "axios": "^0.26.0",
+    "chartjs-adapter-moment": "^1.0.0",
     "concurrently": "^7.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
@@ -35,6 +36,7 @@
     "fs": "^0.0.1-security",
     "gpio": "^0.2.10",
     "mcp-spi-adc": "^3.2.0",
+    "moment": "^2.29.1",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
     "node-schedule": "^2.1.0",
