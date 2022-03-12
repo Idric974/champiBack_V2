@@ -30,7 +30,7 @@
 .box {
   display: flex;
   flex-direction: row;
-  height: 100vh;
+  /* height: 100vh; */
 }
 
 .box1,
@@ -330,32 +330,84 @@
 .boxGraph {
   width: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
 }
 
 .boxCourbes {
-  width: 95%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border: solid green 1px;
+  /* border: solid green 1px; */
 }
 
 .graph1 {
-  width: 95%;
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  margin-top: 20px;
+  /* flex-direction: column; */
+  /* justify-content: center; */
   border-radius: 10px;
   box-shadow: 0px 0px 10px 1px black;
 }
 
 .graph2 {
-  width: 95%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
 
   box-shadow: 0px 0px 10px 1px black;
+}
+
+.tabBox {
+  width: 85%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+.tablinks {
+  width: 300px;
+  margin-top: 20px;
+}
+
+.tab {
+  /* border: solid green 1px; */
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+  box-shadow: 0px 0px 10px 1px black;
+  border-radius: 10px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  width: 99%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  display: none;
 }

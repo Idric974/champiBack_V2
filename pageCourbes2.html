@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Champi</title>
+    <link rel="icon" type="image/png" href="./images/champignon.ico" />
+    <link rel="stylesheet" type="text/css" href="./styles/globaleStyles.css" />
+    <link rel="stylesheet" type="text/css" href="./styles/style.css" />
+  </head>
+  <body>
+    <!-- NAVIGATION -->
+    <div class="boxGraph">
+      <div class="box1">
+        <button class="boutonAccueil"><a href="/">Accueil</a></button>
+        <button class="boutonAccueil">
+          <a href="/pageRelay.html">Gestion Relay</a>
+        </button>
+        <button class="boutonAccueil">
+          <a href="/pageCourbes.html">Courbe</a>
+        </button>
+      </div>
+      <!-- FIN NAVIGATION -->
+
+      <!-- MAIN -->
+
+      <div class="tabBox">
+        <div class="tab">
+          <button class="tablinks" onclick="openCity(event, 'London')">
+            Courbes gestion air
+          </button>
+          <button class="tablinks" onclick="openCity(event, 'Paris')">
+            Courbes gestion humidité
+          </button>
+          <button class="tablinks" onclick="openCity(event, 'Tokyo')">
+            Courbes gestion Co2
+          </button>
+        </div>
+
+        <div id="London" class="tabcontent">
+          <canvas class="graph1" id="graph1"></canvas>
+        </div>
+
+        <div id="Paris" class="tabcontent">
+          <canvas class="graph1" id="graph1"></canvas>
+        </div>
+
+        <div id="Tokyo" class="tabcontent">
+          <canvas class="graph1" id="graph1"></canvas>
+        </div>
+      </div>
+
+      <!-- FIN MAIN -->
+    </div>
+
+    <script>
+      function openCity(evt, cityName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName('tabcontent');
+        for (i = 0; i < tabcontent.length; i++) {
+          tabcontent[i].style.display = 'none';
+        }
+        tablinks = document.getElementsByClassName('tablinks');
+        for (i = 0; i < tablinks.length; i++) {
+          tablinks[i].className = tablinks[i].className.replace(' active', '');
+        }
+        document.getElementById(cityName).style.display = 'block';
+        evt.currentTarget.className += ' active';
+      }
+    </script>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"
+      integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/moment@^2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1"></script>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.25.0/axios.js"
+      integrity="sha512-II/TvxJGs27N3NEu/WWRFtyhBdSByZwS5ovX1vHXVsi2JXj0I5hRvHwgBPKbzZDk0wsKVDoEUEI8rAYGEF394A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script>
+      let tauxHumidite = [];
+      let listTauxHumidite;
+      let consigneHumidite = [];
+      let listConsigneHumidite;
+
+      let temperatureSec180 = [];
+      let listTemperatureSec180;
+
+      let temperatureHum90 = [];
+      let listTemperatureHum90;
+
+      let date;
+
+      let lab = [];
+      let listLab;
+
+      let getDataCourbeHumidite = () => {
+        axios({
+          url: 'http://localhost:3003/api/gestionCourbeRoutes/getTauxHumiditeCourbe/',
+          method: 'get',
+        })
+          .then((response) => {
+            console.log(response.data.tauxHumiditeCourbe);
+
+            // Taux humidité
+            listTauxHumidite = response.data.tauxHumiditeCourbe;
+            listTauxHumidite.forEach((item, index) => {
+              tauxHumidite.push({ x: index, y: item['tauxHumidite'] });
+              // console.log('tauxHumidite', tauxHumidite);
+            });
+            //----------------------------------------------------------------
+
+            // Température sec.
+            listTemperatureSec180 = response.data.tauxHumiditeCourbe;
+            listTemperatureSec180.forEach((item, index) => {
+              temperatureSec180.push({
+                x: index,
+                y: item['valeursMesureSec180'],
+              });
+              // console.log('temperatureSec180', temperatureSec180);
+            });
+            //----------------------------------------------------------------
+
+            // Température Humide
+            listTemperatureHum90 = response.data.tauxHumiditeCourbe;
+
+            listTemperatureHum90.forEach((item, index) => {
+              temperatureHum90.push({
+                x: index,
+                y: item['valeursMesureHum90'],
+              });
+              // console.log('temperatureHum90', temperatureHum90);
+            });
+            //----------------------------------------------------------------
+
+            listLab = response.data.tauxHumiditeCourbe;
+
+            listLab.forEach((index) => {
+              lab.push(JSON.stringify({ x: index['createdAt'] }));
+              // console.log({ x: index['createdAt'] });
+            });
+          })
+
+          .then(() => {
+            axios({
+              url: 'http://localhost:3003/api/gestionCourbeRoutes/getconsigneHumiditeCourbe/',
+              method: 'get',
+            }).then((response) => {
+              // console.log(response.data.dataHumiditeCourbe);
+
+              listConsigneHumidite = response.data.dataHumiditeCourbe;
+
+              listConsigneHumidite.forEach((item, index) => {
+                consigneHumidite.push({ x: index, y: item['consigneHum'] });
+
+                // console.log('consigneHumidite', consigneHumidite);
+              });
+            });
+          })
+
+          .then(() => {
+            // for (let i = 1; i < 41; i++) {
+            //   date = moment().subtract(i, 'days').format('MMMM-DD');
+            //   nbJour.push('jour : ' + date);
+            //   console.log('nbJour' + nbJour);
+            // }
+          })
+
+          .then(() => {
+            let data = {
+              labels: lab,
+              datasets: [
+                {
+                  label: 'Taux humidite',
+                  data: tauxHumidite,
+                  xAxisID: 'xAxis1',
+                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                  borderColor: 'rgba(255, 99, 132, 1)',
+                  lineTension: 0.2,
+                  borderWidth: 1,
+                  // pointRadius: 1,
+                },
+                {
+                  label: 'Consigne Humidite',
+                  data: consigneHumidite,
+                  xAxisID: 'xAxis1',
+                  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  lineTension: 0.2,
+                  borderWidth: 1,
+                  // pointRadius: 1,
+                },
+
+                {
+                  label: 'Tempèrature Sec',
+                  data: temperatureSec180,
+                  xAxisID: 'xAxis1',
+                  backgroundColor: 'red',
+                  borderColor: 'red',
+                  lineTension: 0.2,
+                  borderWidth: 1,
+                  // pointRadius: 1,
+                },
+
+                {
+                  label: 'Tempèrature Hum',
+                  data: temperatureHum90,
+                  xAxisID: 'xAxis1',
+                  backgroundColor: 'green',
+                  borderColor: 'green',
+                  lineTension: 0.2,
+                  borderWidth: 1,
+                  // pointRadius: 1,
+                },
+              ],
+            };
+
+            let options = {
+              scales: {
+                x: {
+                  type: 'time',
+                  time: {
+                    unit: 'month',
+                  },
+                },
+
+                y: { beginAtZero: true },
+              },
+
+              plugins: {
+                legend: {
+                  labels: {
+                    font: {
+                      size: 20,
+                    },
+                  },
+                },
+              },
+
+              layout: {
+                padding: 20,
+              },
+
+              elements: {
+                point: {
+                  radius: 0,
+                },
+              },
+            };
+
+            let ctx = document.getElementById('graph1').getContext('2d');
+
+            const config = {
+              type: 'line',
+              data: data,
+              options: options,
+            };
+
+            let graph1 = new Chart(ctx, config);
+          })
+          .catch((error) => {
+            console.log(error);
+            console.log(JSON.stringify(error));
+          });
+      };
+
+      getDataCourbeHumidite();
+    </script>
+  </body>
+</html>

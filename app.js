@@ -59,12 +59,16 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/pageRelay.html', (req, res) => {
+  res.sendFile(__dirname + '/pageRelay.html');
+});
+
 app.get('/pageCourbes.html', (req, res) => {
   res.sendFile(__dirname + '/pageCourbes.html');
 });
 
-app.get('/pageRelay.html', (req, res) => {
-  res.sendFile(__dirname + '/pageRelay.html');
+app.get('/pageCourbes2.html', (req, res) => {
+  res.sendFile(__dirname + '/pageCourbes2.html');
 });
 
 //! --------------------------------------------------
