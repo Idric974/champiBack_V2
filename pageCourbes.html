@@ -11,7 +11,7 @@
   </head>
   <body>
     <!-- NAVIGATION -->
-    <div class="box">
+    <div class="boxGraph">
       <div class="box1">
         <button class="boutonAccueil"><a href="/">Accueil</a></button>
         <button class="boutonAccueil">
@@ -25,12 +25,50 @@
 
       <!-- MAIN -->
 
-      <div class="boxCourbes">
-        <canvas class="graph1" id="graph1"></canvas>
+      <div class="tabBox">
+        <div class="tab">
+          <button class="tablinks" onclick="openCity(event, 'London')">
+            Courbes gestion air
+          </button>
+          <button class="tablinks" onclick="openCity(event, 'Paris')">
+            Courbes gestion humidité
+          </button>
+          <button class="tablinks" onclick="openCity(event, 'Tokyo')">
+            Courbes gestion Co2
+          </button>
+        </div>
+
+        <div id="London" class="tabcontent">
+          <canvas class="graph1" id="graph1"></canvas>
+        </div>
+
+        <div id="Paris" class="tabcontent">
+          <canvas class="graph1" id="graph1"></canvas>
+        </div>
+
+        <div id="Tokyo" class="tabcontent">
+          <canvas class="graph1" id="graph1"></canvas>
+        </div>
       </div>
 
       <!-- FIN MAIN -->
     </div>
+
+    <script>
+      function openCity(evt, cityName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName('tabcontent');
+        for (i = 0; i < tabcontent.length; i++) {
+          tabcontent[i].style.display = 'none';
+        }
+        tablinks = document.getElementsByClassName('tablinks');
+        for (i = 0; i < tablinks.length; i++) {
+          tablinks[i].className = tablinks[i].className.replace(' active', '');
+        }
+        document.getElementById(cityName).style.display = 'block';
+        evt.currentTarget.className += ' active';
+      }
+    </script>
 
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"

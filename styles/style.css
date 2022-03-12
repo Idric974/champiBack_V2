@@ -376,10 +376,6 @@
   margin-top: 20px;
 }
 
-.tab {
-  /* border: solid green 1px; */
-}
-
 /* Style the buttons inside the tab */
 .tab button {
   background-color: inherit;
