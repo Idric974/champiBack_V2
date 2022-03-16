@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 const cyan = '\x1b[36m';
-const https = require('https');
+const http = require('http');
 const { resolve } = require('path');
 const sequelize = require('sequelize');
 const db = require('../../models');
@@ -21,8 +21,8 @@ let heuresCo2;
 
 const getTauxCo2 = new Promise((resolve, reject) => {
   //! 2) Demande de mesure à la master.
-  https
-    .get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY', (resp) => {
+  http
+    .get('http://192.168.0.10:6000/getCO2/2', (resp) => {
       let data = '';
 
       // Un morceau de réponse est reçu
@@ -56,13 +56,6 @@ const getTauxCo2 = new Promise((resolve, reject) => {
     })
     .on('error', (err) => {
       console.log('Error: ' + err.message);
-
-      // On relance la demande à la master.
-
-      setTimeout(() => {
-        updateTimeVariateur();
-      }, 10000);
-      // -----------------------------------
     });
 });
 
