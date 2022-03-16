@@ -38,11 +38,11 @@ const getTauxCo2 = new Promise((resolve, reject) => {
 
       // Taux de Co2.
       tauxCO2 = parseFloat(data).toFixed(2);
-      // console.log(
-      //   cyan,
-      //   '[ GESTION CO2 CALCULES  ] Le taux de CO2 est de : ',
-      //   tauxCO2
-      // );
+      console.log(
+        cyan,
+        '[ GESTION CO2 CALCULES  ] Le taux de CO2 est de : ',
+        tauxCO2
+      );
     })
 
     .on('response', function (resp) {
@@ -105,6 +105,24 @@ actiongetTauxCo2()
               objectif = result['objectifCo2'];
               // console.log('Objectif : ', objectif);
             });
+        })
+        .then(() => {
+          //! Calcule du delta.
+
+          setTimeout(() => {
+            let calcDelta = () => {
+              deltaCo2 = tauxCO2 - consigne;
+              console.log(
+                cyan,
+                '[ GESTION CO2 CALCULES  ] Le delta de Co2 est de :',
+                deltaCo2
+              );
+            };
+
+            calcDelta();
+          }, 1000);
+
+          //!------------------------------------------------------------
         });
     };
 
@@ -112,24 +130,24 @@ actiongetTauxCo2()
 
     //!------------------------------------------------------------
   })
-  .then(() => {
-    //! Calcule du delta.
+  // .then(() => {
+  //   //! Calcule du delta.
 
-    setTimeout(() => {
-      let calcDelta = () => {
-        deltaCo2 = tauxCO2 - consigne;
-        console.log(
-          cyan,
-          '[ GESTION CO2 CALCULES  ] Le delta de Co2 est de :',
-          deltaCo2
-        );
-      };
+  //   setTimeout(() => {
+  //     let calcDelta = () => {
+  //       deltaCo2 = tauxCO2 - consigne;
+  //       console.log(
+  //         cyan,
+  //         '[ GESTION CO2 CALCULES  ] Le delta de Co2 est de :',
+  //         deltaCo2
+  //       );
+  //     };
 
-      calcDelta();
-    }, 1000);
+  //     calcDelta();
+  //   }, 1000);
 
-    //!------------------------------------------------------------
-  })
+  //   //!------------------------------------------------------------
+  // })
   .then(() => {
     //! 4) Enregistrement en base de donnes.
 
