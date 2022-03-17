@@ -193,11 +193,11 @@ actiongetTauxCo2()
             data += chunk;
           });
 
-          // console.log(
-          //   cyan,
-          //   '[ GESTION CO2 CALCULES  ] Valeur CO2 de la master',
-          //   data
-          // );
+          console.log(
+            cyan,
+            '[ GESTION CO2 CALCULES  ] Valeur CO2 de la master',
+            data
+          );
 
           // Taux de Co2.
           tauxCO2 = parseFloat(data).toFixed(2);
