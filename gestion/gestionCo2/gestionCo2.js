@@ -12,12 +12,11 @@ const gestionCo2DataModels = db.gestionCo2Data;
 
 //! Les variables.
 
-let tauxCO2;
+let data = '';
 let consigne;
 let deltaCo2;
 let daysCo2;
 let heuresCo2;
-let data = '';
 //! ----------------------------------
 
 const getTauxCo2 = new Promise((resolve, reject) => {
@@ -29,15 +28,7 @@ const getTauxCo2 = new Promise((resolve, reject) => {
         data += chunk;
       });
 
-      resp.on('end', () => {
-        // Taux de Co2.
-        tauxCO2 = data;
-        console.log(
-          cyan,
-          '[ GESTION CO2 CALCULES  ] Le taux de CO2 est de : ',
-          data
-        );
-      });
+      resp.on('end', () => {});
     })
 
     .on('response', function (resp) {
@@ -49,19 +40,20 @@ const getTauxCo2 = new Promise((resolve, reject) => {
         // console.log('PAS OK');
       }
     })
+
     .on('error', (err) => {
       console.log('Error: ' + err.message);
     });
 });
 
-let actiongetTauxCo2 = async () => {
+let actionGetTauxCo2 = async () => {
   let go = await getTauxCo2;
   return go;
 };
 
 //!------------------------------------------------------------
 
-actiongetTauxCo2()
+actionGetTauxCo2(data)
   .then(() => {
     //! Récupération de la consigne
 
@@ -102,22 +94,30 @@ actiongetTauxCo2()
             });
         })
         .then(() => {
-          //! Calcule du delta.
+          //* Calcule du delta.
 
           setTimeout(() => {
             let calcDelta = () => {
-              deltaCo2 = tauxCO2 - consigne;
+              deltaCo2 = data - consigne;
+
+              console.log(
+                cyan,
+                '[ GESTION CO2 CALCULES  ] Le taux de Co2 est de :' +
+                  data +
+                  'ppm'
+              );
+
               console.log(
                 cyan,
                 '[ GESTION CO2 CALCULES  ] Le delta de Co2 est de :',
-                deltaCo2
+                deltaCo2 + 'ppm'
               );
             };
 
             calcDelta();
           }, 1000);
 
-          //!------------------------------------------------------------
+          //*------------------------------------------------------------
         });
     };
 
@@ -125,24 +125,7 @@ actiongetTauxCo2()
 
     //!------------------------------------------------------------
   })
-  // .then(() => {
-  //   //! Calcule du delta.
 
-  //   setTimeout(() => {
-  //     let calcDelta = () => {
-  //       deltaCo2 = tauxCO2 - consigne;
-  //       console.log(
-  //         cyan,
-  //         '[ GESTION CO2 CALCULES  ] Le delta de Co2 est de :',
-  //         deltaCo2
-  //       );
-  //     };
-
-  //     calcDelta();
-  //   }, 1000);
-
-  //   //!------------------------------------------------------------
-  // })
   .then(() => {
     //! 4) Enregistrement en base de donnes.
 
@@ -150,7 +133,7 @@ actiongetTauxCo2()
       let enregistrement = () => {
         const newVal = gestionCo2Models
           .create({
-            tauxCo2: tauxCO2,
+            tauxCo2: data,
             deltaCo2: deltaCo2,
           })
           .then(() => {
@@ -176,44 +159,4 @@ actiongetTauxCo2()
 
   .catch(() => {
     console.log(cyan, '[ GESTION CO2 CALCULES  ] Erreur Co2', err);
-
-    const getTauxCo2 = new Promise((resolve, reject) => {
-      //! 2) Demande de mesure à la master.
-      http
-        .get('http://192.168.0.10:6000/getCO2/2', (resp) => {
-          let data = '';
-
-          // Un morceau de réponse est reçu
-          resp.on('data', (chunk) => {
-            data += chunk;
-          });
-
-          console.log(
-            cyan,
-            '[ GESTION CO2 CALCULES  ] Valeur CO2 de la master',
-            data
-          );
-
-          // Taux de Co2.
-          tauxCO2 = parseFloat(data).toFixed(2);
-          console.log(
-            cyan,
-            '[ GESTION CO2 CALCULES  ] Le taux de CO2 est de : ',
-            tauxCO2
-          );
-        })
-
-        .on('response', function (resp) {
-          if (resp.statusCode === 200) {
-            // console.log('OK OK');
-            resolve();
-          } else {
-            reject();
-            // console.log('PAS OK');
-          }
-        })
-        .on('error', (err) => {
-          console.log('Error: ' + err.message);
-        });
-    });
   });
