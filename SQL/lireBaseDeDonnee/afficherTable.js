@@ -11,14 +11,14 @@ const con = mysql.createConnection({
 
 //* gestionAir.
 
-// let table = 'gestion_airs';
+let table = 'gestion_airs';
 // let table = 'gestion_airs_datas';
 // let table = 'gestion_airs_etalonnages';
 // let table = 'gestion_airs_etat_relays';
 
 //* gestion Co2
 
-let table = 'gestion_co2s';
+// let table = 'gestion_co2s';
 // let table = 'gestion_co2s_datas';
 
 //* gestion Hummidité.

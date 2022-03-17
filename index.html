@@ -846,7 +846,7 @@
             tauxCo2LocalStorage = localStorage.getItem('Valeure taux Co2 : ');
 
             document.getElementById('tauxCo2').innerHTML =
-              tauxCo2LocalStorage + '%';
+              tauxCo2LocalStorage + 'ppm';
 
             // -------------------------------------
           })
@@ -896,7 +896,7 @@
             );
 
             document.getElementById('consigneCo2').innerHTML =
-              'Consigne Co2 : ' + consigneCo2LocalStorage + '%';
+              'Consigne Co2 : ' + consigneCo2LocalStorage + 'ppm';
 
             // -------------------------------------
 
@@ -976,7 +976,7 @@
             deltaCo2LocalStorage = localStorage.getItem('Valeure delta Co2 : ');
 
             document.getElementById('deltaCo2').innerHTML =
-              'Delta Co2 : ' + deltaCo2LocalStorage + '%';
+              'Delta Co2 : ' + deltaCo2LocalStorage + 'ppm';
           })
 
           .catch((error) => {

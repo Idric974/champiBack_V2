@@ -38,7 +38,32 @@ miseAjourEtatRelay = () => {
     });
 };
 
-//⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐
+let valEtatRelay;
+
+recuperationEtatRlay = () => {
+  gestionAirModels
+    .findOne({
+      attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+      raw: true,
+    })
+    .then((id) => {
+      // console.log('Le dernier id de gestionAir est : ', id);
+      // console.log(id.maxid);
+
+      gestionAirModels
+        .findOne({
+          where: { id: id.maxid },
+        })
+        .then((result) => {
+          valEtatRelay = result['etatRelay'];
+
+          // console.log('valEtatRelay : ' + valEtatRelay);
+          // console.log('valEtatRelay : ' + typeof valEtatRelay);
+        });
+    });
+};
+
+//!⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐
 
 //* ➖ ➖ ➖ ➖ ➖ ➖ Testeur relay ➖ ➖ ➖ ➖ ➖ ➖ //
 
@@ -120,42 +145,54 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
   let relayVanneFroid = req.body.etatRelay;
 
   if (relayVanneFroid == 'ON') {
+    recuperationEtatRlay();
+
+    // setTimeout(() => {
+    //   console.log('etatRelayBDD ++++++++++> ' + valEtatRelay);
+    // }, 500);
+
     const relay_22_ON = new Gpio(22, 'out');
 
     const relay_23_ON = new Gpio(23, 'out');
 
-    etatRelay = 5000;
-
-    miseAjourEtatRelay();
-
     res.status(200).json({ message: 'Relay Vanne Froid à 5 Secondes ON: OK' });
-
-    console.log('Vanne froid 5S ON');
 
     setTimeout(() => {
       const relay_22_OFF = new Gpio(22, 'in');
 
       const relay_23_OFF = new Gpio(23, 'in');
 
-      console.log('Vanne froid 5S OFF');
+      if (valEtatRelay >= 40000) {
+        etatRelay = 40000;
+      } else {
+        etatRelay = valEtatRelay + 5000;
+      }
+
+      miseAjourEtatRelay();
     }, 5000);
   }
   if (relayVanneFroid == 'OFF') {
+    recuperationEtatRlay();
+
+    // setTimeout(() => {
+    //   console.log('etatRelayBDD ----------> ' + valEtatRelay);
+    // }, 500);
+
     const relay_22_OFF = new Gpio(22, 'out');
 
     setTimeout(() => {
       const relay_22_OFF = new Gpio(22, 'in');
 
-      etatRelay = 0;
+      if (valEtatRelay <= 0) {
+        etatRelay = 0;
+      } else {
+        etatRelay = valEtatRelay - 5000;
+      }
 
       miseAjourEtatRelay();
     }, 5000);
 
-    // miseAjourEtatRelay();
-
     res.status(200).json({ message: 'Relay Vanne Froid à 5 Secondes OFF: OK' });
-
-    console.log('Vanne froid 5S OFF');
   }
 };
 
@@ -166,15 +203,15 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
   let relayVanneFroid = req.body.etatRelay;
 
   if (relayVanneFroid == 'ON') {
+    recuperationEtatRlay();
+
+    // setTimeout(() => {
+    //   console.log('etatRelayBDD ++++++++++> ' + valEtatRelay);
+    // }, 500);
+
     const relay_22_ON = new Gpio(22, 'out');
 
     const relay_23_ON = new Gpio(23, 'out');
-
-    etatRelay = 40000;
-
-    // console.log('etatRelay =====> ' + etatRelay);
-
-    miseAjourEtatRelay();
 
     res.status(200).json({ message: 'Relay Vanne Froid à 40 Secondes ON: OK' });
 
@@ -183,23 +220,38 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
 
       const relay_23_OFF = new Gpio(23, 'in');
 
-      // console.log('Vanne froid ouverte pour 40S ');
+      if (valEtatRelay >= 40000) {
+        etatRelay = 40000;
+      } else {
+        etatRelay = valEtatRelay + 40000;
+      }
+
+      miseAjourEtatRelay();
     }, 40000);
   }
   if (relayVanneFroid == 'OFF') {
+    recuperationEtatRlay();
+
+    // setTimeout(() => {
+    //   console.log('etatRelayBDD ----------> ' + valEtatRelay);
+    // }, 500);
+
     const relay_22_OFF = new Gpio(22, 'out');
-    console.log('relayVanneFroid == OFF');
 
     setTimeout(() => {
       const relay_22_OFF = new Gpio(22, 'in');
+
+      if (valEtatRelay <= 0) {
+        etatRelay = 0;
+      } else {
+        etatRelay = valEtatRelay - 40000;
+      }
+
+      miseAjourEtatRelay();
     }, 40000);
 
-    etatRelay = 0;
-
-    miseAjourEtatRelay();
-
-    res.status(200).json({ message: 'Relay Vanne Froid à 40 Secondes fermée' });
-
-    // console.log('Vanne froid 40S OFF');
+    res
+      .status(200)
+      .json({ message: 'Relay Vanne Froid à 40 Secondes OFF: OK' });
   }
 };

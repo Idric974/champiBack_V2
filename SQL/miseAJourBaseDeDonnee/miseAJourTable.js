@@ -1,6 +1,6 @@
 require('dotenv').config();
-const Sequelize = require('sequelize');
 const db = require('../../models');
+const Sequelize = require('sequelize');
 
 //* Gestion Air
 
@@ -19,9 +19,9 @@ const db = require('../../models');
 //     console.log('Table non mise à jour', error);
 //   });
 
-const miseAJourGestionAirEtatRelay = db.gestionAirEtatRelay;
+const majGestionAirModels = db.gestionAir;
 
-const newEtatRelay = miseAJourGestionAirEtatRelay
+const newEtatRelay = majGestionAirModels
   .create({
     etatRelay: 0,
   })

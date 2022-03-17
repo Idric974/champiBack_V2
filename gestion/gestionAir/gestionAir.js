@@ -286,7 +286,6 @@ resultats()
     try {
       if (delta >= 1.1) {
         //
-
         let preconisation = 40000;
         console.log('preconisation : ' + preconisation);
 
@@ -294,21 +293,17 @@ resultats()
         const relay_23_ON = new Gpio(23, 'out');
         console.log('Ouverture du froid');
 
-        let calculeEtatVanne = () => {
-          if (etatVanneBDD + preconisation >= 40000) {
-            etatVanne = 40000;
-          } else {
-            etatVanne = etatVanneBDD + preconisation;
-          }
-        };
-        calculeEtatVanne();
-        // console.log('Nouvelle etatVanne : ' + etatVanne);
+        if (etatVanneBDD >= 40000) {
+          etatRelay = 40000;
+        } else {
+          etatRelay = preconisation;
+        }
 
-        etatRelay = etatVanne;
         actionRelay = 1;
         miseAjourEtatRelay();
 
         setTimeout(() => {
+          //
           const relay_22_OFF = new Gpio(22, 'in');
           const relay_23_OFF = new Gpio(23, 'in');
           console.log('Fermeture du froid');
@@ -317,31 +312,26 @@ resultats()
           miseAjourEtatRelay();
           //
         }, preconisation);
-
         //
       } else if (delta <= 1 && delta >= 0.6) {
         //
-
         let preconisation = 15000;
         console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(22, 'out');
         const relay_23_ON = new Gpio(23, 'out');
 
-        let calculeEtatVanne = () => {
-          if (etatVanneBDD + preconisation >= 40000) {
-            etatVanne = 40000;
-          } else {
-            etatVanne = etatVanneBDD + preconisation;
-          }
-        };
-        calculeEtatVanne();
+        if (etatVanneBDD >= 40000) {
+          etatRelay = 40000;
+        } else {
+          etatRelay = preconisation;
+        }
 
-        etatRelay = preconisation;
         actionRelay = 1;
         miseAjourEtatRelay();
 
         setTimeout(() => {
+          //
           const relay_22_OFF = new Gpio(22, 'in');
           const relay_23_OFF = new Gpio(23, 'in');
 
@@ -353,27 +343,23 @@ resultats()
         //
       } else if (delta <= 0.5 && delta >= 0.4) {
         //
-
         let preconisation = 5000;
         console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(22, 'out');
         const relay_23_ON = new Gpio(23, 'out');
 
-        let calculeEtatVanne = () => {
-          if (etatVanneBDD + preconisation >= 40000) {
-            etatVanne = 40000;
-          } else {
-            etatVanne = etatVanneBDD + preconisation;
-          }
-        };
-        calculeEtatVanne();
+        if (etatVanneBDD >= 40000) {
+          etatRelay = 40000;
+        } else {
+          etatRelay = preconisation;
+        }
 
-        etatRelay = preconisation;
         actionRelay = 1;
         miseAjourEtatRelay();
 
         setTimeout(() => {
+          //
           const relay_22_OFF = new Gpio(22, 'in');
           const relay_23_OFF = new Gpio(23, 'in');
 
@@ -395,20 +381,18 @@ resultats()
 
         const relay_22_OFF = new Gpio(22, 'out');
 
-        let calculeEtatVanne = () => {
-          if (etatVanneBDD + preconisation >= 40000) {
-            etatVanne = 40000;
-          } else {
-            etatVanne = etatVanneBDD + preconisation;
-          }
-        };
-        calculeEtatVanne();
+        if (etatVanneBDD <= 0) {
+          etatRelay = 0;
+        } else {
+          etatRelay = preconisation;
+        }
 
         etatRelay = preconisation;
         actionRelay = 1;
         miseAjourEtatRelay();
 
         setTimeout(() => {
+          //
           const relay_22_OFF = new Gpio(22, 'in');
 
           actionRelay = 0;
@@ -419,26 +403,22 @@ resultats()
         //
       } else if (delta <= -0.6 && delta >= -1) {
         //
-
         let preconisation = 15000;
         console.log('preconisation : ' + preconisation);
 
         const relay_22_OFF = new Gpio(22, 'out');
 
-        let calculeEtatVanne = () => {
-          if (etatVanneBDD + preconisation >= 40000) {
-            etatVanne = 40000;
-          } else {
-            etatVanne = etatVanneBDD + preconisation;
-          }
-        };
-        calculeEtatVanne();
+        if (etatVanneBDD <= 0) {
+          etatRelay = 0;
+        } else {
+          etatRelay = preconisation;
+        }
 
-        etatRelay = preconisation;
         actionRelay = 1;
         miseAjourEtatRelay();
 
         setTimeout(() => {
+          //
           const relay_22_OFF = new Gpio(22, 'in');
 
           actionRelay = 0;
@@ -455,20 +435,17 @@ resultats()
 
         const relay_22_OFF = new Gpio(22, 'out');
 
-        let calculeEtatVanne = () => {
-          if (etatVanneBDD + preconisation >= 40000) {
-            etatVanne = 40000;
-          } else {
-            etatVanne = etatVanneBDD + preconisation;
-          }
-        };
-        calculeEtatVanne();
+        if (etatVanneBDD <= 0) {
+          etatRelay = 0;
+        } else {
+          etatRelay = preconisation;
+        }
 
-        etatRelay = preconisation;
         actionRelay = 1;
         miseAjourEtatRelay();
 
         setTimeout(() => {
+          //
           const relay_22_OFF = new Gpio(22, 'in');
 
           actionRelay = 0;

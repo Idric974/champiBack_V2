@@ -249,20 +249,61 @@
       // 1) Affichage de l'état de la vanne froid.
 
       let etatRelay;
+      let etatRelayBrute;
       let etatRelayLocalStorage;
 
       let afficheEtatRelay = () => {
         axios
           .get('http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/')
           .then(function (response) {
-            // console.log(response.data.temperatureAir.etatRelay);
+            etatRelayBrute = response.data.temperatureAir.etatRelay;
+            console.log('etatRelayBrute ===> ' + etatRelayBrute);
+            // console.log('etatRelayBrute ===> ' + typeof etatRelayBrute);
+          })
+          .then(() => {
+            if (etatRelayBrute >= 40000) {
+              etatRelayLocalStorage = 100;
+              console.log('Select etatRalayBDD : ' + etatRelayBrute);
+              //
+            } else if (etatRelayBrute == 35000) {
+              etatRelayLocalStorage = 87.5;
+              console.log('Select etatRalayBDD : ' + etatRelayBrute);
+              //
+            } else if (etatRelayBrute == 30000) {
+              etatRelayLocalStorage = 75;
+              console.log('Select etatRalayBDD : ' + etatRelayBrute);
+              //
+            } else if (etatRelayBrute == 25000) {
+              etatRelayLocalStorage = 62.5;
+              console.log('Select etatRalayBDD : ' + etatRelayBrute);
+              //
+            } else if (etatRelayBrute == 20000) {
+              etatRelayLocalStorage = 50;
+              console.log('Select etatRalayBDD : ' + etatRelayBrute);
+              //
+            } else if (etatRelayBrute == 15000) {
+              etatRelayLocalStorage = 37.5;
+              console.log('Select etatRalayBDD : ' + etatRelayBrute);
+              //
+            } else if (etatRelayBrute == 10000) {
+              etatRelayLocalStorage = 25;
+              console.log('Select etatRalayBDD : ' + etatRelayBrute);
+              //
+            } else if (etatRelayBrute == 5000) {
+              etatRelayLocalStorage = 12.5;
+              console.log('Select etatRalayBDD : ' + etatRelayBrute);
+              //
+            } else if (etatRelayBrute == 0) {
+              etatRelayLocalStorage = 0;
+              console.log('Select etatRalayBDD : ' + etatRelayBrute);
+              //
+            } else {
+              console.log('Erreur d affichage');
+              console.log('Select etatRalayBDD : ' + etatRelayBrute);
+            }
+          })
 
-            etatRelayLocalStorage =
-              (response.data.temperatureAir.etatRelay / 1000 / 40) * 100;
-            console.log(
-              'etatRelayLocalStorage : ' + etatRelayLocalStorage + '%'
-            );
-
+          .then(() => {
             etatRelay = JSON.stringify(etatRelayLocalStorage);
 
             localStorage.setItem('Etat relay : ', etatRelay);
@@ -278,7 +319,10 @@
 
       // 1) Gestion de vanne frois à 5 secondes.
 
+      // ----------------- FROID 5 SECONDES ON --------------------------- //
+
       let vanneFroid5SesoncdesOn = () => {
+        //
         let valeurEtatVanne;
 
         let captureEtatRelay = () => {
@@ -331,9 +375,11 @@
 
         setTimeout(() => {
           afficheEtatRelay();
-        }, 1000);
+        }, 6000);
       };
+      //--------------------------------------------------------------
 
+      // ----------------- FROID 5 SECONDES OFF --------------------------- //
       let vanneFroid5SesoncdesOff = () => {
         let valeurEtatVanne;
 
@@ -448,7 +494,7 @@
 
         setTimeout(() => {
           afficheEtatRelay();
-        }, 1000);
+        }, 40500);
       };
 
       let vanneFroid40SesoncdesOff = () => {
