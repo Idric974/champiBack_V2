@@ -195,7 +195,7 @@ actiongetTauxCo2()
 
           console.log(
             cyan,
-            '[ GESTION CO2 CALCULES  ] Valeur CO2 de la master',
+            '[ GESTION CO2 CALCULES  ] la valeur CO2 de la master',
             data
           );
 
