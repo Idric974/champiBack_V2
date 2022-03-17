@@ -30,14 +30,18 @@ const getTauxCo2 = new Promise((resolve, reject) => {
         data += chunk;
       });
 
-      console.log(
-        cyan,
-        '[ GESTION CO2 CALCULES  ] Valeur CO2 de la master',
-        data
-      );
+      resp.on('end', () => {
+        console.log(JSON.parse('Data ==============> ' + data));
+      });
+
+      // console.log(
+      //   cyan,
+      //   '[ GESTION CO2 CALCULES  ] Valeur CO2 de la master',
+      //   data
+      // );
 
       // Taux de Co2.
-      tauxCO2 = parseFloat(data).toFixed(2);
+      tauxCO2 = data;
       console.log(
         cyan,
         '[ GESTION CO2 CALCULES  ] Le taux de CO2 est de : ',
