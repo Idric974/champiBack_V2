@@ -238,6 +238,12 @@
 
 /*! ➖➖➖➖➖➖➖➖➖➖ page Relay ➖➖➖➖➖➖➖➖➖➖ */
 
+.boxTab {
+  display: flex;
+  flex-direction: row;
+  /* height: 100vh; */
+}
+
 .boxRelayContent {
   width: 85%;
   display: flex;
@@ -327,83 +333,67 @@
 
 /*! ➖➖➖➖➖➖➖➖➖➖ page Courbes ➖➖➖➖➖➖➖➖➖➖ */
 
-.boxGraph {
+/*! ******** tabBox **********/
+
+.tabBox {
+  /* border: solid green 1px; */
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.buttonBox {
   display: flex;
   flex-direction: row;
   justify-content: center;
-}
-
-.boxCourbes {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  /* border: solid green 1px; */
-}
-
-.graph1 {
-  width: 100%;
-  display: flex;
-  margin-top: 20px;
-  /* flex-direction: column; */
-  /* justify-content: center; */
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px 1px black;
-}
-
-.graph2 {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  box-shadow: 0px 0px 10px 1px black;
-}
-
-.tabBox {
-  width: 85%;
-  display: flex;
-  flex-direction: column;
+  justify-content: space-around;
   align-items: center;
-  overflow: hidden;
-  border: 1px solid #ccc;
-  background-color: #f1f1f1;
 }
 
-.tablinks {
-  width: 300px;
-  margin-top: 20px;
-}
-
-/* Style the buttons inside the tab */
-.tab button {
-  background-color: inherit;
+.tablink {
+  width: 33%;
+  border-radius: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  background-color: var(--bgColor);
+  color: white;
+  font-size: 17px;
+  float: left;
   border: none;
   outline: none;
   cursor: pointer;
   padding: 14px 16px;
-  transition: 0.3s;
-  font-size: 17px;
-  box-shadow: 0px 0px 10px 1px black;
-  border-radius: 10px;
 }
 
-/* Change background color of buttons on hover */
-.tab button:hover {
-  background-color: #ddd;
+.tablink:hover {
+  background-color: #777;
 }
 
-/* Create an active/current tablink class */
-.tab button.active {
-  background-color: #ccc;
+.contentBox {
+  /* border: solid red 1px; */
+  width: 100%;
 }
 
-/* Style the tab content */
 .tabcontent {
-  width: 99%;
+  /* border: solid green 1px; */
   display: flex;
   flex-direction: column;
   align-items: center;
   display: none;
+  border-radius: 10px;
 }
+
+.graph1 {
+  /* border: solid green 1px; */
+  width: 100%;
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  margin: auto;
+  display: flex;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+/*! ********* FIN tabBox ******** */

@@ -8,45 +8,36 @@ const sequelize = require('sequelize');
 const db = require('../../models');
 const gestionCo2Models = db.gestionCo2;
 const gestionCo2DataModels = db.gestionCo2Data;
-//* -----------------------------------------------------------
+//! -----------------------------------------------------------
 
-//* Les variables.
+//! Les variables.
 
 let tauxCO2;
 let consigne;
 let deltaCo2;
 let daysCo2;
 let heuresCo2;
-//* ----------------------------------
+let data = '';
+//! ----------------------------------
 
 const getTauxCo2 = new Promise((resolve, reject) => {
   //! 2) Demande de mesure à la master.
   http
     .get('http://192.168.0.10:6000/getCO2/2', (resp) => {
-      let data = '';
-
-      // Un morceau de réponse est reçu
+      //
       resp.on('data', (chunk) => {
         data += chunk;
       });
 
       resp.on('end', () => {
-        console.log(JSON.parse('Data ==============> ' + data));
+        // Taux de Co2.
+        tauxCO2 = data;
+        console.log(
+          cyan,
+          '[ GESTION CO2 CALCULES  ] Le taux de CO2 est de : ',
+          data
+        );
       });
-
-      // console.log(
-      //   cyan,
-      //   '[ GESTION CO2 CALCULES  ] Valeur CO2 de la master',
-      //   data
-      // );
-
-      // Taux de Co2.
-      tauxCO2 = data;
-      console.log(
-        cyan,
-        '[ GESTION CO2 CALCULES  ] Le taux de CO2 est de : ',
-        tauxCO2
-      );
     })
 
     .on('response', function (resp) {

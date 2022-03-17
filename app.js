@@ -67,8 +67,8 @@ app.get('/pageCourbes.html', (req, res) => {
   res.sendFile(__dirname + '/pageCourbes.html');
 });
 
-app.get('/pageCourbes2.html', (req, res) => {
-  res.sendFile(__dirname + '/pageCourbes2.html');
+app.get('/pageCourbes1.html', (req, res) => {
+  res.sendFile(__dirname + '/pageCourbes1.html');
 });
 
 //! --------------------------------------------------
