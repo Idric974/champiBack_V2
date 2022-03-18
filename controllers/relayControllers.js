@@ -151,16 +151,12 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
     //   console.log('etatRelayBDD ++++++++++> ' + valEtatRelay);
     // }, 500);
 
-    const relay_22_ON = new Gpio(22, 'out');
-
-    const relay_23_ON = new Gpio(23, 'out');
+    const relay_22_ON = new Gpio(16, 'out');
 
     res.status(200).json({ message: 'Relay Vanne Froid à 5 Secondes ON: OK' });
 
     setTimeout(() => {
-      const relay_22_OFF = new Gpio(22, 'in');
-
-      const relay_23_OFF = new Gpio(23, 'in');
+      const relay_22_OFF = new Gpio(15, 'in');
 
       if (valEtatRelay >= 40000) {
         etatRelay = 40000;
@@ -178,10 +174,10 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
     //   console.log('etatRelayBDD ----------> ' + valEtatRelay);
     // }, 500);
 
-    const relay_22_OFF = new Gpio(22, 'out');
+    const relay_22_ON = new Gpio(16, 'out');
 
     setTimeout(() => {
-      const relay_22_OFF = new Gpio(22, 'in');
+      const relay_22_OFF = new Gpio(15, 'in');
 
       if (valEtatRelay <= 0) {
         etatRelay = 0;
@@ -209,16 +205,12 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
     //   console.log('etatRelayBDD ++++++++++> ' + valEtatRelay);
     // }, 500);
 
-    const relay_22_ON = new Gpio(22, 'out');
-
-    const relay_23_ON = new Gpio(23, 'out');
+    const relay_22_ON = new Gpio(16, 'out');
 
     res.status(200).json({ message: 'Relay Vanne Froid à 40 Secondes ON: OK' });
 
     setTimeout(() => {
-      const relay_22_OFF = new Gpio(22, 'in');
-
-      const relay_23_OFF = new Gpio(23, 'in');
+      const relay_22_OFF = new Gpio(15, 'in');
 
       if (valEtatRelay >= 40000) {
         etatRelay = 40000;
@@ -236,10 +228,10 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
     //   console.log('etatRelayBDD ----------> ' + valEtatRelay);
     // }, 500);
 
-    const relay_22_OFF = new Gpio(22, 'out');
+    const relay_22_ON = new Gpio(16, 'out');
 
     setTimeout(() => {
-      const relay_22_OFF = new Gpio(22, 'in');
+      const relay_22_OFF = new Gpio(15, 'in');
 
       if (valEtatRelay <= 0) {
         etatRelay = 0;

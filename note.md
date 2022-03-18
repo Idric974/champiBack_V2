@@ -1,7 +1,11 @@
-//⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐
+Installer Vs Code.
+
+===> sudo apt install code
 //--------------------------------------------------------------
 
-test
+Installer le module OnOff
+===> npm install onoff
+//--------------------------------------------------------------
 
 GIT PULL
 
@@ -9,50 +13,48 @@ git fetch --all
 
 git reset --hard Origin/master
 
-//----------------------------------
+//--------------------------------------------------------------
 
-les couleurs :
-export const reset = "\x1b[0m"
-export const bright = "\x1b[1m"
-export const dim = "\x1b[2m"
-export const underscore = "\x1b[4m"
-export const blink = "\x1b[5m"
-export const reverse = "\x1b[7m"
-export const caché = "\x1b[8m"
+I) Installer MariaDB
 
-export const noir = "\x1b[30m"
-export const rouge = "\x1b[31m"
-export const vert = "\x1b[32m"
-export const jaune = "\x1b[33m"
-export const bleu = "\x1b[34m"
-export const magenta = "\x1b[35m"
-export const cyan = "\x1b[36m"
-export const blanc = "\x1b[37m"
+1. ===> sudo apt update
 
-export const BGblack = "\x1b[40m"
-export const BGred = "\x1b[41m"
-export const BGgreen = "\x1b[42m"
-export const BGyellow = "\x1b[43m"
-export const BGblue = "\x1b[44m"
-export const BGmagenta = "\x1b[45m"
-export const BGcyan = "\x1b[46m"
-export const BGwhite = "\x1b[47m"
+2. ===> sudo apt upgrade
 
-//----------------------------------
+3. Installer :
+   ===> sudo apt-get install mariadb-server mariadb-client.
+   . Tapez "Y" et Enter pour continuer.
 
-1. Installer :
-   sudo apt-get install mariadb-server mariadb-client
+4. Définir le mot de passe pour l'utilisateur root et commencer à utiliser MariaDB.
+   ===> sudo mysql_secure_installation
+   . Appuyez sur Entrée pour continuer (pas de mot de passe par défaut)  
+   . Tapez ensuite "Y" pour définir un nouveau mot de passe, et entrez le mot de passe de votre choix
+   . Maintenant, appuyez trois fois sur "Y" pour :
+   . Supprimer les utilisateurs anonymes
+   . Interdire la connexion root à distance
+   . Supprimer la base de données de test
+   . Et enfin, appuyez à nouveau sur "Y" pour recharger les privilèges
+   . Ça y est, cette fois MariaDB est prête à être utilisée avec la connexion root
 
-2. Vérifier que le processus est démarré :
-   ps -e | grep mysql
+5. Commande pour votre première connexion :
+   ===> sudo mysql -uroot -p
+   . Entrez ensuite le mot de passe que vous avez défini précédemment
 
-3. Vérifier que le port utilisé par MariaDB (3306 par défaut) est ouvert
+6. Vérifier que le processus est démarré :
+   ps -efl | grep mysql
+
+7. Vérifier que le port utilisé par MariaDB (3306 par défaut) est ouvert
    ss -lnt sport = :3306
 
-4. Vérifier l'état du serveur :
+8. Vérifier l'état du serveur :
    systemctl status mariadb
 
-//----------------------------------
+II) Créer un nouvel utilisateur et une base de données
+
+===> sudo mysql -uroot -p
+
+//--------------------------------------------------------------
+
 https://stackoverflow.com/questions/21944936/error-1045-28000-access-denied-for-user-rootlocalhost-using-password-y
 
 Changer le mot de passe:
@@ -78,7 +80,7 @@ Ce sera une commande en cours jusqu'à ce que le processus soit terminé.
    ou
    sudo /usr/local/mysql/support-files/mysql.server start
 
-//----------------------------------
+//--------------------------------------------------------------
 
 Créer un utilisateur sous MySQL / MariaDB :
 
@@ -90,14 +92,14 @@ Créer un utilisateur sous MySQL / MariaDB :
 CREATE USER 'idric'@'localhost' IDENTIFIED BY 'Kup33uC4W6';
 
 3. On donne ensuite tous les droits :
-   GRANT ALL PRIVILEGES ON dinath.\* TO 'idric'@'localhost' WITH GRANT OPTION;
+   GRANT ALL PRIVILEGES ON x.x TO 'idric'@'localhost' WITH GRANT OPTION;
 
    FLUSH PRIVILEGES;
 
 4. Créé de base de données
-   CREATE DATABASE 'database' DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+   CREATE DATABASE champyresi DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-//----------------------------------
+//--------------------------------------------------------------
 
 Informations de version du moteur MySQL / MariaDB
 SHOW GLOBAL VARIABLES LIKE '%version%';
@@ -117,9 +119,7 @@ SET PASSWORD FOR 'user'@'localhost' = PASSWORD('newpassword');
 Suppression Utilisateur :
 DROP USER 'user'@'localhost';
 
-//----------------------------------
+//--------------------------------------------------------------
 
 Aperçu de la répartition de la mémoir
 free -h
-
-'

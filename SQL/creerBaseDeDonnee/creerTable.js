@@ -108,13 +108,13 @@ db.connect(function (err) {
 
   //* Gestion des courbes
 
-  let tableLog =
-    'CREATE TABLE  gestion_courbes (id int auto_increment,  dateDemarrageCycle DATE, createdAt DATE, updatedAt DATE, primary key(id))';
+  // let tableLog =
+  //   'CREATE TABLE  gestion_courbes (id int auto_increment,  dateDemarrageCycle DATE, createdAt DATE, updatedAt DATE, primary key(id))';
 
-  db.query(tableLog, function (err, result) {
-    if (err) throw err;
-    console.log('Table gestion_courbes créé', result);
-  });
+  // db.query(tableLog, function (err, result) {
+  //   if (err) throw err;
+  //   console.log('Table gestion_courbes créé', result);
+  // });
 
   //* -----------------------------------------------------------------
 });
