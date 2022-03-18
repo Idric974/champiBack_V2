@@ -19,23 +19,23 @@ const Sequelize = require('sequelize');
 //     console.log('Table non mise à jour', error);
 //   });
 
-const majGestionAirModels = db.gestionAir;
+// const majGestionAirModels = db.gestionAir;
 
-const newEtatRelay = majGestionAirModels
-  .create({
-    etatRelay: 0,
-    temperatureAir: 0,
-    deltaAir: 0,
-    days: 0,
-    heures: 0,
-    actionRelay: 0,
-  })
-  .then((result) => {
-    console.log('Table mise à jour');
-  })
-  .catch((error) => {
-    console.log('Table non mise à jour', error);
-  });
+// const newEtatRelay = majGestionAirModels
+//   .create({
+//     etatRelay: 0,
+//     temperatureAir: 0,
+//     deltaAir: 0,
+//     days: 0,
+//     heures: 0,
+//     actionRelay: 0,
+//   })
+//   .then((result) => {
+//     console.log('Table mise à jour');
+//   })
+//   .catch((error) => {
+//     console.log('Table non mise à jour', error);
+//   });
 
 //* -----------------------------------------------------------------
 

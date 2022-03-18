@@ -7,12 +7,13 @@ Installer le module OnOff
 ===> npm install onoff
 //--------------------------------------------------------------
 
+Installer dépendances.
+npm install axios chartjs-adapter-moment concurrently cors dotenv express fs gpio mcp-spi-adc moment mysql mysql2 node-schedule nodemon sequelize winston
+//--------------------------------------------------------------
+
 GIT PULL
-
 git fetch --all
-
 git reset --hard Origin/master
-
 //--------------------------------------------------------------
 
 I) Installer MariaDB

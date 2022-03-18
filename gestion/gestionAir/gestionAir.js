@@ -289,7 +289,7 @@ resultats()
         let preconisation = 40000;
         console.log('preconisation : ' + preconisation);
 
-        const relay_22_ON = new Gpio(16, 'out');
+        const relay_22_ON = new Gpio(23, 'out');
 
         console.log('Ouverture du froid');
 
@@ -304,7 +304,7 @@ resultats()
 
         setTimeout(() => {
           //
-          const relay_22_OFF = new Gpio(15, 'in');
+          const relay_22_OFF = new Gpio(22, 'in');
 
           console.log('Fermeture du froid');
 
@@ -318,7 +318,7 @@ resultats()
         let preconisation = 15000;
         console.log('preconisation : ' + preconisation);
 
-        const relay_22_ON = new Gpio(16, 'out');
+        const relay_22_ON = new Gpio(23, 'out');
 
         if (etatVanneBDD >= 40000) {
           etatRelay = 40000;
@@ -331,7 +331,7 @@ resultats()
 
         setTimeout(() => {
           //
-          const relay_22_OFF = new Gpio(15, 'in');
+          const relay_22_OFF = new Gpio(22, 'in');
 
           actionRelay = 0;
           miseAjourEtatRelay();
@@ -344,7 +344,7 @@ resultats()
         let preconisation = 5000;
         console.log('preconisation : ' + preconisation);
 
-        const relay_22_ON = new Gpio(16, 'out');
+        const relay_22_ON = new Gpio(23, 'out');
 
         if (etatVanneBDD >= 40000) {
           etatRelay = 40000;
@@ -357,7 +357,7 @@ resultats()
 
         setTimeout(() => {
           //
-          const relay_22_OFF = new Gpio(15, 'in');
+          const relay_22_OFF = new Gpio(22, 'in');
 
           actionRelay = 0;
           miseAjourEtatRelay();
@@ -375,7 +375,7 @@ resultats()
         let preconisation = 5000;
         console.log('preconisation : ' + preconisation);
 
-        const relay_22_ON = new Gpio(16, 'out');
+        const relay_22_ON = new Gpio(23, 'out');
 
         if (etatVanneBDD <= 0) {
           etatRelay = 0;
@@ -389,7 +389,7 @@ resultats()
 
         setTimeout(() => {
           //
-          const relay_22_OFF = new Gpio(15, 'in');
+          const relay_22_OFF = new Gpio(22, 'in');
 
           actionRelay = 0;
           miseAjourEtatRelay();
@@ -402,7 +402,7 @@ resultats()
         let preconisation = 15000;
         console.log('preconisation : ' + preconisation);
 
-        const relay_22_ON = new Gpio(16, 'out');
+        const relay_22_ON = new Gpio(23, 'out');
 
         if (etatVanneBDD <= 0) {
           etatRelay = 0;
@@ -415,7 +415,7 @@ resultats()
 
         setTimeout(() => {
           //
-          const relay_22_OFF = new Gpio(15, 'in');
+          const relay_22_OFF = new Gpio(22, 'in');
 
           actionRelay = 0;
           miseAjourEtatRelay();
@@ -429,7 +429,7 @@ resultats()
         let preconisation = 40000;
         console.log('preconisation : ' + preconisation);
 
-        const relay_22_ON = new Gpio(16, 'out');
+        const relay_22_ON = new Gpio(23, 'out');
 
         if (etatVanneBDD <= 0) {
           etatRelay = 0;
@@ -442,7 +442,7 @@ resultats()
 
         setTimeout(() => {
           //
-          const relay_22_OFF = new Gpio(15, 'in');
+          const relay_22_OFF = new Gpio(22, 'in');
 
           actionRelay = 0;
           miseAjourEtatRelay();
