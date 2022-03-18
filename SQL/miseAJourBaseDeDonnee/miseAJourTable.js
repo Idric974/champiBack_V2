@@ -24,6 +24,11 @@ const majGestionAirModels = db.gestionAir;
 const newEtatRelay = majGestionAirModels
   .create({
     etatRelay: 0,
+    temperatureAir: 0,
+    deltaAir: 0,
+    days: 0,
+    heures: 0,
+    actionRelay: 0,
   })
   .then((result) => {
     console.log('Table mise à jour');
