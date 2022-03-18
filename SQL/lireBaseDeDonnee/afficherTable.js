@@ -33,7 +33,7 @@ let table = 'gestion_hums';
 // let table = 'gestion_logs';
 
 //* Gestion des courbes
-// let table = 'gestion_courbes';
+let table = 'gestion_courbes';
 
 //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 con.connect(function (err) {
