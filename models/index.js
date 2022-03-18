@@ -54,6 +54,12 @@ db.gestionAirEtatRelay = require('./gestionAir/gestionAirEtatRelayModels')(
   Sequelize
 );
 
+// Courbes.
+db.gestionCourbes = require('./courbes/gestionCourbesModels')(
+  sequelize,
+  Sequelize
+);
+
 //* -----------------------------------------------------------------
 
 //? Gestion Humidité.

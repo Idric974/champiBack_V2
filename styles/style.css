@@ -199,7 +199,8 @@
 }
 
 .boutonActivation,
-.boutonDeactivation {
+.boutonDeactivation,
+.demarrerCycleButton {
   width: 60%;
   display: flex;
   flex-direction: column;
@@ -223,14 +224,16 @@
 }
 
 .boutonActivation:hover,
-.boutonDeactivation:hover {
+.boutonDeactivation:hover,
+.demarrerCycleButton:hover {
   box-shadow: 0 4px black;
   top: 2px;
   color: white;
 }
 
 .boutonActivation:active,
-.boutonDeactivation:active {
+.boutonDeactivation:active,
+.demarrerCycleButton:active {
   box-shadow: 0 0px black;
   top: 6px;
   color: white;
@@ -398,6 +401,22 @@
   display: flex;
   border-radius: 10px;
   box-shadow: var(--shadow);
+}
+
+.demarrerCycle {
+  /* border: solid green 1px; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.demarrerCycleButton {
+  width: 30%;
+  height: 40px;
+  background-color: red;
+  margin: 10px;
+  color: white;
+  font-weight: bolder;
 }
 
 /*! ********* FIN tabBox ******** */

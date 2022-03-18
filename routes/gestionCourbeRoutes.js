@@ -11,4 +11,14 @@ router.get(
   affichageConsigneHumiditeCourbe.getconsigneHumiditeCourbe
 );
 
+const funcGetDateDemarrageCycle = require('../controllers/gestionCourbeControllers');
+router.get(
+  '/getDateDemarrageCycle',
+  funcGetDateDemarrageCycle.getDateDemarrageCycle
+);
+
+// POST
+const postDateDemarrageCycle = require('../controllers/gestionCourbeControllers');
+router.post('/dateDemarrageCycle', postDateDemarrageCycle.dateDemarrageCycle);
+
 module.exports = router;

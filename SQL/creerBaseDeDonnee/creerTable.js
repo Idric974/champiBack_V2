@@ -14,12 +14,12 @@ db.connect(function (err) {
 
   //* gestion Air
 
-  let sql =
-    'CREATE TABLE gestion_airs (id int auto_increment, temperatureAir FLOAT, deltaAir FLOAT, days FLOAT, heures FLOAT, etatRelay FLOAT, actionRelay FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
-  db.query(sql, function (err, result) {
-    if (err) throw err;
-    console.log('Table gestion_airs créé', result);
-  });
+  // let sql =
+  //   'CREATE TABLE gestion_airs (id int auto_increment, temperatureAir FLOAT, deltaAir FLOAT, days FLOAT, heures FLOAT, etatRelay FLOAT, actionRelay FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
+  // db.query(sql, function (err, result) {
+  //   if (err) throw err;
+  //   console.log('Table gestion_airs créé', result);
+  // });
 
   // let sql =
   //   'CREATE TABLE gestion_airs_data (id int auto_increment, consigneAir FLOAT, pasAir FLOAT, objectifAir FLOAT, deltaAir FLOAT, days INTEGER, heures INTEGER, createdAt DATE, updatedAt DATE, primary key(id))';
@@ -103,6 +103,18 @@ db.connect(function (err) {
   //   if (err) throw err;
   //   console.log('Table gestion_logs créé', result);
   // });
+
+  //* -----------------------------------------------------------------
+
+  //* Gestion des courbes
+
+  let tableLog =
+    'CREATE TABLE  gestion_courbes (id int auto_increment,  dateDemarrageCycle DATE, createdAt DATE, updatedAt DATE, primary key(id))';
+
+  db.query(tableLog, function (err, result) {
+    if (err) throw err;
+    console.log('Table gestion_courbes créé', result);
+  });
 
   //* -----------------------------------------------------------------
 });

@@ -7,11 +7,9 @@ const con = mysql.createConnection({
   database: 'champyresi',
 });
 
-//* Tables à supprimer
-
 //* gestionAir.
 
-let table = 'gestion_airs';
+// let table = 'gestion_airs';
 // let table = 'gestion_airs_datas';
 // let table = 'gestion_airs_etalonnages';
 // let table = 'gestion_airs_etat_relays';
@@ -23,7 +21,7 @@ let table = 'gestion_airs';
 
 //* gestion Hummidité.
 
-// let table = 'gestion_hums';
+let table = 'gestion_hums';
 // let table = 'gestion_hums_datas';
 // let table = 'gestion_hums_etalonnage_hums';
 // let table = 'gestion_hums_etalonnage_secs';
@@ -33,6 +31,9 @@ let table = 'gestion_airs';
 
 //* Gestion des Logs
 // let table = 'gestion_logs';
+
+//* Gestion des courbes
+// let table = 'gestion_courbes';
 
 //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 con.connect(function (err) {

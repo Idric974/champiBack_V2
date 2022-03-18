@@ -4,31 +4,72 @@ const db = require('../models');
 const gestionAirsDataModels = db.gestionAirData;
 const gestionHumDataModels = db.gestionHumData;
 const gestionHumModels = db.gestionHum;
+const gestionCourbesModels = db.gestionCourbes;
+
 const moment = require('moment');
 require('dotenv').config();
 
 let dateDeDebut = moment().subtract(40, 'days').format('YYYY-MM-DD');
 // console.log('Date de début : ', dateDeDebut);
+// console.log('Date de début : ', typeof dateDeDebut);
 
 let dateDeFin = moment().format('YYYY-MM-DD');
 // console.log('Date de fin : ', dateDeFin);
+// console.log('Date de fin : ', typeof dateDeFin);
+
+let dateDuJour = moment().add(1, 'days').format('YYYY-MM-DD');
+
+// console.log('Date du jour           : ', dateDuJour);
+// console.log('Date du jour           : ', typeof dateDuJour);
+
+//! ➖ ➖ ➖ ➖ ➖ ➖ Les fonctions ➖ ➖ ➖ ➖ ➖ ➖ //
+// let dateDemarrageCycle = '2022-03-01';
+let dateDuJour2 = '2022-03-19';
+let dateDemarrageCycle;
+
+recuperationDateDebutCycle = () => {
+  gestionCourbesModels
+    .findOne({
+      attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+      raw: true,
+    })
+    .then((id) => {
+      // console.log('Le dernier id de gestionAir est : ', id);
+      // console.log(id.maxid);
+
+      gestionCourbesModels
+        .findOne({
+          where: { id: id.maxid },
+        })
+        .then((result) => {
+          dateDemarrageCycle = result['dateDemarrageCycle'];
+
+          // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
+          // console.log('Date de début du Cycle : ' + typeof dateDemarrageCycle);
+        });
+    });
+};
 
 //* ➖ ➖ ➖ ➖ ➖ ➖ GET taux humidité courbe ➖ ➖ ➖ ➖ ➖ ➖ //
 exports.getTauxHumiditeCourbe = (req, res) => {
-  // console.log('Responce back');
+  //
+  recuperationDateDebutCycle();
+  setTimeout(() => {
+    // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
 
-  gestionHumModels
-    .findAll({
-      raw: true,
-      where: {
-        createdAt: {
-          [Op.between]: [dateDeDebut, dateDeFin],
+    gestionHumModels
+      .findAll({
+        raw: true,
+        where: {
+          createdAt: {
+            [Op.between]: [dateDemarrageCycle, dateDuJour],
+          },
         },
-      },
-    })
-    .then((tauxHumiditeCourbe) => {
-      res.status(200).json({ tauxHumiditeCourbe });
-    });
+      })
+      .then((tauxHumiditeCourbe) => {
+        res.status(200).json({ tauxHumiditeCourbe });
+      });
+  }, 500);
 };
 
 //* ➖ ➖ ➖ ➖ ➖ ➖ GET Consigne humidité courbe ➖ ➖ ➖ ➖ ➖ ➖ //
@@ -46,5 +87,46 @@ exports.getconsigneHumiditeCourbe = (req, res) => {
     })
     .then((dataHumiditeCourbe) => {
       res.status(200).json({ dataHumiditeCourbe });
+    });
+};
+
+//* ➖ ➖ ➖ ➖ ➖ ➖ GET Date de dmarrage du Cycle ➖ ➖ ➖ ➖ ➖ ➖ //
+exports.getDateDemarrageCycle = (req, res) => {
+  //
+  gestionCourbesModels
+    .findOne({
+      attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+      raw: true,
+    })
+    .then((id) => {
+      // console.log('Le dernier id de gestionAir est : ', id);
+      // console.log(id.maxid);
+
+      gestionCourbesModels
+        .findOne({
+          where: { id: id.maxid },
+        })
+        .then((dateDemarrageCycle) => {
+          res.status(200).json({ dateDemarrageCycle });
+        });
+    });
+};
+
+//* ➖ ➖ ➖ ➖ ➖ ➖ POST Date de dmarrage du Cycle ➖ ➖ ➖ ➖ ➖ ➖ //
+exports.dateDemarrageCycle = (req, res) => {
+  //
+  gestionCourbesModels
+    .create({
+      dateDemarrageCycle: req.body.dateDemarrageCycle,
+    })
+    .then(() =>
+      res.status(200).json({
+        message: 'La date de démarrage du cycle à été enregistrée',
+      })
+    )
+    .catch((error) => {
+      console.log(error);
+
+      return res.status(400).json({ error });
     });
 };
