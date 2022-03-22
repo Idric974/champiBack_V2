@@ -340,7 +340,20 @@
 
 /*! ➖➖➖➖➖➖➖➖➖➖ page Courbes ➖➖➖➖➖➖➖➖➖➖ */
 
-/*! ******** tabBox **********/
+/** Info small */
+.infoSmall {
+  margin: 10px;
+  color: red;
+  font-size: 2rem;
+  font-weight: bolder;
+  text-align: center;
+}
+
+.infoSmallDisplay {
+  display: none;
+}
+
+/** ------------------------------------------*/
 
 .tabBox {
   /* border: solid green 1px; */

@@ -10,11 +10,11 @@
     "✔️_gestionHum": " node /home/pi/Desktop/champiBack_V2/gestion/gestionHum/gestionHum.js",
     "✔️_gestionCo2": " node /home/pi/Desktop/champiBack_V2/gestion/gestionCo2/gestionCo2.js",
     "⚡_AfficherTable": " node /home/pi/Desktop/champiBack_V2/SQL/lireBaseDeDonnee/afficherTable.js ",
+    "⚡_MiseAJourTable": " node /home/pi/Desktop/champiBack_V2/SQL/miseAJourBaseDeDonnee/miseAJourTable.js",
     "⚡_AfficherListeTable": " node /home/pi/Desktop/champiBack_V2/SQL/lireBaseDeDonnee/afficherListeTable.js",
     "⚡_AfficherListeBase": " node /home/pi/Desktop/champiBack_V2/SQL/lireBaseDeDonnee/afficherListeBase.js",
     "⚡_CreerTable": " node /home/pi/Desktop/champiBack_V2/SQL/creerBaseDeDonnee/creerTable.js",
-    "⚡_SupprimerTable": " node /home/pi/Desktop/champiBack_V2/SQL/supprimerBaseDeDonnee/supprimerTable.js",
-    "⚡_MiseAJourTable": " node /home/pi/Desktop/champiBack_V2/SQL/miseAJourBaseDeDonnee/miseAJourTable.js"
+    "⚡_SupprimerTable": " node /home/pi/Desktop/champiBack_V2/SQL/supprimerBaseDeDonnee/supprimerTable.js"
   },
   "repository": {
     "type": "git",

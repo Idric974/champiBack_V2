@@ -1,9 +1,8 @@
 Installer Vs Code.
-
 ===> sudo apt install code
 //--------------------------------------------------------------
 
-Installer le module OnOff
+Installer le module OnOff.
 ===> npm install onoff
 //--------------------------------------------------------------
 
@@ -11,6 +10,7 @@ Installer dépendances.
 npm install axios chartjs-adapter-moment concurrently cors dotenv express fs gpio mcp-spi-adc moment mysql mysql2 node-schedule nodemon sequelize winston
 //--------------------------------------------------------------
 
+Commande GIT.
 GIT PULL
 git fetch --all
 git reset --hard Origin/master
@@ -124,3 +124,6 @@ DROP USER 'user'@'localhost';
 
 Aperçu de la répartition de la mémoir
 free -h
+
+//! Les fonctions.
+//!--------------------------------------------------------------

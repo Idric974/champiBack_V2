@@ -27,9 +27,18 @@
 
       <div class="tabBox">
         <div class="demarrerCycle">
-          <button class="demarrerCycleButton" onclick="myFunction()">
+          <button
+            id="infoSmallButton"
+            class="demarrerCycleButton"
+            onclick="myFunction()"
+          >
             Démarrer un cycle
           </button>
+
+          <small id="infoSmallId" class="infoSmall infoSmallDisplay"
+            >La date de début de cycle à été créé et enregistrée dans la base de
+            données.</small
+          >
         </div>
 
         <div class="buttonBoxTab">
@@ -106,7 +115,13 @@
               console.log(error);
             });
 
-          alert('Date de début de cycle créé');
+          const infoSmall = document.getElementById('infoSmallButton');
+
+          infoSmallId.classList.remove('infoSmallDisplay');
+
+          setTimeout(() => {
+            infoSmallId.classList.add('infoSmallDisplay');
+          }, 5000);
         } else {
           console.log('You canceled!');
         }
@@ -153,6 +168,8 @@
       let dateDuJour = moment().add(1, 'days').format('YYYY-MM-DD');
       let nbJour = [];
 
+      //* Date de démarrage du cycle.
+
       let getDateDemarrageCycle = () => {
         axios({
           url: 'http://localhost:3003/api/gestionCourbeRoutes/getDateDemarrageCycle/',
@@ -167,12 +184,12 @@
 
             let nbJ = moment(dateDuJour).diff(dateDemarrageCycle, 'days');
 
-            // console.log('nbJ : ' + nbJ);
-            // console.log('nbJ : ' + typeof nbJ);
+            console.log('Nombre de jour d écart      : ' + nbJ);
+            // console.log('Type Nombre de jour d écart : ' + typeof nbJ);
 
-            for (let i = 0; i <= nbJ; i++) {
+            for (let i = 1; i <= nbJ; i++) {
               const count = nbJour.push(i);
-              console.log('NbJour ' + nbJour);
+              // console.log('NbJour ' + nbJour);
             }
           })
           .catch((error) => {
@@ -181,6 +198,10 @@
       };
 
       getDateDemarrageCycle();
+
+      //--------------------------------------------------------------
+
+      // Récupération des taux d’humidité.
 
       let getDataCourbeHumidite = () => {
         axios({
@@ -192,59 +213,31 @@
 
             // Taux humidité
             listTauxHumidite = response.data.tauxHumiditeCourbe;
+
             listTauxHumidite.forEach((item, index) => {
               tauxHumidite.push({ x: index, y: item['tauxHumidite'] });
+
               // console.log('tauxHumidite', tauxHumidite);
             });
             //----------------------------------------------------------------
-
-            // Température sec.
-            listTemperatureSec180 = response.data.tauxHumiditeCourbe;
-            listTemperatureSec180.forEach((item, index) => {
-              temperatureSec180.push({
-                x: index,
-                y: item['valeursMesureSec180'],
-              });
-              // console.log('temperatureSec180', temperatureSec180);
-            });
-            //----------------------------------------------------------------
-
-            // Température Humide
-            listTemperatureHum90 = response.data.tauxHumiditeCourbe;
-
-            listTemperatureHum90.forEach((item, index) => {
-              temperatureHum90.push({
-                x: index,
-                y: item['valeursMesureHum90'],
-              });
-              // console.log('temperatureHum90', temperatureHum90);
-            });
-            //----------------------------------------------------------------
-
-            listLab = response.data.tauxHumiditeCourbe;
-
-            listLab.forEach((index) => {
-              lab.push(JSON.stringify({ x: index['createdAt'] }));
-              // console.log({ x: index['createdAt'] });
-            });
           })
 
-          .then(() => {
-            axios({
-              url: 'http://localhost:3003/api/gestionCourbeRoutes/getconsigneHumiditeCourbe/',
-              method: 'get',
-            }).then((response) => {
-              // console.log(response.data.dataHumiditeCourbe);
+          // .then(() => {
+          //   axios({
+          //     url: 'http://localhost:3003/api/gestionCourbeRoutes/getconsigneHumiditeCourbe/',
+          //     method: 'get',
+          //   }).then((response) => {
+          //     // console.log(response.data.dataHumiditeCourbe);
 
-              listConsigneHumidite = response.data.dataHumiditeCourbe;
+          //     listConsigneHumidite = response.data.dataHumiditeCourbe;
 
-              listConsigneHumidite.forEach((item, index) => {
-                consigneHumidite.push({ x: index, y: item['consigneHum'] });
+          //     listConsigneHumidite.forEach((item, index) => {
+          //       consigneHumidite.push({ x: index, y: item['consigneHum'] });
 
-                // console.log('consigneHumidite', consigneHumidite);
-              });
-            });
-          })
+          //       // console.log('consigneHumidite', consigneHumidite);
+          //     });
+          //   });
+          // })
 
           .then(() => {
             let data = {
@@ -323,6 +316,8 @@
       };
 
       getDataCourbeHumidite();
+
+      //--------------------------------------------------------------
     </script>
   </body>
 </html>

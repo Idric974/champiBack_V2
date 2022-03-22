@@ -21,19 +21,19 @@ const con = mysql.createConnection({
 
 //* gestion Hummidité.
 
-let table = 'gestion_hums';
+// let table = 'gestion_hums';
 // let table = 'gestion_hums_datas';
 // let table = 'gestion_hums_etalonnage_hums';
 // let table = 'gestion_hums_etalonnage_secs';
 
 //* gestion Substrat.
-// let table = 'gestion_sub_etalonnages';
+let table = 'gestion_sub_etalonnages';
 
 //* Gestion des Logs
 // let table = 'gestion_logs';
 
 //* Gestion des courbes
-let table = 'gestion_courbes';
+// let table = 'gestion_courbes';
 
 //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 con.connect(function (err) {

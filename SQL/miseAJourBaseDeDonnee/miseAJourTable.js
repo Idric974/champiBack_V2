@@ -76,3 +76,54 @@ const Sequelize = require('sequelize');
 //   });
 
 //* -----------------------------------------------------------------
+
+//* Etalonnage Air.
+
+// const miseAJourEtalonnageAir = db.etalonnageAir;
+
+// const newEtalAir = miseAJourEtalonnageAir
+//   .create({
+//     etalonnageAir: 0,
+//   })
+//   .then((result) => {
+//     console.log('Table mise à jour');
+//   })
+//   .catch((error) => {
+//     console.log('Table non mise à jour', error);
+//   });
+
+//* -----------------------------------------------------------------
+
+//* Etalonnage Hum Sec.
+
+// const miseAJourEtalonnageHumSec = db.etalonnageSec;
+
+// const newEtalAir = miseAJourEtalonnageHumSec
+//   .create({
+//     etalonnageSec: 0,
+//   })
+//   .then((result) => {
+//     console.log('Table mise à jour');
+//   })
+//   .catch((error) => {
+//     console.log('Table non mise à jour', error);
+//   });
+
+//* -----------------------------------------------------------------
+
+//* Etalonnage Hum Hum.
+
+// const miseAJourEtalonnageHumHum = db.etalonnageHum;
+
+// const newEtalAir = miseAJourEtalonnageHumHum
+//   .create({
+//     etalonnageHum: 0,
+//   })
+//   .then((result) => {
+//     console.log('Table mise à jour');
+//   })
+//   .catch((error) => {
+//     console.log('Table non mise à jour', error);
+//   });
+
+//* -----------------------------------------------------------------

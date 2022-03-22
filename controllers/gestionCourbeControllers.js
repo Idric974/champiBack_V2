@@ -1,3 +1,5 @@
+//! Les constantes.
+
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const db = require('../models');
@@ -5,27 +7,22 @@ const gestionAirsDataModels = db.gestionAirData;
 const gestionHumDataModels = db.gestionHumData;
 const gestionHumModels = db.gestionHum;
 const gestionCourbesModels = db.gestionCourbes;
-
 const moment = require('moment');
 require('dotenv').config();
+//!--------------------------------------------------------------
 
-let dateDeDebut = moment().subtract(40, 'days').format('YYYY-MM-DD');
-// console.log('Date de début : ', dateDeDebut);
-// console.log('Date de début : ', typeof dateDeDebut);
-
-let dateDeFin = moment().format('YYYY-MM-DD');
-// console.log('Date de fin : ', dateDeFin);
-// console.log('Date de fin : ', typeof dateDeFin);
+//! Les variables.
 
 let dateDuJour = moment().add(1, 'days').format('YYYY-MM-DD');
+console.log('Date du jour du cycle ==============> ', dateDuJour);
+console.log('Type Date du jour du cycle =========> ', typeof dateDuJour);
 
-// console.log('Date du jour           : ', dateDuJour);
-// console.log('Date du jour           : ', typeof dateDuJour);
-
-//! ➖ ➖ ➖ ➖ ➖ ➖ Les fonctions ➖ ➖ ➖ ➖ ➖ ➖ //
 // let dateDemarrageCycle = '2022-03-01';
 let dateDuJour2 = '2022-03-19';
 let dateDemarrageCycle;
+//!--------------------------------------------------------------
+
+//! Les fonctions.
 
 recuperationDateDebutCycle = () => {
   gestionCourbesModels
@@ -49,8 +46,10 @@ recuperationDateDebutCycle = () => {
         });
     });
 };
+//!--------------------------------------------------------------
 
-//* ➖ ➖ ➖ ➖ ➖ ➖ GET taux humidité courbe ➖ ➖ ➖ ➖ ➖ ➖ //
+//*! GET taux humidité courbe.
+
 exports.getTauxHumiditeCourbe = (req, res) => {
   //
   recuperationDateDebutCycle();
@@ -71,26 +70,19 @@ exports.getTauxHumiditeCourbe = (req, res) => {
       });
   }, 500);
 };
+//!--------------------------------------------------------------
 
-//* ➖ ➖ ➖ ➖ ➖ ➖ GET Consigne humidité courbe ➖ ➖ ➖ ➖ ➖ ➖ //
+//*! GET Consigne humidité courbe.
+
 exports.getconsigneHumiditeCourbe = (req, res) => {
   // console.log('Responce back');
 
-  gestionHumDataModels
-    .findAll({
-      raw: true,
-      where: {
-        createdAt: {
-          [Op.between]: [dateDeDebut, dateDeFin],
-        },
-      },
-    })
-    .then((dataHumiditeCourbe) => {
-      res.status(200).json({ dataHumiditeCourbe });
-    });
+  res.status(200).json({ dataHumiditeCourbe });
 };
+//!--------------------------------------------------------------
 
-//* ➖ ➖ ➖ ➖ ➖ ➖ GET Date de dmarrage du Cycle ➖ ➖ ➖ ➖ ➖ ➖ //
+//! GET Date de démarrage du Cycle.
+
 exports.getDateDemarrageCycle = (req, res) => {
   //
   gestionCourbesModels
@@ -107,12 +99,23 @@ exports.getDateDemarrageCycle = (req, res) => {
           where: { id: id.maxid },
         })
         .then((dateDemarrageCycle) => {
+          console.log(
+            'Date de démarrage du cycle =========> ' +
+              JSON.stringify(dateDemarrageCycle.dateDemarrageCycle)
+          );
+          console.log(
+            'Type Date de démarrage du cycle ====> ' +
+              typeof JSON.stringify(dateDemarrageCycle.dateDemarrageCycle)
+          );
+
           res.status(200).json({ dateDemarrageCycle });
         });
     });
 };
+//!--------------------------------------------------------------
 
-//* ➖ ➖ ➖ ➖ ➖ ➖ POST Date de dmarrage du Cycle ➖ ➖ ➖ ➖ ➖ ➖ //
+//!POST Date de dmarrage du Cycle.
+
 exports.dateDemarrageCycle = (req, res) => {
   //
   gestionCourbesModels
@@ -130,3 +133,4 @@ exports.dateDemarrageCycle = (req, res) => {
       return res.status(400).json({ error });
     });
 };
+//!--------------------------------------------------------------
