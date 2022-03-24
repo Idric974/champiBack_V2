@@ -244,7 +244,6 @@
 .boxTab {
   display: flex;
   flex-direction: row;
-  /* height: 100vh; */
 }
 
 .boxRelayContent {
@@ -418,6 +417,7 @@
 
 .demarrerCycle {
   /* border: solid green 1px; */
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -433,3 +433,74 @@
 }
 
 /*! ********* FIN tabBox ******** */
+
+/*! ********* Container à onglet ******** */
+
+/* .box2 {
+  border: solid red 1px;
+} */
+
+.container {
+  /* border: solid green 1px; */
+  width: 98%;
+  margin: 10px 0px 10px 0px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.container-onglets {
+  background: #f1f1f1;
+  width: 100%;
+  height: 80px;
+  display: flex;
+  border-bottom: 1px solid #333;
+}
+.onglets {
+  width: 33.33%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.onglets:not(:nth-child(3)) {
+  border-right: 1px solid #333;
+}
+
+.contenu {
+  background-color: white;
+  width: 85.2%;
+  position: absolute;
+  opacity: 0;
+}
+
+/* Anim */
+
+.active {
+  background: #373964;
+  color: #f1f1f1;
+  transition: all 0.3s ease;
+}
+
+.active-contenu {
+  -webkit-animation: fade 0.5s forwards;
+  animation: fade 0.5s forwards;
+}
+@-webkit-keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

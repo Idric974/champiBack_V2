@@ -19,40 +19,40 @@ console.log('Type Date du jour du cycle =========> ', typeof dateDuJour);
 
 // let dateDemarrageCycle = '2022-03-01';
 let dateDuJour2 = '2022-03-19';
-let dateDemarrageCycle;
+let dateDemarrageCycle = '2022-03-14';
 //!--------------------------------------------------------------
 
 //! Les fonctions.
 
-recuperationDateDebutCycle = () => {
-  gestionCourbesModels
-    .findOne({
-      attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
-      raw: true,
-    })
-    .then((id) => {
-      // console.log('Le dernier id de gestionAir est : ', id);
-      // console.log(id.maxid);
+// recuperationDateDebutCycle = () => {
+//   gestionCourbesModels
+//     .findOne({
+//       attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+//       raw: true,
+//     })
+//     .then((id) => {
+//       // console.log('Le dernier id de gestionAir est : ', id);
+//       // console.log(id.maxid);
 
-      gestionCourbesModels
-        .findOne({
-          where: { id: id.maxid },
-        })
-        .then((result) => {
-          dateDemarrageCycle = result['dateDemarrageCycle'];
+//       gestionCourbesModels
+//         .findOne({
+//           where: { id: id.maxid },
+//         })
+//         .then((result) => {
+//           dateDemarrageCycle = result['dateDemarrageCycle'];
 
-          // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
-          // console.log('Date de début du Cycle : ' + typeof dateDemarrageCycle);
-        });
-    });
-};
+//           // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
+//           // console.log('Date de début du Cycle : ' + typeof dateDemarrageCycle);
+//         });
+//     });
+// };
 //!--------------------------------------------------------------
 
 //*! GET taux humidité courbe.
 
 exports.getTauxHumiditeCourbe = (req, res) => {
   //
-  recuperationDateDebutCycle();
+  // recuperationDateDebutCycle();
   setTimeout(() => {
     // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
 
@@ -76,8 +76,6 @@ exports.getTauxHumiditeCourbe = (req, res) => {
 
 exports.getconsigneHumiditeCourbe = (req, res) => {
   // console.log('Responce back');
-
-  res.status(200).json({ dataHumiditeCourbe });
 };
 //!--------------------------------------------------------------
 

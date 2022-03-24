@@ -85,7 +85,7 @@ app.use('/styles', express.static('/home/pi/Desktop/champiBack_V2/styles'));
 
 //! Le Javascript.
 
-app.use('/mainsJs', express.static('/home/pi/Desktop/champiBack_V2/mainsJs'));
+app.use('/', express.static('/home/pi/Desktop/champiBack_V2/'));
 //! --------------------------------------------------
 
 //! Liste des routes.
