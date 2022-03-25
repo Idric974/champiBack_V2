@@ -125,5 +125,8 @@ DROP USER 'user'@'localhost';
 Aperçu de la répartition de la mémoir
 free -h
 
-//! Les fonctions.
+//! Compilation du code Javascript.
+
+browserify /home/pi/Desktop/champiBack_V2/gestion/gestionCourbes/courbes.js > bundle.js
+
 //!--------------------------------------------------------------

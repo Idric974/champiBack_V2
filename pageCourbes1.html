@@ -25,31 +25,63 @@
 
       <!-- MAIN -->
       <div class="box2">
-        <div class="demarrerCycle">
-          <button id="btn" class="demarrerCycleButton">
-            Démarrer un cycle
-          </button>
-
-          <small id="infoSmallId" class="infoSmall infoSmallDisplay"
-            >La date de début de cycle à été créé et enregistrée dans la base de
-            données.</small
-          >
-        </div>
-
         <div class="container">
+          <!-- Boutons des tabs. -->
           <div class="container-onglets">
             <div class="onglets active">Gestion courbes air</div>
             <div class="onglets">Gestion courbes humidité</div>
             <div class="onglets">Gestion courbes Co2</div>
           </div>
+          <!-- Fin Boutons des tabs. -->
 
+          <!-- Courbes gestionAir -->
           <div class="contenu active-contenu">
-            <canvas id="myChart"></canvas>
+            <h1>Courbe Hum</h1>
+            <div class="demarrerCycle">
+              <button id="btnAir" class="demarrerCycleButton">
+                Démarrer un cycle
+              </button>
+
+              <small id="infoSmallId" class="infoSmall infoSmallDisplay"
+                >La date de début de cycle à été créé et enregistrée dans la
+                base de données.</small
+              >
+            </div>
+            <canvas id="myChartAir"></canvas>
           </div>
+          <!-- FIN Courbes gestionAir -->
 
-          <div class="contenu"></div>
+          <!-- Courbes gestionHum -->
+          <div class="contenu">
+            <div class="demarrerCycle">
+              <button id="btnHum" class="demarrerCycleButton">
+                Démarrer un cycle
+              </button>
 
-          <div class="contenu"></div>
+              <small id="infoSmallId" class="infoSmall infoSmallDisplay"
+                >La date de début de cycle à été créé et enregistrée dans la
+                base de données.</small
+              >
+            </div>
+            <canvas id="myChartHum"></canvas>
+          </div>
+          <!-- FIN Courbes gestionHum -->
+
+          <!-- Courbes gestionHum -->
+          <div class="contenu">
+            <h1>Courbe Hum</h1>
+            <div class="demarrerCycle">
+              <button id="btnCo2" class="demarrerCycleButton">
+                Démarrer un cycle
+              </button>
+
+              <small id="infoSmallId" class="infoSmall infoSmallDisplay"
+                >La date de début de cycle à été créé et enregistrée dans la
+                base de données.</small
+              >
+            </div>
+          </div>
+          <!-- Courbes gestionCo2 -->
         </div>
       </div>
 
