@@ -117,15 +117,15 @@ let getDataCourbeAir = () => {
       dataCourbeAir.forEach((item, index) =>
         valeurTemperatureAir.push({
           // x: item['createdAt'].split('.')[0].split('T')[0],
-          x: item['createdAt'],
+          x: item['id'].toString(),
           y: item['temperatureAir'],
         })
       );
 
-      console.log(
-        'Tableau des valeur temperature air à afficher : ',
-        valeurTemperatureAir
-      );
+      // console.log(
+      //   'Tableau des valeur temperature air à afficher : ',
+      //   valeurTemperatureAir
+      // );
     })
 
     .then(() => {
@@ -148,15 +148,15 @@ let getDataCourbeAir = () => {
           consigneCourbeAir.forEach((item, index) =>
             valeurConsigneAir.push({
               // x: item['createdAt'].split('.')[0].split('T')[0],
-              x: item['createdAt'],
+              x: item['id'].toString(),
               y: item['consigneAir'],
             })
           );
 
-          console.log(
-            'Tableau des valeur consigne air à afficher : ',
-            valeurConsigneAir
-          );
+          // console.log(
+          //   'Tableau des valeur consigne air à afficher : ',
+          //   valeurConsigneAir
+          // );
         });
       };
 
@@ -164,7 +164,7 @@ let getDataCourbeAir = () => {
     })
 
     .then(() => {
-      // ! Logique pour les courbes.
+      // ! Logique pour les courbes Air.
 
       //! Le contexte graphique.
       const ctxAir = document.getElementById('myChartAir').getContext('2d');
@@ -328,7 +328,7 @@ let dateDemarrageCycleHum;
 // let nbJour = [];
 //! --------------------------------------------------------------
 
-//! Logique pour l'affichage des courbes.
+//! Logique pour l'affichage des courbes Hum.
 
 let getDataCourbeHumiditeHum = () => {
   axios({
@@ -350,15 +350,15 @@ let getDataCourbeHumiditeHum = () => {
       dataCourbeHumidite.forEach((item, index) =>
         valeurTauxHumidite.push({
           // x: item['createdAt'].split('.')[0].split('T')[0],
-          x: item['createdAt'],
+          x: item['id'].toString(),
           y: item['tauxHumidite'],
         })
       );
 
-      console.log(
-        'Tableau des valeur taux humidité à afficher : ',
-        valeurTauxHumidite
-      );
+      // console.log(
+      //   'Tableau des valeur taux humidité à afficher : ',
+      //   valeurTauxHumidite
+      // );
     })
 
     .then(() => {
@@ -381,15 +381,15 @@ let getDataCourbeHumiditeHum = () => {
           consigneCourbeHumidite.forEach((item, index) =>
             valeurConsigneHumidite.push({
               // x: item['createdAt'].split('.')[0].split('T')[0],
-              x: item['createdAt'],
+              x: item['id'].toString(),
               y: item['consigneHum'],
             })
           );
 
-          console.log(
-            'Tableau des valeur consigne humidité à afficher : ',
-            valeurConsigneHumidite
-          );
+          // console.log(
+          //   'Tableau des valeur consigne humidité à afficher : ',
+          //   valeurConsigneHumidite
+          // );
         });
       };
 
