@@ -290,10 +290,10 @@ let getDataCourbeAir = () => {
     method: 'get',
   })
     .then((response) => {
-      console.log(
-        'La réponse de la requête temperature air : ',
-        response.data.temperatureAirCourbe
-      );
+      // console.log(
+      //   'La réponse de la requête temperature air : ',
+      //   response.data.temperatureAirCourbe
+      // );
 
       dataCourbeAir = response.data.temperatureAirCourbe;
       // console.log(

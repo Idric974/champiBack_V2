@@ -24,300 +24,67 @@
       <!-- FIN NAVIGATION -->
 
       <!-- MAIN -->
-
-      <div class="tabBox">
-        <div class="demarrerCycle">
-          <button
-            id="infoSmallButton"
-            class="demarrerCycleButton"
-            onclick="myFunction()"
-          >
-            Démarrer un cycle
-          </button>
-
-          <small id="infoSmallId" class="infoSmall infoSmallDisplay"
-            >La date de début de cycle à été créé et enregistrée dans la base de
-            données.</small
-          >
-        </div>
-
-        <div class="buttonBoxTab">
-          <button
-            class="tablink"
-            onclick="openPage('gestionAir', this)"
-            id="defaultOpen"
-          >
-            Courbes Gestion Air
-          </button>
-
-          <button class="tablink" onclick="openPage('gestionHum', this)">
-            Courbes Gestion Humidité
-          </button>
-
-          <button class="tablink" onclick="openPage('gestionCo2', this)">
-            Courbes Gestion Co2
-          </button>
-        </div>
-
-        <div class="contentBox">
-          <div id="gestionAir" class="tabcontent">
-            <canvas class="graph1" id="graph1"></canvas>
+      <div class="box2">
+        <div class="container">
+          <!-- Boutons des tabs. -->
+          <div class="container-onglets">
+            <div class="onglets active">Gestion courbes air</div>
+            <div class="onglets">Gestion courbes humidité</div>
+            <div class="onglets">Gestion courbes Co2</div>
           </div>
+          <!-- Fin Boutons des tabs. -->
 
-          <div id="gestionHum" class="tabcontent">
-            <canvas class="graph1" id="graph1"></canvas>
-          </div>
+          <!-- Courbes gestionAir -->
+          <div class="contenu active-contenu">
+            <div class="demarrerCycle">
+              <button id="btnAir" class="demarrerCycleButton">
+                Démarrer un cycle
+              </button>
 
-          <div id="gestionCo2" class="tabcontent">
-            <canvas class="graph1" id="graph1"></canvas>
+              <small id="infoSmallId" class="infoSmall infoSmallDisplay"
+                >La date de début de cycle à été créé et enregistrée dans la
+                base de données.</small
+              >
+            </div>
+            <canvas id="myChartAir"></canvas>
           </div>
+          <!-- FIN Courbes gestionAir -->
+
+          <!-- Courbes gestionHum -->
+          <div class="contenu">
+            <div class="demarrerCycle">
+              <button id="btnHum" class="demarrerCycleButton">
+                Démarrer un cycle
+              </button>
+
+              <small id="infoSmallId" class="infoSmall infoSmallDisplay"
+                >La date de début de cycle à été créé et enregistrée dans la
+                base de données.</small
+              >
+            </div>
+            <canvas id="myChartHum"></canvas>
+          </div>
+          <!-- FIN Courbes gestionHum -->
+
+          <!-- Courbes gestionHum -->
+          <div class="contenu">
+            <div class="demarrerCycle">
+              <button id="btnCo2" class="demarrerCycleButton">
+                Démarrer un cycle
+              </button>
+
+              <small id="infoSmallId" class="infoSmall infoSmallDisplay"
+                >La date de début de cycle à été créé et enregistrée dans la
+                base de données.</small
+              >
+            </div>
+          </div>
+          <!-- Courbes gestionCo2 -->
         </div>
       </div>
 
       <!-- FIN MAIN -->
     </div>
-
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"
-      integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/moment@^2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1"></script>
-
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.25.0/axios.js"
-      integrity="sha512-II/TvxJGs27N3NEu/WWRFtyhBdSByZwS5ovX1vHXVsi2JXj0I5hRvHwgBPKbzZDk0wsKVDoEUEI8rAYGEF394A=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-
-    <script>
-      function myFunction() {
-        let text = 'Etes-vous sûre de vouloir démarrer un cycle ?';
-        if (confirm(text) == true) {
-          let dateDemarrageCycle = moment().format('YYYY-MM-DD');
-          console.log('Date de demarrage du cycle : ', dateDemarrageCycle);
-
-          axios
-            .post(
-              'http://localhost:3003/api/gestionCourbeRoutes/dateDemarrageCycle/',
-              {
-                dateDemarrageCycle: dateDemarrageCycle,
-              }
-            )
-            .then(function (response) {
-              console.log(response);
-            })
-            .catch(function (error) {
-              console.log(error);
-            });
-
-          const infoSmall = document.getElementById('infoSmallButton');
-
-          infoSmallId.classList.remove('infoSmallDisplay');
-
-          setTimeout(() => {
-            infoSmallId.classList.add('infoSmallDisplay');
-          }, 5000);
-        } else {
-          console.log('You canceled!');
-        }
-      }
-    </script>
-
-    <script>
-      function openPage(pageName, elmnt, color) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName('tabcontent');
-        for (i = 0; i < tabcontent.length; i++) {
-          tabcontent[i].style.display = 'none';
-        }
-        tablinks = document.getElementsByClassName('tablink');
-        for (i = 0; i < tablinks.length; i++) {
-          tablinks[i].style.backgroundColor = '';
-        }
-        document.getElementById(pageName).style.display = 'block';
-        elmnt.style.backgroundColor = color;
-      }
-
-      // Get the element with id="defaultOpen" and click on it
-      document.getElementById('defaultOpen').click();
-    </script>
-
-    <script>
-      let tauxHumidite = [];
-      let listTauxHumidite;
-      let consigneHumidite = [];
-      let listConsigneHumidite;
-
-      let temperatureSec180 = [];
-      let listTemperatureSec180;
-
-      let temperatureHum90 = [];
-      let listTemperatureHum90;
-
-      let date;
-
-      let lab = [];
-      let listLab;
-
-      let dateDemarrageCycle;
-      let dateDuJour = moment().add(1, 'days').format('YYYY-MM-DD');
-      let nbJour = [];
-
-      //* Date de démarrage du cycle.
-
-      let getDateDemarrageCycle = () => {
-        axios({
-          url: 'http://localhost:3003/api/gestionCourbeRoutes/getDateDemarrageCycle/',
-          method: 'get',
-        })
-          .then((response) => {
-            // console.log(response.data.dateDemarrageCycle.dateDemarrageCycle);
-            dateDemarrageCycle =
-              response.data.dateDemarrageCycle.dateDemarrageCycle;
-
-            console.log('Date de démarrage du cycle : ' + dateDemarrageCycle);
-
-            let nbJ = moment(dateDuJour).diff(dateDemarrageCycle, 'days');
-
-            console.log('Nombre de jour d écart      : ' + nbJ);
-            // console.log('Type Nombre de jour d écart : ' + typeof nbJ);
-
-            for (let i = 1; i <= nbJ; i++) {
-              const count = nbJour.push(i);
-              // console.log('NbJour ' + nbJour);
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      };
-
-      getDateDemarrageCycle();
-
-      //--------------------------------------------------------------
-
-      // Récupération des taux d’humidité.
-
-      let getDataCourbeHumidite = () => {
-        axios({
-          url: 'http://localhost:3003/api/gestionCourbeRoutes/getTauxHumiditeCourbe/',
-          method: 'get',
-        })
-          .then((response) => {
-            console.log(response.data.tauxHumiditeCourbe);
-
-            // Taux humidité
-            listTauxHumidite = response.data.tauxHumiditeCourbe;
-
-            listTauxHumidite.forEach((item, index) => {
-              tauxHumidite.push({ x: index, y: item['tauxHumidite'] });
-
-              // console.log('tauxHumidite', tauxHumidite);
-            });
-            //----------------------------------------------------------------
-          })
-
-          // .then(() => {
-          //   axios({
-          //     url: 'http://localhost:3003/api/gestionCourbeRoutes/getconsigneHumiditeCourbe/',
-          //     method: 'get',
-          //   }).then((response) => {
-          //     // console.log(response.data.dataHumiditeCourbe);
-
-          //     listConsigneHumidite = response.data.dataHumiditeCourbe;
-
-          //     listConsigneHumidite.forEach((item, index) => {
-          //       consigneHumidite.push({ x: index, y: item['consigneHum'] });
-
-          //       // console.log('consigneHumidite', consigneHumidite);
-          //     });
-          //   });
-          // })
-
-          .then(() => {
-            let data = {
-              labels: nbJour,
-              datasets: [
-                {
-                  label: 'Taux humidite',
-                  data: tauxHumidite,
-                  xAxisID: 'xAxis1',
-                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                  borderColor: 'rgba(255, 99, 132, 1)',
-                  lineTension: 0.2,
-                  borderWidth: 1,
-                  pointRadius: 2,
-                },
-                {
-                  label: 'Consigne Humidite',
-                  data: consigneHumidite,
-                  xAxisID: 'xAxis1',
-                  backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                  borderColor: 'rgba(54, 162, 235, 1)',
-                  lineTension: 0.2,
-                  borderWidth: 1,
-                  // pointRadius: 2,
-                },
-              ],
-            };
-
-            let options = {
-              scales: {
-                x: {
-                  type: 'time',
-                  time: {
-                    unit: 'day',
-                  },
-                },
-
-                y: { beginAtZero: true },
-              },
-
-              plugins: {
-                legend: {
-                  labels: {
-                    font: {
-                      size: 20,
-                    },
-                  },
-                },
-              },
-
-              layout: {
-                padding: 20,
-              },
-
-              elements: {
-                point: {
-                  radius: 0,
-                },
-              },
-            };
-
-            let ctx = document.getElementById('graph1').getContext('2d');
-
-            const config = {
-              type: 'line',
-              data: data,
-              options: options,
-            };
-
-            let graph1 = new Chart(ctx, config);
-          })
-          .catch((error) => {
-            console.log(error);
-            console.log(JSON.stringify(error));
-          });
-      };
-
-      getDataCourbeHumidite();
-
-      //--------------------------------------------------------------
-    </script>
+    <script src="bundle.js"></script>
   </body>
 </html>
