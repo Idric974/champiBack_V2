@@ -470,6 +470,7 @@
 }
 
 .contenu {
+  /* border: solid red 1px; */
   background-color: white;
   width: 85.2%;
   position: absolute;

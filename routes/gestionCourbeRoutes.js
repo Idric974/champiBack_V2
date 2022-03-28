@@ -1,6 +1,25 @@
 const express = require('express');
 const router = express.Router();
 
+//! Cestion date de démarrage courbes.
+
+//* GET.
+
+const funcGetDateDemarrageCycle = require('../controllers/gestionCourbeControllers');
+router.get(
+  '/getDateDemarrageCycle',
+  funcGetDateDemarrageCycle.getDateDemarrageCycle
+);
+
+//* POST.
+
+const postDateDemarrageCycle = require('../controllers/gestionCourbeControllers');
+router.post('/dateDemarrageCycle', postDateDemarrageCycle.dateDemarrageCycle);
+
+module.exports = router;
+
+//!--------------------------------------------------------------
+
 //! Cestion Air.
 
 //* GET.
@@ -28,26 +47,23 @@ router.get('/getTauxHumiditeCourbe', affichageDataCourbe.getTauxHumiditeCourbe);
 
 const affichageConsigneHumiditeCourbe = require('../controllers/gestionCourbeControllers');
 router.get(
-  '/getconsigneHumiditeCourbe',
-  affichageConsigneHumiditeCourbe.getconsigneHumiditeCourbe
+  '/getConsigneHumiditeCourbe',
+  affichageConsigneHumiditeCourbe.getConsigneHumiditeCourbe
 );
-
-const funcGetDateDemarrageCycle = require('../controllers/gestionCourbeControllers');
-router.get(
-  '/getDateDemarrageCycle',
-  funcGetDateDemarrageCycle.getDateDemarrageCycle
-);
-
-//*-------------------------------
-
-//* POST.
-const postDateDemarrageCycle = require('../controllers/gestionCourbeControllers');
-router.post('/dateDemarrageCycle', postDateDemarrageCycle.dateDemarrageCycle);
-
-module.exports = router;
 
 //!--------------------------------------------------------------
 
 //! Cestion Co2.
+
+//* GET.
+
+const affichageDataCourbeCo2 = require('../controllers/gestionCourbeControllers');
+router.get('/getTauxCo2Courbe', affichageDataCourbeCo2.getTauxCo2Courbe);
+
+const affichageConsigneCo2Courbe = require('../controllers/gestionCourbeControllers');
+router.get(
+  '/getConsigneCo2Courbe',
+  affichageConsigneCo2Courbe.getConsigneCo2Courbe
+);
 
 //!--------------------------------------------------------------

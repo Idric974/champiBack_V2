@@ -25,6 +25,16 @@
 
       <!-- MAIN -->
       <div class="box2">
+        <div class="demarrerCycle">
+          <button id="btnAir" class="demarrerCycleButton">
+            Démarrer un cycle
+          </button>
+
+          <small id="infoSmallId" class="infoSmall infoSmallDisplay"
+            >La date de début de cycle à été créé et enregistrée dans la base de
+            données.</small
+          >
+        </div>
         <div class="container">
           <!-- Boutons des tabs. -->
           <div class="container-onglets">
@@ -36,48 +46,19 @@
 
           <!-- Courbes gestionAir -->
           <div class="contenu active-contenu">
-            <div class="demarrerCycle">
-              <button id="btnAir" class="demarrerCycleButton">
-                Démarrer un cycle
-              </button>
-
-              <small id="infoSmallId" class="infoSmall infoSmallDisplay"
-                >La date de début de cycle à été créé et enregistrée dans la
-                base de données.</small
-              >
-            </div>
             <canvas id="myChartAir"></canvas>
           </div>
           <!-- FIN Courbes gestionAir -->
 
           <!-- Courbes gestionHum -->
           <div class="contenu">
-            <div class="demarrerCycle">
-              <button id="btnHum" class="demarrerCycleButton">
-                Démarrer un cycle
-              </button>
-
-              <small id="infoSmallId" class="infoSmall infoSmallDisplay"
-                >La date de début de cycle à été créé et enregistrée dans la
-                base de données.</small
-              >
-            </div>
             <canvas id="myChartHum"></canvas>
           </div>
           <!-- FIN Courbes gestionHum -->
 
           <!-- Courbes gestionHum -->
           <div class="contenu">
-            <div class="demarrerCycle">
-              <button id="btnCo2" class="demarrerCycleButton">
-                Démarrer un cycle
-              </button>
-
-              <small id="infoSmallId" class="infoSmall infoSmallDisplay"
-                >La date de début de cycle à été créé et enregistrée dans la
-                base de données.</small
-              >
-            </div>
+            <canvas id="myChartCo2"></canvas>
           </div>
           <!-- Courbes gestionCo2 -->
         </div>
