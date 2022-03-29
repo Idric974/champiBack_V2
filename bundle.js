@@ -226,7 +226,7 @@ function tabsAnimation(e) {
 
 //! --------------------------------------------------------------
 
-//! Création de la date de début du cycle AIR.
+//! Bouton création de la date de début du cycle AIR.
 
 var btnAir = document.getElementById('btnAir');
 btnAir.addEventListener(
@@ -278,6 +278,8 @@ let valeurTemperatureAir = [];
 
 let consigneCourbeAir;
 let valeurConsigneAir = [];
+
+let nombreDeJour = ['1', '2', '3', '4', '5'];
 
 let dateDemarrageCycle;
 // let dateDuJour = moment().add(1, 'days').format('YYYY-MM-DD');
@@ -350,6 +352,8 @@ let getDataCourbeAir = () => {
       getConsigneAir();
     })
 
+    .then(() => {})
+
     .then(() => {
       // ! Logique pour les courbes Air.
 
@@ -389,6 +393,13 @@ let getDataCourbeAir = () => {
             pointRadius: 0,
             // xAxisID: 'xAxis2',
           },
+
+          // Axe X pour nb jour.
+          // {
+          //   label: 'nombreDeJour',
+          //   data: nombreDeJour,
+          //   xAxisID: 'xAxis3',
+          // },
           // ------------------------------
         ],
       };
@@ -402,30 +413,17 @@ let getDataCourbeAir = () => {
         scales: {
           x: {
             display: false,
-            // id: 'xAxis1',
-            // time: {
-            //   displayFormats: {
-            //     quarter: 'HH:mm',
-            //   },
-            // },
-            ticks: {
-              // callback: function (label) {
-              // },
-            },
+            id: 'xAxis1',
           },
 
           x: {
             display: false,
-            // id: 'xAxis2',
-            // time: {
-            //   displayFormats: {
-            //     quarter: 'HH:mm',
-            //   },
-            // },
-            ticks: {
-              // callback: function (label) {
-              // },
-            },
+            id: 'xAxis2',
+          },
+
+          x: {
+            display: true,
+            id: 'xAxis3',
           },
           y: {},
         },

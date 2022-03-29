@@ -1,37 +1,39 @@
-//! Les constantes.
-
+//! Les Dépendances.
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const db = require('../models');
-const moment = require('moment');
 require('dotenv').config();
+//! ---------------------------------------------
 
-// Gestion Air.
+//! Gestion Air.
 const gestionAirModels = db.gestionAir;
 const gestionAirsDataModels = db.gestionAirData;
-// ---------------------------------------------
+//! ---------------------------------------------
 
-// Gestion Humidité.
-
+//! Gestion Humidité.
 const gestionHumModels = db.gestionHum;
 const gestionHumDataModels = db.gestionHumData;
-// ---------------------------------------------
+//! ---------------------------------------------
 
-// Gestion Co2.
-
+//! Gestion Co2.
 const gestionCo2Models = db.gestionCo2;
 const gestionCo2DataModels = db.gestionCo2Data;
-// ---------------------------------------------
+//! ---------------------------------------------
 
 const gestionCourbesModels = db.gestionCourbes;
-// ---------------------------------------------
+//! ---------------------------------------------
 
-//!--------------------------------------------------------------
+//! Le variables
+let dateDuJour = new Date();
+let dateDemarrageCycle;
+let dateDemarrageCycle2 = '2022 - 03 - 20';
+
+//! --------------------------------------------------
 
 //! Les fonctions.
 
-recuperationDateDebutCycleAir = () => {
-  gestionAirDateDebutCycleCourbesModels
+recuperationDateDemarrageCycle = () => {
+  gestionCourbesModels
     .findOne({
       attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
       raw: true,
@@ -40,21 +42,44 @@ recuperationDateDebutCycleAir = () => {
       // console.log('Le dernier id de gestionAir est : ', id);
       // console.log(id.maxid);
 
-      gestionAirDateDebutCycleCourbesModels
+      gestionCourbesModels
         .findOne({
           where: { id: id.maxid },
         })
         .then((result) => {
-          dateDemarrageCycleAir = result['dateDemarrageCycleAir'];
+          dateDemarrageCycle = result['dateDemarrageCycle'];
 
-          // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
-          // console.log('Date de début du Cycle : ' + typeof dateDemarrageCycle);
+          console.log('Date de début du Cycle : ' + dateDemarrageCycle);
+          console.log('Date de début du Cycle : ' + typeof dateDemarrageCycle);
         });
     });
 };
+
 //!--------------------------------------------------------------
 
-//? I) ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ GESTION DATE DE DEMARRAGE CYCLE ➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+//? I) ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ GESTION DATE DE DÉMARRAGE CYCLE ➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
+//! POST Date de dmarrage du Cycle.
+
+exports.dateDemarrageCycle = (req, res) => {
+  //
+  gestionCourbesModels
+    .create({
+      dateDemarrageCycle: req.body.dateDemarrageCycle,
+    })
+    .then(() =>
+      res.status(200).json({
+        message: 'La date de démarrage du cycle à été enregistrée',
+      })
+    )
+    .catch((error) => {
+      console.log(error);
+
+      return res.status(400).json({ error });
+    });
+};
+
+//!--------------------------------------------------------------
 
 //! GET Date de démarrage du Cycle.
 
@@ -90,48 +115,13 @@ exports.getDateDemarrageCycle = (req, res) => {
 
 //!--------------------------------------------------------------
 
-//!POST Date de dmarrage du Cycle.
-
-exports.dateDemarrageCycle = (req, res) => {
-  //
-  gestionCourbesModels
-    .create({
-      dateDemarrageCycle: req.body.dateDemarrageCycle,
-    })
-    .then(() =>
-      res.status(200).json({
-        message: 'La date de démarrage du cycle à été enregistrée',
-      })
-    )
-    .catch((error) => {
-      console.log(error);
-
-      return res.status(400).json({ error });
-    });
-};
-
-//!--------------------------------------------------------------
-
-//? I) FIN ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ GESTION DATE DE DEMARRAGE CYCLE ➖➖➖➖➖➖➖➖➖➖➖➖➖➖
-
 //? II) ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ GESTION COURBES AIR ➖➖➖➖➖➖➖➖➖➖➖➖➖➖
-
-//! Les variables.
-
-let dateDuJourAir = moment().add(1, 'days').format('YYYY-MM-DD');
-// console.log('Date du jour du cycle ==============> ', dateDuJourAir);
-// console.log('Type Date du jour du cycle =========> ', typeof dateDuJourAir);
-
-// let dateDemarrageCycleAir = '2022-03-01';
-let dateDuJourAir2 = '2022-03-19';
-let dateDemarrageCycleAir = '2022-01-01';
-//!--------------------------------------------------------------
 
 //*! GET température air courbe.
 
 exports.getTemperatureAirCourbe = (req, res) => {
   //
-  // recuperationDateDebutCycleAir();
+  // recuperationDateDemarrageCycle();
 
   setTimeout(() => {
     // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
@@ -141,7 +131,7 @@ exports.getTemperatureAirCourbe = (req, res) => {
         raw: true,
         where: {
           createdAt: {
-            [Op.between]: [dateDemarrageCycleAir, dateDuJourAir],
+            [Op.between]: [dateDemarrageCycle2, dateDuJour],
           },
         },
       })
@@ -156,7 +146,7 @@ exports.getTemperatureAirCourbe = (req, res) => {
 
 exports.getConsigneAirCourbe = (req, res) => {
   //
-  // recuperationDateDebutCycleAir();
+  // recuperationDateDemarrageCycle();
 
   setTimeout(() => {
     // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
@@ -166,7 +156,7 @@ exports.getConsigneAirCourbe = (req, res) => {
         raw: true,
         where: {
           createdAt: {
-            [Op.between]: [dateDemarrageCycleAir, dateDuJourAir],
+            [Op.between]: [dateDemarrageCycle2, dateDuJour],
           },
         },
       })
@@ -177,26 +167,13 @@ exports.getConsigneAirCourbe = (req, res) => {
 };
 //!--------------------------------------------------------------
 
-//? II) FIN ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ GESTION COURBES AIR ➖➖➖➖➖➖➖➖➖➖➖➖➖➖
-
 //? III) ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ GESTION COURBES HUMIDITE ➖➖➖➖➖➖➖➖➖➖➖➖➖➖
-
-//! Les variables.
-
-let dateDuJour = moment().add(1, 'days').format('YYYY-MM-DD');
-// console.log('Date du jour du cycle ==============> ', dateDuJour);
-// console.log('Type Date du jour du cycle =========> ', typeof dateDuJour);
-
-// let dateDemarrageCycle = '2022-03-01';
-let dateDuJour2 = '2022-03-19';
-let dateDemarrageCycle = '2022-01-01';
-//!--------------------------------------------------------------
 
 //*! GET taux humidité courbe.
 
 exports.getTauxHumiditeCourbe = (req, res) => {
   //
-  // recuperationDateDebutCycle();
+  // recuperationDateDemarrageCycle();
   setTimeout(() => {
     // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
 
@@ -205,7 +182,7 @@ exports.getTauxHumiditeCourbe = (req, res) => {
         raw: true,
         where: {
           createdAt: {
-            [Op.between]: [dateDemarrageCycle, dateDuJour],
+            [Op.between]: [dateDemarrageCycle2, dateDuJour],
           },
         },
       })
@@ -227,7 +204,7 @@ exports.getConsigneHumiditeCourbe = (req, res) => {
         raw: true,
         where: {
           createdAt: {
-            [Op.between]: [dateDemarrageCycle, dateDuJour],
+            [Op.between]: [dateDemarrageCycle2, dateDuJour],
           },
         },
       })
@@ -238,26 +215,13 @@ exports.getConsigneHumiditeCourbe = (req, res) => {
 };
 //!--------------------------------------------------------------
 
-//? III) FIN ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ GESTION COURBES HUMIDITE ➖➖➖➖➖➖➖➖➖➖➖➖➖➖
-
 //? IV) ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ GESTION COURBES CO2 ➖➖➖➖➖➖➖➖➖➖➖➖➖➖
-
-//! Les variables.
-
-let dateDuJourCo2 = moment().add(1, 'days').format('YYYY-MM-DD');
-// console.log('Date du jour du cycle ==============> ', dateDuJour);
-// console.log('Type Date du jour du cycle =========> ', typeof dateDuJour);
-
-// let dateDemarrageCycle = '2022-03-01';
-let dateDuJourCO22 = '2022-03-19';
-let dateDemarrageCycleCo2 = '2022-01-01';
-//!--------------------------------------------------------------
 
 //*! GET taux Co2 courbe.
 
 exports.getTauxCo2Courbe = (req, res) => {
   //
-  // recuperationDateDebutCycle();
+  // recuperationDateDemarrageCycle();
   setTimeout(() => {
     // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
 
@@ -266,7 +230,7 @@ exports.getTauxCo2Courbe = (req, res) => {
         raw: true,
         where: {
           createdAt: {
-            [Op.between]: [dateDemarrageCycleCo2, dateDuJourCO22],
+            [Op.between]: [dateDemarrageCycle, dateDuJour],
           },
         },
       })
@@ -275,11 +239,13 @@ exports.getTauxCo2Courbe = (req, res) => {
       });
   }, 500);
 };
+
 //!--------------------------------------------------------------
 
 //*! GET Consigne Co2 courbe.
 
 exports.getConsigneCo2Courbe = (req, res) => {
+  // recuperationDateDemarrageCycle();
   setTimeout(() => {
     // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
 
@@ -297,6 +263,5 @@ exports.getConsigneCo2Courbe = (req, res) => {
       });
   }, 500);
 };
-//!--------------------------------------------------------------
 
-//? III) FIN ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ GESTION COURBES HUMIDITE ➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+//!--------------------------------------------------------------
