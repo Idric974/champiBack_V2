@@ -27,7 +27,6 @@ const gestionCourbesModels = db.gestionCourbes;
 let dateDuJour = new Date();
 let dateDemarrageCycle;
 let dateDemarrageCycle2 = '2022 - 03 - 20';
-
 //! --------------------------------------------------
 
 //! Les fonctions.
@@ -131,7 +130,7 @@ exports.getTemperatureAirCourbe = (req, res) => {
         raw: true,
         where: {
           createdAt: {
-            [Op.between]: [dateDemarrageCycle2, dateDuJour],
+            [Op.between]: [dateDemarrageCycle, dateDuJour],
           },
         },
       })
@@ -156,7 +155,7 @@ exports.getConsigneAirCourbe = (req, res) => {
         raw: true,
         where: {
           createdAt: {
-            [Op.between]: [dateDemarrageCycle2, dateDuJour],
+            [Op.between]: [dateDemarrageCycle, dateDuJour],
           },
         },
       })
@@ -182,7 +181,7 @@ exports.getTauxHumiditeCourbe = (req, res) => {
         raw: true,
         where: {
           createdAt: {
-            [Op.between]: [dateDemarrageCycle2, dateDuJour],
+            [Op.between]: [dateDemarrageCycle, dateDuJour],
           },
         },
       })
@@ -204,7 +203,7 @@ exports.getConsigneHumiditeCourbe = (req, res) => {
         raw: true,
         where: {
           createdAt: {
-            [Op.between]: [dateDemarrageCycle2, dateDuJour],
+            [Op.between]: [dateDemarrageCycle, dateDuJour],
           },
         },
       })

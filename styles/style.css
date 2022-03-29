@@ -416,15 +416,59 @@
 }
 
 .demarrerCycle {
-  /* border: solid green 1px; */
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+.boxButtonDemCycle {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.cont {
+  /* border: solid green 1px; */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+  color: white;
+  font-weight: bolder;
+  text-align: center;
+}
+
+.cont1 {
+  /* border: solid green 1px; */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+  color: white;
+  font-weight: bolder;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.cont2 {
+  /* border: solid green 1px; */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+  color: white;
+  font-weight: bolder;
+  font-size: 2.5rem;
+  text-align: center;
+}
+
 .demarrerCycleButton {
-  width: 30%;
+  width: 90%;
   height: 40px;
   background-color: red;
   margin: 10px;

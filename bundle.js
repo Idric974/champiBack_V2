@@ -201,6 +201,57 @@ const {
 
 //! --------------------------------------------------------------
 
+//! Gestion des dates.
+
+let date = new Date();
+let dateDuJour;
+let dateDemarrageCycle;
+let difference;
+let jourDuCycle;
+const options = {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+};
+
+let getDateDemarrageCycle = () => {
+  axios
+    .get('http://localhost:3003/api/gestionCourbeRoutes/getDateDemarrageCycle')
+    .then((response) => {
+      // console.log(response.data.dateDemarrageCycle.dateDemarrageCycle);
+
+      //* Date du jour.
+      dateDuJour = new Date();
+      // console.log('Date du Jour : ', dateDuJour);
+      document.getElementById('dateDuJourCycle').innerHTML = dateDuJour
+        .toLocaleString('fr-FR', options)
+        .toLocaleUpperCase();
+      //* --------------------------------------------------
+
+      //* Date de demarrage du cycle
+      dateDemarrageCycle = new Date(
+        response.data.dateDemarrageCycle.dateDemarrageCycle
+      );
+      // console.log('La date de démarrage du cycle :', dateDemarrageCycle);
+      //* --------------------------------------------------
+
+      //* Affichage du nombre de jour.
+      difference = Math.abs(dateDuJour - dateDemarrageCycle);
+      jourDuCycle = Math.round(difference / (1000 * 3600 * 24)) + 1;
+      // console.log('Nombre De Jour : ', jourDuCycle);
+      document.getElementById('jourDuCycle').innerHTML =
+        'JOUR : ' + jourDuCycle;
+      //* --------------------------------------------------
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+getDateDemarrageCycle();
+
+//! --------------------------------------------------------------
+
 //? LOGIQUE POUR LA GESTION DES ONGLETS.
 
 const onglets = Array.from(document.querySelectorAll('.onglets'));
@@ -281,9 +332,6 @@ let valeurConsigneAir = [];
 
 let nombreDeJour = ['1', '2', '3', '4', '5'];
 
-let dateDemarrageCycle;
-// let dateDuJour = moment().add(1, 'days').format('YYYY-MM-DD');
-// let nbJour = [];
 //! --------------------------------------------------------------
 
 let getDataCourbeAir = () => {
@@ -305,16 +353,16 @@ let getDataCourbeAir = () => {
 
       dataCourbeAir.forEach((item, index) =>
         valeurTemperatureAir.push({
-          // x: item['createdAt'].split('.')[0].split('T')[0],
+          // x: item['createdAt'],
           x: item['id'].toString(),
           y: item['temperatureAir'],
         })
       );
 
-      // console.log(
-      //   'Tableau des valeur temperature air à afficher : ',
-      //   valeurTemperatureAir
-      // );
+      console.log(
+        'Tableau des valeur temperature air à afficher : ',
+        valeurTemperatureAir
+      );
     })
 
     .then(() => {
@@ -466,9 +514,6 @@ let valeurTauxHumidite = [];
 let consigneCourbeHumidite;
 let valeurConsigneHumidite = [];
 
-let dateDemarrageCycleHum;
-// let dateDuJour = moment().add(1, 'days').format('YYYY-MM-DD');
-// let nbJour = [];
 //! --------------------------------------------------------------
 
 //! Logique pour l'affichage des courbes Hum.
