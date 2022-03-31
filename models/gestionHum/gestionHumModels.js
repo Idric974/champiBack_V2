@@ -34,6 +34,18 @@ module.exports = (sequelize, Sequelize) => {
     heuresHum: {
       type: Sequelize.INTEGER,
     },
+
+    consigne: {
+      type: Sequelize.STRING,
+    },
+
+    valeurAxeX: {
+      type: Sequelize.STRING,
+    },
+
+    jourDuCycle: {
+      type: Sequelize.STRING,
+    },
   });
 
   return gestionHumModels;

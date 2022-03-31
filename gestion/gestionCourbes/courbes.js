@@ -12,15 +12,13 @@ const {
   millisecond,
 } = require('date-fns');
 
-//! --------------------------------------------------------------
+//! --------------------------------------------------
 
-//! Gestion des dates.
+//! Le variable.
 
-let date = new Date();
 let dateDuJour;
-let dateDemarrageCycle;
-let difference;
 let jourDuCycle;
+let jourDuCycleLocalStorage;
 const options = {
   weekday: 'long',
   year: 'numeric',
@@ -28,42 +26,50 @@ const options = {
   day: 'numeric',
 };
 
-let getDateDemarrageCycle = () => {
-  axios
-    .get('http://localhost:3003/api/gestionCourbeRoutes/getDateDemarrageCycle')
-    .then((response) => {
-      // console.log(response.data.dateDemarrageCycle.dateDemarrageCycle);
+//! --------------------------------------------------
 
-      //* Date du jour.
+//! Affichage du jour du cycle.
+
+let getJourDuCycle = () => {
+  //
+  axios({
+    url: 'http://localhost:3003/api/gestionCourbeRoutes/getJourDuCycle/',
+    method: 'get',
+  })
+    //* Récupération du jour du cycle.
+    .then((response) => {
+      console.log('Jour du cycle : ', response.data.jourDuCycle.jourDuCycle);
+
+      jourDuCycle = response.data.jourDuCycle.jourDuCycle;
+
+      localStorage.setItem('Jour du cycle : ', jourDuCycle);
+
+      jourDuCycleLocalStorage = localStorage.getItem('Jour du cycle : ');
+
+      document.getElementById('jourDuCycle').innerHTML =
+        'Jour ' + jourDuCycleLocalStorage;
+    })
+    //* -------------------------*
+
+    //* Date du jour.
+    .then(() => {
       dateDuJour = new Date();
       // console.log('Date du Jour : ', dateDuJour);
       document.getElementById('dateDuJourCycle').innerHTML = dateDuJour
         .toLocaleString('fr-FR', options)
         .toLocaleUpperCase();
-      //* --------------------------------------------------
-
-      //* Date de demarrage du cycle
-      dateDemarrageCycle = new Date(
-        response.data.dateDemarrageCycle.dateDemarrageCycle
-      );
-      // console.log('La date de démarrage du cycle :', dateDemarrageCycle);
-      //* --------------------------------------------------
-
-      //* Affichage du nombre de jour.
-      difference = Math.abs(dateDuJour - dateDemarrageCycle);
-      jourDuCycle = Math.round(difference / (1000 * 3600 * 24)) + 1;
-      // console.log('Nombre De Jour : ', jourDuCycle);
-      document.getElementById('jourDuCycle').innerHTML =
-        'JOUR : ' + jourDuCycle;
-      //* --------------------------------------------------
     })
+    //* -------------------------*
+
     .catch((error) => {
       console.log(error);
+      console.log(JSON.stringify(error));
     });
 };
-getDateDemarrageCycle();
 
-//! --------------------------------------------------------------
+getJourDuCycle();
+
+//! --------------------------------------------------
 
 //? LOGIQUE POUR LA GESTION DES ONGLETS.
 
@@ -143,8 +149,6 @@ let valeurTemperatureAir = [];
 let consigneCourbeAir;
 let valeurConsigneAir = [];
 
-let nombreDeJour = ['1', '2', '3', '4', '5'];
-
 //! --------------------------------------------------------------
 
 let getDataCourbeAir = () => {
@@ -153,10 +157,9 @@ let getDataCourbeAir = () => {
     method: 'get',
   })
     .then((response) => {
-      // console.log(
-      //   'La réponse de la requête temperature air : ',
-      //   response.data.temperatureAirCourbe
-      // );
+      // console.log('La réponse de la requête temperature air : ', response.data);
+
+      //* Récupération de la température.
 
       dataCourbeAir = response.data.temperatureAirCourbe;
       // console.log(
@@ -167,53 +170,42 @@ let getDataCourbeAir = () => {
       dataCourbeAir.forEach((item, index) =>
         valeurTemperatureAir.push({
           // x: item['createdAt'],
-          x: item['id'].toString(),
+          x: item['valeurAxeX'],
           y: item['temperatureAir'],
         })
       );
 
-      console.log(
-        'Tableau des valeur temperature air à afficher : ',
-        valeurTemperatureAir
+      // console.log(
+      //   'Tableau des valeurs temperature air à afficher : ',
+      //   valeurTemperatureAir
+      // );
+
+      //*---------------------------------------------
+
+      //* Récupération de la consigne.
+
+      consigneCourbeAir = response.data.temperatureAirCourbe;
+
+      // console.log(
+      //   'La réponse de la requête consigne air : ',
+      //   consigneCourbeAir
+      // );
+
+      consigneCourbeAir.forEach((item, index) =>
+        valeurConsigneAir.push({
+          // x: item['createdAt'].split('.')[0].split('T')[0],
+          x: item['valeurAxeX'],
+          y: item['consigne'],
+        })
       );
+
+      // console.log(
+      //   'Tableau des valeurs consigne air à afficher : ',
+      //   valeurConsigneAir
+      // );
+
+      //*---------------------------------------------
     })
-
-    .then(() => {
-      let getConsigneAir = () => {
-        axios({
-          url: 'http://localhost:3003/api/gestionCourbeRoutes/getConsigneAirCourbe/',
-          method: 'get',
-        }).then((response) => {
-          // console.log(
-          //   'La réponse de la requête consigne Air : ',
-          //   response.data.consigneAirCourbe
-          // );
-
-          consigneCourbeAir = response.data.consigneAirCourbe;
-          // console.log(
-          //   'La réponse de la requête consigne air : ',
-          //   consigneCourbeAir
-          // );
-
-          consigneCourbeAir.forEach((item, index) =>
-            valeurConsigneAir.push({
-              // x: item['createdAt'].split('.')[0].split('T')[0],
-              x: item['id'].toString(),
-              y: item['consigneAir'],
-            })
-          );
-
-          // console.log(
-          //   'Tableau des valeur consigne air à afficher : ',
-          //   valeurConsigneAir
-          // );
-        });
-      };
-
-      getConsigneAir();
-    })
-
-    .then(() => {})
 
     .then(() => {
       // ! Logique pour les courbes Air.
@@ -240,7 +232,6 @@ let getDataCourbeAir = () => {
             borderWidth: 1,
             lineTension: 0.2,
             pointRadius: 0,
-            // xAxisID: 'xAxis1',
           },
 
           // Courbe consigne air.
@@ -252,16 +243,8 @@ let getDataCourbeAir = () => {
             borderWidth: 1,
             lineTension: 0.2,
             pointRadius: 0,
-            // xAxisID: 'xAxis2',
+            display: false,
           },
-
-          // Axe X pour nb jour.
-          // {
-          //   label: 'nombreDeJour',
-          //   data: nombreDeJour,
-          //   xAxisID: 'xAxis3',
-          // },
-          // ------------------------------
         ],
       };
       //! ---------------------------------
@@ -272,20 +255,8 @@ let getDataCourbeAir = () => {
           duration: 0,
         },
         scales: {
-          x: {
-            display: false,
-            id: 'xAxis1',
-          },
+          x: {},
 
-          x: {
-            display: false,
-            id: 'xAxis2',
-          },
-
-          x: {
-            display: true,
-            id: 'xAxis3',
-          },
           y: {},
         },
       };
@@ -342,6 +313,7 @@ let getDataCourbeHumiditeHum = () => {
       //   response.data.tauxHumiditeCourbe
       // );
 
+      //* Récupération du taux humidité.
       dataCourbeHumidite = response.data.tauxHumiditeCourbe;
       // console.log(
       //   'La réponse de la requête taux humidité : ',
@@ -351,7 +323,7 @@ let getDataCourbeHumiditeHum = () => {
       dataCourbeHumidite.forEach((item, index) =>
         valeurTauxHumidite.push({
           // x: item['createdAt'].split('.')[0].split('T')[0],
-          x: item['id'].toString(),
+          x: item['valeurAxeX'],
           y: item['tauxHumidite'],
         })
       );
@@ -360,41 +332,32 @@ let getDataCourbeHumiditeHum = () => {
       //   'Tableau des valeur taux humidité à afficher : ',
       //   valeurTauxHumidite
       // );
-    })
 
-    .then(() => {
-      let getConsigneHum = () => {
-        axios({
-          url: 'http://localhost:3003/api/gestionCourbeRoutes/getconsigneHumiditeCourbe/',
-          method: 'get',
-        }).then((response) => {
-          // console.log(
-          //   'La réponse de la requête consigne humidité : ',
-          //   response.data.consigneHumiditeCourbe
-          // );
+      //*---------------------------------------------
 
-          consigneCourbeHumidite = response.data.consigneHumiditeCourbe;
-          // console.log(
-          //   'La réponse de la requête consigne humidité : ',
-          //   consigneCourbeHumidite
-          // );
+      //* Récupération de la consigne.
 
-          consigneCourbeHumidite.forEach((item, index) =>
-            valeurConsigneHumidite.push({
-              // x: item['createdAt'].split('.')[0].split('T')[0],
-              x: item['id'].toString(),
-              y: item['consigneHum'],
-            })
-          );
+      consigneCourbeHumidite = response.data.tauxHumiditeCourbe;
 
-          // console.log(
-          //   'Tableau des valeur consigne humidité à afficher : ',
-          //   valeurConsigneHumidite
-          // );
-        });
-      };
+      // console.log(
+      //   'La réponse de la requête consigne hum : ',
+      //   consigneCourbeHumidite
+      // );
 
-      getConsigneHum();
+      consigneCourbeHumidite.forEach((item, index) =>
+        valeurConsigneHumidite.push({
+          // x: item['createdAt'].split('.')[0].split('T')[0],
+          x: item['valeurAxeX'],
+          y: item['consigne'],
+        })
+      );
+
+      // console.log(
+      //   'Tableau des valeurs consigne hum à afficher : ',
+      //   valeurConsigneHumidite
+      // );
+
+      //*---------------------------------------------
     })
 
     .then(() => {
@@ -530,6 +493,8 @@ let getDataCourbeCo2 = () => {
       //   response.data.tauxCo2Courbe
       // );
 
+      //* Récupération Taux de Co2.
+
       dataCourbeCo2 = response.data.tauxCo2Courbe;
       // console.log(
       //   'La réponse de la requête taux humidité : ',
@@ -538,49 +503,70 @@ let getDataCourbeCo2 = () => {
 
       dataCourbeCo2.forEach((item, index) =>
         valeurTauxCo2.push({
-          // x: item['createdAt'].split('.')[0].split('T')[0],
-          x: item['id'].toString(),
+          x: item['valeurAxeX'],
           y: item['tauxCo2'],
         })
       );
 
+      console.log(
+        'Tableau des valeur taux humidité à afficher : ',
+        valeurTauxCo2
+      );
+
+      //*---------------------------------------------
+
+      //* Récupération de la consigne.
+
+      consigneCourbeCo2 = response.data.tauxCo2Courbe;
+
       // console.log(
-      //   'Tableau des valeur taux humidité à afficher : ',
-      //   valeurTauxCo2
+      //   'La réponse de la requête consigne Co2 : ',
+      //   tauxCo2Courbe
       // );
+
+      consigneCourbeCo2.forEach((item, index) =>
+        valeurConsigneCo2.push({
+          // x: item['createdAt'].split('.')[0].split('T')[0],
+          x: item['valeurAxeX'],
+          y: item['consigne'],
+        })
+      );
+
+      console.log(
+        'Tableau des valeurs consigne Co2 à afficher : ',
+        valeurConsigneCo2
+      );
+
+      //*---------------------------------------------
     })
 
     .then(() => {
-      let getConsigneCo2 = () => {
-        axios({
-          url: 'http://localhost:3003/api/gestionCourbeRoutes/getconsigneCo2Courbe/',
-          method: 'get',
-        }).then((response) => {
-          // console.log(
-          //   'La réponse de la requête consigne Co2 : ',
-          //   response.data.consigneCo2Courbe
-          // );
-
-          consigneCourbeCo2 = response.data.consigneCo2Courbe;
-          // console.log(
-          //   'La réponse de la requête consigne humidité : ',
-          //   consigneCourbeCo2          // );
-
-          consigneCourbeCo2.forEach((item, index) =>
-            valeurConsigneCo2.push({
-              x: item['id'].toString(),
-              y: item['consigneCo2'],
-            })
-          );
-
-          // console.log(
-          //   'Tableau des valeur consigne humidité à afficher : ',
-          //   valeurConsigneCo2
-          // );
-        });
-      };
-
-      getConsigneCo2();
+      // let getConsigneCo2 = () => {
+      //   axios({
+      //     url: 'http://localhost:3003/api/gestionCourbeRoutes/getconsigneCo2Courbe/',
+      //     method: 'get',
+      //   }).then((response) => {
+      //     // console.log(
+      //     //   'La réponse de la requête consigne Co2 : ',
+      //     //   response.data.consigneCo2Courbe
+      //     // );
+      //     consigneCourbeCo2 = response.data.consigneCo2Courbe;
+      //     // console.log(
+      //     //   'La réponse de la requête consigne humidité : ',
+      //     //   consigneCourbeCo2          // );
+      //     consigneCourbeCo2.forEach((item, index) =>
+      //       valeurConsigneCo2.push({
+      //         x: item['id'].toString(),
+      //         y: item['consigneCo2'],
+      //       })
+      //     );
+      //     // console.log(
+      //     //   'Tableau des valeur consigne humidité à afficher : ',
+      //     //   valeurConsigneCo2
+      //     // );
+      //   });
+      // };
+      // getConsigneCo2();
     })
 
     .then(() => {

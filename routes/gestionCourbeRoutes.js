@@ -36,6 +36,9 @@ router.get(
   affichageConsigneAirCourbe.getConsigneAirCourbe
 );
 
+const affichageJourCycleAirCourbe = require('../controllers/gestionCourbeControllers');
+router.get('/getJourDuCycle', affichageJourCycleAirCourbe.getJourDuCycle);
+
 //!--------------------------------------------------------------
 
 //! Cestion Humidité.

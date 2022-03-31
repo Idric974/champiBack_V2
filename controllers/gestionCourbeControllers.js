@@ -48,8 +48,8 @@ recuperationDateDemarrageCycle = () => {
         .then((result) => {
           dateDemarrageCycle = result['dateDemarrageCycle'];
 
-          console.log('Date de début du Cycle : ' + dateDemarrageCycle);
-          console.log('Date de début du Cycle : ' + typeof dateDemarrageCycle);
+          // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
+          // console.log('Date de début du Cycle : ' + typeof dateDemarrageCycle);
         });
     });
 };
@@ -98,16 +98,39 @@ exports.getDateDemarrageCycle = (req, res) => {
           where: { id: id.maxid },
         })
         .then((dateDemarrageCycle) => {
-          console.log(
-            'Date de démarrage du cycle =========> ' +
-              JSON.stringify(dateDemarrageCycle.dateDemarrageCycle)
-          );
-          console.log(
-            'Type Date de démarrage du cycle ====> ' +
-              typeof JSON.stringify(dateDemarrageCycle.dateDemarrageCycle)
-          );
+          // console.log(
+          //   'Date de démarrage du cycle =========> ' +
+          //     JSON.stringify(dateDemarrageCycle.dateDemarrageCycle)
+          // );
 
           res.status(200).json({ dateDemarrageCycle });
+        });
+    });
+};
+
+//!--------------------------------------------------------------
+
+//! GET Jour du Cycle.
+
+exports.getJourDuCycle = (req, res) => {
+  //
+  gestionAirModels
+    .findOne({
+      attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+      raw: true,
+    })
+    .then((id) => {
+      // console.log('Le dernier id de gestionAir est : ', id);
+      // console.log(id.maxid);
+
+      gestionAirModels
+        .findOne({
+          where: { id: id.maxid },
+        })
+        .then((jourDuCycle) => {
+          console.log('Date de démarrage du cycle =======> : ', jourDuCycle);
+
+          res.status(200).json({ jourDuCycle });
         });
     });
 };
@@ -120,7 +143,7 @@ exports.getDateDemarrageCycle = (req, res) => {
 
 exports.getTemperatureAirCourbe = (req, res) => {
   //
-  // recuperationDateDemarrageCycle();
+  recuperationDateDemarrageCycle();
 
   setTimeout(() => {
     // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
@@ -145,7 +168,7 @@ exports.getTemperatureAirCourbe = (req, res) => {
 
 exports.getConsigneAirCourbe = (req, res) => {
   //
-  // recuperationDateDemarrageCycle();
+  recuperationDateDemarrageCycle();
 
   setTimeout(() => {
     // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
@@ -172,7 +195,7 @@ exports.getConsigneAirCourbe = (req, res) => {
 
 exports.getTauxHumiditeCourbe = (req, res) => {
   //
-  // recuperationDateDemarrageCycle();
+  recuperationDateDemarrageCycle();
   setTimeout(() => {
     // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
 
@@ -220,7 +243,7 @@ exports.getConsigneHumiditeCourbe = (req, res) => {
 
 exports.getTauxCo2Courbe = (req, res) => {
   //
-  // recuperationDateDemarrageCycle();
+  recuperationDateDemarrageCycle();
   setTimeout(() => {
     // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
 
@@ -244,7 +267,8 @@ exports.getTauxCo2Courbe = (req, res) => {
 //*! GET Consigne Co2 courbe.
 
 exports.getConsigneCo2Courbe = (req, res) => {
-  // recuperationDateDemarrageCycle();
+  //
+  recuperationDateDemarrageCycle();
   setTimeout(() => {
     // console.log('Date de début du Cycle : ' + dateDemarrageCycle);
 

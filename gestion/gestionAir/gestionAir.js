@@ -12,9 +12,10 @@ const gestionAirsDataModels = db.gestionAirData;
 const gestionAirEtalonnageModels = db.etalonnageAir;
 const gestionAirEtatRelayModels = db.gestionAirEtatRelay;
 const gestionLogsModels = db.gestionLogsBack;
-
 const logger = require('../../src/logger');
-//-------------------------------------
+const axios = require('axios');
+
+//! -------------------------------------------------- !
 
 //! Les variables.
 
@@ -33,15 +34,26 @@ let etatRelay;
 let actionRelay;
 let etatVanne;
 let etatVanneBDD;
+let dateDuJour;
+let dateDemarrageCycle;
+let difference;
+let jourDuCycle;
+let heureDuCycle;
+let minuteDuCycle;
+let heureMinute;
+let valeurAxeX;
 
-//-------------------------------------
+//! -------------------------------------------------- !
 
 //! Les tableaux.
 
 listValAir = [];
-//-------------------------------------
 
-//! fonctions
+//! -------------------------------------------------- !
+
+//? I) LES FONCTIONS.
+
+//! Mise à jour de l'état des relay.
 
 let miseAjourEtatRelay = () => {
   gestionAirModels
@@ -67,7 +79,8 @@ let miseAjourEtatRelay = () => {
         .catch((err) => console.log(err));
     });
 };
-//-------------------------------------
+
+//! -------------------------------------------------- !
 
 //! Récupération de la consigne
 
@@ -120,7 +133,7 @@ let recuperationConsigneAir = () => {
 
 recuperationConsigneAir();
 
-//------------------------------------------------------------
+//! -------------------------------------------------- !
 
 //! Récupération de l'étalonage
 
@@ -154,7 +167,7 @@ let recuperationEtalonnage = () => {
 };
 recuperationEtalonnage();
 
-//------------------------------------------------------------
+//! -------------------------------------------------- !
 
 //! Récupération de l'état de la vanne froid.
 
@@ -188,9 +201,58 @@ let recuperationEtatRelay = () => {
 };
 recuperationEtatRelay();
 
-//------------------------------------------------------------
+//! -------------------------------------------------- !
 
-// Calcule de la temprature.
+//! Construction de la valeur de l'axe x.
+
+let getDateDemarrageCycle = () => {
+  axios
+    .get('http://localhost:3003/api/gestionCourbeRoutes/getDateDemarrageCycle')
+    .then((response) => {
+      //   console.log(
+      //     'Date démarrage du cycle :---:',
+      //     response.data.dateDemarrageCycle.dateDemarrageCycle
+      //   );
+
+      //* Date du jour.
+      dateDuJour = new Date();
+      // console.log('Date du Jour :---------------------:', dateDuJour);
+      //* --------------------------------------------------
+
+      //* Date de demarrage du cycle
+      dateDemarrageCycle = new Date(
+        response.data.dateDemarrageCycle.dateDemarrageCycle
+      );
+      // console.log('La date de démarrage du cycle :----:', dateDemarrageCycle);
+      //* --------------------------------------------------
+
+      //* Affichage du nombre de jour du cycle.
+      difference = Math.abs(dateDuJour - dateDemarrageCycle);
+      jourDuCycle = Math.round(difference / (1000 * 3600 * 24)) + 1;
+      console.log('Nombre de jour du cycle :----------:', jourDuCycle);
+      //* --------------------------------------------------
+
+      //* Affichage de l'heure.
+      heureDuCycle = new Date().getHours();
+      minuteDuCycle = new Date().getMinutes();
+      heureMinute = heureDuCycle + 'h' + minuteDuCycle;
+      // console.log("l'heure du cycle :-----------------:", heureMinute);
+      //* --------------------------------------------------
+
+      //* Valeure de l'axe x.
+      valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
+      // console.log("Valeure de l'axe x :---------------:", valeurAxeX);
+      //* --------------------------------------------------
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+getDateDemarrageCycle();
+
+//! -------------------------------------------------- !
+
+//? II) CALCULE DE LA TEMPÉRATURE.
 
 // Fonction moyenne
 function ArrayAvg(listValAir) {
@@ -202,9 +264,8 @@ function ArrayAvg(listValAir) {
   }
   return summ / ArrayLen;
 }
-// FIN Fonction moyenne
 
-//------------------------------------------------------------
+//! -------------------------------------------------- !
 
 let calculeTemperatureMoyenne = () => {
   return new Promise((resolve) => {
@@ -242,7 +303,8 @@ let calculeTemperatureMoyenne = () => {
   });
 };
 
-//------------------------------------------------------------
+//! -------------------------------------------------- !
+
 let resultats = async () => {
   let temperatureMoyenneAir = await calculeTemperatureMoyenne();
 
@@ -472,6 +534,9 @@ resultats()
             deltaAir: delta,
             actionRelay: actionRelay,
             etatRelay: etatRelay,
+            consigne: consigne,
+            valeurAxeX: valeurAxeX,
+            jourDuCycle: jourDuCycle,
           })
 
           // .then(function (result) {
@@ -503,6 +568,8 @@ resultats()
         error
       );
     }
+    //
+    //! -------------------------------------------------- !
   })
   .then(() => {
     listValAir = [];
@@ -539,6 +606,7 @@ resultats()
 
       newDelta();
       //
+      //! -------------------------------------------------- !
     } catch (error) {
       logger.info(
         'Fchier source : gestionAir | Module : Mise à jour des informations dans la base de donnée | Type erreur : ',

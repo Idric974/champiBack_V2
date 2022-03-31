@@ -60,6 +60,32 @@ const Sequelize = require('sequelize');
 
 //* Gestion Co2
 
+// Valeurs.
+
+// Data.
+
+const miseAJourGestionCo2 = db.gestionCo2;
+
+const newDataCo2 = miseAJourGestionCo2
+  .create({
+    tauxCo2: 1300,
+    deltaCo2: 500,
+    daysCo2: 2,
+    heuresCo2: 40,
+    consigne: '1100',
+    valeurAxeX: 'jour 1 - 10h30',
+    jourDuCycle: '1',
+  })
+  .then((result) => {
+    console.log('Table mise à jour');
+  })
+  .catch((error) => {
+    console.log('Table non mise à jour', error);
+  });
+
+// -------------------------
+
+// Data.
 // const miseAJourGestionCo2Data = db.gestionCo2Data;
 
 // const newDataCo2 = miseAJourGestionCo2Data

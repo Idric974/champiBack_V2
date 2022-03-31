@@ -32,6 +32,18 @@ module.exports = (sequelize, Sequelize) => {
     etatRelay: {
       type: Sequelize.FLOAT,
     },
+
+    consigne: {
+      type: Sequelize.STRING,
+    },
+
+    valeurAxeX: {
+      type: Sequelize.STRING,
+    },
+
+    jourDuCycle: {
+      type: Sequelize.STRING,
+    },
   });
 
   return gestionAirModels;

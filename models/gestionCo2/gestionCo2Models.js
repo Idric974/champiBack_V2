@@ -24,6 +24,18 @@ module.exports = (sequelize, Sequelize) => {
     heuresCo2: {
       type: Sequelize.FLOAT,
     },
+
+    consigne: {
+      type: Sequelize.STRING,
+    },
+
+    valeurAxeX: {
+      type: Sequelize.STRING,
+    },
+
+    jourDuCycle: {
+      type: Sequelize.STRING,
+    },
   });
 
   return gestionCo2Models;
