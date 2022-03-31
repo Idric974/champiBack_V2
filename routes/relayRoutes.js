@@ -17,4 +17,6 @@ router.post(
   relayCtrl.relayVanneFroid40SecondesOn
 );
 
+router.post('/miseAZeroEtatVanne', relayCtrl.miseAZeroEtatVanne);
+
 module.exports = router;

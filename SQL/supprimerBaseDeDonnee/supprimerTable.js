@@ -10,7 +10,7 @@ var con = mysql.createConnection({
 //* Tables à supprimer
 
 //! gestionAir.
-// let table = 'gestion_airs';
+let table = 'gestion_airs';
 // let table = 'gestion_airs_datas';
 // let table = 'gestion_airs_etalonnages';
 // let table = 'gestion_airs_etat_relay';
@@ -22,7 +22,7 @@ var con = mysql.createConnection({
 // let table = 'gestion_hums_etalonnage_secs';
 
 //! gestion Co2
-let table = 'gestion_co2s';
+// let table = 'gestion_co2s';
 // let table = 'gestion_co2s_datas';
 
 //! gestion Substrat.

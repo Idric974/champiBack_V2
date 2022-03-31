@@ -88,6 +88,32 @@ exports.relay = (req, res, next) => {
   res.status(200).json({ message: 'Requete relay : OK' });
 };
 
+//*! ➖ ➖ ➖ ➖ ➖ ➖ Mise à zéro etat vanne ➖ ➖ ➖ ➖ ➖ ➖ //
+
+exports.miseAZeroEtatVanne = (res, req) => {
+  const miseAJourEtatRelay = db.gestionAir;
+
+  const newEtalAir = miseAJourEtatRelay
+    .findOne({
+      attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+      raw: true,
+    })
+    .then((id) => {
+      // console.log('Le dernier id de gestionAir est : ', id);
+      // console.log(id.maxid);
+      lastId = id.maxid;
+
+      miseAJourEtatRelay
+        .update({ etatRelay: 0 }, { where: { id: lastId } })
+
+        .then(() => {
+          console.log('Data Air enregitrées dans la base gestion_airs');
+        })
+
+        .catch((err) => console.log(err));
+    });
+};
+
 //*! ➖ ➖ ➖ ➖ ➖ ➖ Gestion relay eau au sol ➖ ➖ ➖ ➖ ➖ ➖ //
 
 exports.relayEau = (req, res, next) => {
@@ -156,7 +182,7 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
     res.status(200).json({ message: 'Relay Vanne Froid à 5 Secondes ON: OK' });
 
     setTimeout(() => {
-      const relay_22_OFF = new Gpio(22, 'in');
+      const relay_22_OFF = new Gpio(23, 'in');
 
       if (valEtatRelay >= 40000) {
         etatRelay = 40000;
@@ -174,7 +200,7 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
     //   console.log('etatRelayBDD ----------> ' + valEtatRelay);
     // }, 500);
 
-    const relay_22_ON = new Gpio(23, 'out');
+    const relay_22_ON = new Gpio(22, 'out');
 
     setTimeout(() => {
       const relay_22_OFF = new Gpio(22, 'in');
@@ -210,7 +236,7 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
     res.status(200).json({ message: 'Relay Vanne Froid à 40 Secondes ON: OK' });
 
     setTimeout(() => {
-      const relay_22_OFF = new Gpio(22, 'in');
+      const relay_22_OFF = new Gpio(23, 'in');
 
       if (valEtatRelay >= 40000) {
         etatRelay = 40000;
@@ -228,7 +254,7 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
     //   console.log('etatRelayBDD ----------> ' + valEtatRelay);
     // }, 500);
 
-    const relay_22_ON = new Gpio(23, 'out');
+    const relay_22_ON = new Gpio(22, 'out');
 
     setTimeout(() => {
       const relay_22_OFF = new Gpio(22, 'in');

@@ -228,7 +228,7 @@ let getDateDemarrageCycle = () => {
 
       //* Affichage du nombre de jour du cycle.
       difference = Math.abs(dateDuJour - dateDemarrageCycle);
-      jourDuCycle = Math.round(difference / (1000 * 3600 * 24)) + 1;
+      jourDuCycle = Math.round(difference / (1000 * 3600 * 24));
       console.log('Nombre de jour du cycle :----------:', jourDuCycle);
       //* --------------------------------------------------
 

@@ -2,7 +2,34 @@ require('dotenv').config();
 const db = require('../../models');
 const Sequelize = require('sequelize');
 
-//* Gestion Air
+//! Gestion Air
+
+//* Valeurs.
+
+const majGestionAirModels = db.gestionAir;
+
+const newEtatRelay = majGestionAirModels
+  .create({
+    temperatureAir: 0,
+    deltaAir: 0,
+    days: 0,
+    heures: 0,
+    actionRelay: 0,
+    etatRelay: 0,
+    consigne: '0',
+    valeurAxeX: '0',
+    jourDuCycle: '0',
+  })
+  .then((result) => {
+    console.log('Table mise à jour');
+  })
+  .catch((error) => {
+    console.log('Table non mise à jour', error);
+  });
+
+//* -------------------------*
+
+//* Data.
 
 // const miseAJourGestionAirData = db.gestionAirData;
 
@@ -19,16 +46,27 @@ const Sequelize = require('sequelize');
 //     console.log('Table non mise à jour', error);
 //   });
 
-// const majGestionAirModels = db.gestionAir;
+//* -------------------------*
+
+//! --------------------------------------------------
+
+//! Gestion Humidité
+
+//* Valeurs.
+
+// const majGestionAirModels = db.gestionHum;
 
 // const newEtatRelay = majGestionAirModels
 //   .create({
-//     etatRelay: 0,
-//     temperatureAir: 0,
-//     deltaAir: 0,
-//     days: 0,
-//     heures: 0,
-//     actionRelay: 0,
+//     tauxHumidite: 0,
+//     deltaHum: 0,
+//     valeursMesureSec180: 0,
+//     valeursMesureHum90: 0,
+//     daysHum: 0,
+//     heuresHum: 0,
+//     consigne: '0',
+//     valeurAxeX: '0',
+//     jourDuCycle: '0',
 //   })
 //   .then((result) => {
 //     console.log('Table mise à jour');
@@ -37,9 +75,9 @@ const Sequelize = require('sequelize');
 //     console.log('Table non mise à jour', error);
 //   });
 
-//* -----------------------------------------------------------------
+//* -------------------------*
 
-//* Gestion Humidité
+//* Data
 
 // const miseAJourGestionHumDataModels = db.gestionHumData;
 
@@ -56,32 +94,34 @@ const Sequelize = require('sequelize');
 //     console.log('Table non mise à jour', error);
 //   });
 
-//* -----------------------------------------------------------------
+//* -------------------------*
 
-//* Gestion Co2
+//! --------------------------------------------------
+
+//! Gestion Co2
 
 // Valeurs.
 
 // Data.
 
-const miseAJourGestionCo2 = db.gestionCo2;
+// const miseAJourGestionCo2 = db.gestionCo2;
 
-const newDataCo2 = miseAJourGestionCo2
-  .create({
-    tauxCo2: 1300,
-    deltaCo2: 500,
-    daysCo2: 2,
-    heuresCo2: 40,
-    consigne: '1100',
-    valeurAxeX: 'jour 1 - 10h30',
-    jourDuCycle: '1',
-  })
-  .then((result) => {
-    console.log('Table mise à jour');
-  })
-  .catch((error) => {
-    console.log('Table non mise à jour', error);
-  });
+// const newDataCo2 = miseAJourGestionCo2
+//   .create({
+//     tauxCo2: 1300,
+//     deltaCo2: 500,
+//     daysCo2: 2,
+//     heuresCo2: 40,
+//     consigne: '1100',
+//     valeurAxeX: 'jour 1 - 10h30',
+//     jourDuCycle: '1',
+//   })
+//   .then((result) => {
+//     console.log('Table mise à jour');
+//   })
+//   .catch((error) => {
+//     console.log('Table non mise à jour', error);
+//   });
 
 // -------------------------
 
@@ -101,7 +141,7 @@ const newDataCo2 = miseAJourGestionCo2
 //     console.log('Table non mise à jour', error);
 //   });
 
-//* -----------------------------------------------------------------
+//! --------------------------------------------------
 
 //* Etalonnage Air.
 
@@ -118,7 +158,7 @@ const newDataCo2 = miseAJourGestionCo2
 //     console.log('Table non mise à jour', error);
 //   });
 
-//* -----------------------------------------------------------------
+//! --------------------------------------------------
 
 //* Etalonnage Hum Sec.
 
@@ -135,7 +175,7 @@ const newDataCo2 = miseAJourGestionCo2
 //     console.log('Table non mise à jour', error);
 //   });
 
-//* -----------------------------------------------------------------
+//! --------------------------------------------------
 
 //* Etalonnage Hum Hum.
 
@@ -152,4 +192,30 @@ const newDataCo2 = miseAJourGestionCo2
 //     console.log('Table non mise à jour', error);
 //   });
 
-//* -----------------------------------------------------------------
+//! --------------------------------------------------
+
+//* Etat relay.
+
+// const miseAJourEtatRelay = db.gestionAir;
+
+// const newEtalAir = miseAJourEtatRelay
+//   .findOne({
+//     attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+//     raw: true,
+//   })
+//   .then((id) => {
+//     // console.log('Le dernier id de gestionAir est : ', id);
+//     // console.log(id.maxid);
+//     lastId = id.maxid;
+
+//     miseAJourEtatRelay
+//       .update({ etatRelay: 0 }, { where: { id: lastId } })
+
+//       .then(() => {
+//         console.log('Data Air enregitrées dans la base gestion_airs');
+//       })
+
+//       .catch((err) => console.log(err));
+//   });
+
+//! --------------------------------------------------

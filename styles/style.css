@@ -35,7 +35,7 @@
 
 .box1,
 .box2 {
-  height: 100vh;
+  height: 150vh;
 }
 
 .box1 {
@@ -514,11 +514,27 @@
 }
 
 .contenu {
-  /* border: solid red 1px; */
+  /* border: solid blue 1px; */
+  display: flex;
+  flex-direction: column;
   background-color: white;
   width: 85.2%;
   position: absolute;
   opacity: 0;
+  height: auto;
+}
+
+.graphData {
+  width: 100%;
+  height: auto;
+  border: solid black 1px;
+}
+
+.graphVanne {
+  border: solid black 1px;
+  width: 100%;
+  height: auto;
+  margin-top: 10px;
 }
 
 /* Anim */

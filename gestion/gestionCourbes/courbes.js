@@ -104,6 +104,7 @@ btnAir.addEventListener(
   function () {
     let text = 'Etes-vous sûre de vouloir démarrer un cycle ?';
     if (confirm(text) == true) {
+      //
       let dateDemarrageCycle = format(new Date(), 'yyyy-MM-dd');
       console.log('Date de demarrage du cycle : ', dateDemarrageCycle);
 
@@ -128,6 +129,10 @@ btnAir.addEventListener(
       setTimeout(() => {
         infoSmallId.classList.add('infoSmallDisplay');
       }, 5000);
+
+      setTimeout(() => {
+        location.reload();
+      }, 5500);
     } else {
       console.log('You canceled!');
     }
@@ -139,7 +144,7 @@ btnAir.addEventListener(
 
 //? I) ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ GESTION COURBES AIR ➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-//! Logique pour l'affichage des courbes.
+//! LOGIQUE POUR L'AFFICHAGE DES COURBES DATA.
 
 //! Les variables.
 
@@ -283,6 +288,116 @@ let getDataCourbeAir = () => {
 };
 
 getDataCourbeAir();
+
+//! --------------------------------------------------------------
+
+//! LOGIQUE POUR L'AFFICHAGE DES COURBES VANNE.
+
+//! Les variables.
+
+let dataCourbeAirVanne;
+let valeurTemperatureAirVanne = [];
+
+//! --------------------------------------------------------------
+
+let getDataCourbeAirVanne = () => {
+  axios({
+    url: 'http://localhost:3003/api/gestionCourbeRoutes/getTemperatureAirCourbe/',
+    method: 'get',
+  })
+    .then((response) => {
+      // console.log('La réponse de la requête vanne air : ', response.data);
+
+      //* Récupération de la valeur vanne.
+
+      dataCourbeAirVanne = response.data.temperatureAirCourbe;
+      // console.log(
+      //   'La réponse de la requête vanne air : ',
+      //   temperatureAir
+      // );
+
+      dataCourbeAirVanne.forEach((item, index) =>
+        valeurTemperatureAirVanne.push({
+          // x: item['createdAt'],
+          x: item['valeurAxeX'],
+          y: item['etatRelay'].toString(),
+        })
+      );
+
+      console.log(
+        'Tableau des valeurs vanne air à afficher : ',
+        valeurTemperatureAirVanne
+      );
+
+      //*---------------------------------------------
+    })
+
+    .then(() => {
+      // ! Logique pour les courbes Air.
+
+      //! Le contexte graphique.
+      const ctxVanne = document
+        .getElementById('myChartAirVanne')
+        .getContext('2d');
+      //! ---------------------------------
+
+      //!les labels.
+      const myLabelsVanne = [];
+      //! ---------------------------------
+
+      //! Les datas.
+      const data = {
+        labels: myLabelsVanne,
+
+        datasets: [
+          // Courbe taux humidité
+          {
+            label: 'Courbe Vanne Air',
+            data: valeurTemperatureAirVanne,
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1,
+            lineTension: 0.2,
+            pointRadius: 0,
+          },
+        ],
+      };
+      //! ---------------------------------
+
+      //! Les options.
+      const optionsVanne = {
+        animation: {
+          duration: 0,
+        },
+        scales: {
+          x: {},
+
+          y: {},
+        },
+      };
+      //! ---------------------------------
+
+      //! La configuration du graphique.
+      const configVanne = {
+        type: 'line',
+        data,
+        optionsVanne,
+      };
+      //! ---------------------------------
+
+      //!L'instanciation de graphique.
+      const myChartVanne = new Chart(ctxVanne, configVanne);
+      //! ---------------------------------
+
+      //! --------------------------------------------------------------
+    })
+    .catch((error) => {
+      console.log(error);
+      console.log(JSON.stringify(error));
+    });
+};
+
+getDataCourbeAirVanne();
 
 //! --------------------------------------------------------------
 
@@ -538,35 +653,6 @@ let getDataCourbeCo2 = () => {
       );
 
       //*---------------------------------------------
-    })
-
-    .then(() => {
-      // let getConsigneCo2 = () => {
-      //   axios({
-      //     url: 'http://localhost:3003/api/gestionCourbeRoutes/getconsigneCo2Courbe/',
-      //     method: 'get',
-      //   }).then((response) => {
-      //     // console.log(
-      //     //   'La réponse de la requête consigne Co2 : ',
-      //     //   response.data.consigneCo2Courbe
-      //     // );
-      //     consigneCourbeCo2 = response.data.consigneCo2Courbe;
-      //     // console.log(
-      //     //   'La réponse de la requête consigne humidité : ',
-      //     //   consigneCourbeCo2          // );
-      //     consigneCourbeCo2.forEach((item, index) =>
-      //       valeurConsigneCo2.push({
-      //         x: item['id'].toString(),
-      //         y: item['consigneCo2'],
-      //       })
-      //     );
-      //     // console.log(
-      //     //   'Tableau des valeur consigne humidité à afficher : ',
-      //     //   valeurConsigneCo2
-      //     // );
-      //   });
-      // };
-      // getConsigneCo2();
     })
 
     .then(() => {

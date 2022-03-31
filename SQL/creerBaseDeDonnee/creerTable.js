@@ -14,12 +14,12 @@ db.connect(function (err) {
 
   //* gestion Air
 
-  // let sql =
-  //   'CREATE TABLE gestion_airs (id int auto_increment, temperatureAir FLOAT, deltaAir FLOAT, days FLOAT, heures FLOAT, etatRelay FLOAT, actionRelay FLOAT,  consigne varchar(255), valeurAxeX varchar(255), jourDuCycle varchar(255), createdAt DATE, updatedAt DATE, primary key(id))';
-  // db.query(sql, function (err, result) {
-  //   if (err) throw err;
-  //   console.log('Table gestion_airs créé', result);
-  // });
+  let sql =
+    'CREATE TABLE gestion_airs (id int auto_increment, temperatureAir FLOAT, deltaAir FLOAT, days FLOAT, heures FLOAT, etatRelay FLOAT, actionRelay FLOAT,  consigne varchar(255), valeurAxeX varchar(255), jourDuCycle varchar(255), createdAt DATE, updatedAt DATE, primary key(id))';
+  db.query(sql, function (err, result) {
+    if (err) throw err;
+    console.log('Table gestion_airs créé', result);
+  });
 
   // let sql =
   //   'CREATE TABLE gestion_airs_data (id int auto_increment, consigneAir FLOAT, pasAir FLOAT, objectifAir FLOAT, deltaAir FLOAT, days INTEGER, heures INTEGER, createdAt DATE, updatedAt DATE, primary key(id))';
@@ -78,12 +78,12 @@ db.connect(function (err) {
 
   //* Gestion Co2
 
-  let sql =
-    'CREATE TABLE  gestion_co2s (id int auto_increment, tauxCo2 FLOAT, deltaCo2 FLOAT, daysCo2 FLOAT,  heuresCo2 FLOAT, consigne varchar(255), valeurAxeX varchar(255), jourDuCycle varchar(255), createdAt DATE, updatedAt DATE, primary key(id))';
-  db.query(sql, function (err, result) {
-    if (err) throw err;
-    console.log('Table gestion_co2s créé', result);
-  });
+  // let sql =
+  //   'CREATE TABLE  gestion_co2s (id int auto_increment, tauxCo2 FLOAT, deltaCo2 FLOAT, daysCo2 FLOAT,  heuresCo2 FLOAT, consigne varchar(255), valeurAxeX varchar(255), jourDuCycle varchar(255), createdAt DATE, updatedAt DATE, primary key(id))';
+  // db.query(sql, function (err, result) {
+  //   if (err) throw err;
+  //   console.log('Table gestion_co2s créé', result);
+  // });
 
   // let sql =
   //   'CREATE TABLE  gestion_co2s_datas (id int auto_increment, consigneCo2 FLOAT, pasCo2 FLOAT, objectifCo2 FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';

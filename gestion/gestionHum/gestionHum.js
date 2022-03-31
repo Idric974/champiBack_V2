@@ -12,7 +12,6 @@ const gestionHumDataModels = db.gestionHumData;
 const gestionHumEtallonnageModels = db.etalonnageHum;
 const gestionSecEtallonnageModels = db.etalonnageSec;
 
-
 //! -------------------------------------------------- !
 
 //! Les variables.

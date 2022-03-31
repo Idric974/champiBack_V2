@@ -128,7 +128,7 @@ exports.getJourDuCycle = (req, res) => {
           where: { id: id.maxid },
         })
         .then((jourDuCycle) => {
-          console.log('Date de démarrage du cycle =======> : ', jourDuCycle);
+          // console.log('Date de démarrage du cycle =======> : ', jourDuCycle);
 
           res.status(200).json({ jourDuCycle });
         });
