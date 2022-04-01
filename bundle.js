@@ -507,14 +507,14 @@ let getDataCourbeAirVanne = () => {
         valeurTemperatureAirVanne.push({
           // x: item['createdAt'],
           x: item['valeurAxeX'],
-          y: item['etatRelay'].toString(),
+          y: item['etatRelay'],
         })
       );
 
-      console.log(
-        'Tableau des valeurs vanne air à afficher : ',
-        valeurTemperatureAirVanne
-      );
+      // console.log(
+      //   'Tableau des valeurs vanne air à afficher : ',
+      //   valeurTemperatureAirVanne
+      // );
 
       //*---------------------------------------------
     })
@@ -810,10 +810,10 @@ let getDataCourbeCo2 = () => {
         })
       );
 
-      console.log(
-        'Tableau des valeur taux humidité à afficher : ',
-        valeurTauxCo2
-      );
+      // console.log(
+      //   'Tableau des valeur taux Co2 à afficher : ',
+      //   valeurTauxCo2
+      // );
 
       //*---------------------------------------------
 
@@ -834,10 +834,10 @@ let getDataCourbeCo2 = () => {
         })
       );
 
-      console.log(
-        'Tableau des valeurs consigne Co2 à afficher : ',
-        valeurConsigneCo2
-      );
+      // console.log(
+      //   'Tableau des valeurs consigne Co2 à afficher : ',
+      //   valeurConsigneCo2
+      // );
 
       //*---------------------------------------------
     })
