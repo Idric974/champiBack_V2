@@ -6,26 +6,26 @@ const Sequelize = require('sequelize');
 
 //* Valeurs.
 
-const majGestionAirModels = db.gestionAir;
+// const majGestionAirModels = db.gestionAir;
 
-const newEtatRelay = majGestionAirModels
-  .create({
-    temperatureAir: 0,
-    deltaAir: 0,
-    days: 0,
-    heures: 0,
-    actionRelay: 0,
-    etatRelay: 0,
-    consigne: '0',
-    valeurAxeX: '0',
-    jourDuCycle: '0',
-  })
-  .then((result) => {
-    console.log('Table mise à jour');
-  })
-  .catch((error) => {
-    console.log('Table non mise à jour', error);
-  });
+// const newEtatRelay = majGestionAirModels
+//   .create({
+//     temperatureAir: 0,
+//     deltaAir: 0,
+//     days: 0,
+//     heures: 0,
+//     actionRelay: 0,
+//     etatRelay: 0,
+//     consigne: '0',
+//     valeurAxeX: '0',
+//     jourDuCycle: '0',
+//   })
+//   .then((result) => {
+//     console.log('Table mise à jour');
+//   })
+//   .catch((error) => {
+//     console.log('Table non mise à jour', error);
+//   });
 
 //* -------------------------*
 
