@@ -54,9 +54,9 @@ const Sequelize = require('sequelize');
 
 //* Valeurs.
 
-// const majGestionAirModels = db.gestionHum;
+// const majGestionHumModels = db.gestionHum;
 
-// const newEtatRelay = majGestionAirModels
+// const newEtatRelay = majGestionHumModels
 //   .create({
 //     tauxHumidite: 0,
 //     deltaHum: 0,

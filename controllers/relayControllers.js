@@ -16,6 +16,8 @@ let etatRelay;
 
 //! Les fonctions.
 
+//* Mise à jour etat Relay.
+
 miseAjourEtatRelay = () => {
   gestionAirModels
     .findOne({
@@ -38,6 +40,35 @@ miseAjourEtatRelay = () => {
     });
 };
 
+//* --------------------------------------------------
+
+//* Mise à jour etat Relay.
+
+miseAjourActionRelay = () => {
+  gestionAirModels
+    .findOne({
+      attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+      raw: true,
+    })
+    .then((id) => {
+      // console.log('Le dernier id de gestionAir est : ', id);
+      // console.log(id.maxid);
+      lastId = id.maxid;
+
+      gestionAirModels
+        .update({ actionRelay: actionRelay }, { where: { id: lastId } })
+
+        .then(function (result) {
+          console.log('result etat relay =======> ' + result);
+        })
+
+        .catch((err) => console.log(err));
+    });
+};
+
+//* --------------------------------------------------
+
+//* Recuperation état Relay.
 let valEtatRelay;
 
 recuperationEtatRlay = () => {
@@ -62,6 +93,8 @@ recuperationEtatRlay = () => {
         });
     });
 };
+
+//* --------------------------------------------------
 
 //!⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐
 
@@ -171,11 +204,10 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
   let relayVanneFroid = req.body.etatRelay;
 
   if (relayVanneFroid == 'ON') {
-    recuperationEtatRlay();
+    actionRelay = 1;
+    miseAjourActionRelay();
 
-    // setTimeout(() => {
-    //   console.log('etatRelayBDD ++++++++++> ' + valEtatRelay);
-    // }, 500);
+    recuperationEtatRlay();
 
     const relay_22_ON = new Gpio(23, 'out');
 
@@ -190,15 +222,17 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
         etatRelay = valEtatRelay + 5000;
       }
 
+      actionRelay = 0;
+      miseAjourActionRelay();
+
       miseAjourEtatRelay();
     }, 5000);
   }
   if (relayVanneFroid == 'OFF') {
-    recuperationEtatRlay();
+    actionRelay = 1;
+    miseAjourActionRelay();
 
-    // setTimeout(() => {
-    //   console.log('etatRelayBDD ----------> ' + valEtatRelay);
-    // }, 500);
+    recuperationEtatRlay();
 
     const relay_22_ON = new Gpio(22, 'out');
 
@@ -210,6 +244,9 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
       } else {
         etatRelay = valEtatRelay - 5000;
       }
+
+      actionRelay = 0;
+      miseAjourActionRelay();
 
       miseAjourEtatRelay();
     }, 5000);
@@ -225,11 +262,10 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
   let relayVanneFroid = req.body.etatRelay;
 
   if (relayVanneFroid == 'ON') {
-    recuperationEtatRlay();
+    actionRelay = 1;
+    miseAjourActionRelay();
 
-    // setTimeout(() => {
-    //   console.log('etatRelayBDD ++++++++++> ' + valEtatRelay);
-    // }, 500);
+    recuperationEtatRlay();
 
     const relay_22_ON = new Gpio(23, 'out');
 
@@ -244,15 +280,17 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
         etatRelay = valEtatRelay + 40000;
       }
 
+      actionRelay = 0;
+      miseAjourActionRelay();
+
       miseAjourEtatRelay();
     }, 40000);
   }
   if (relayVanneFroid == 'OFF') {
-    recuperationEtatRlay();
+    actionRelay = 1;
+    miseAjourActionRelay();
 
-    // setTimeout(() => {
-    //   console.log('etatRelayBDD ----------> ' + valEtatRelay);
-    // }, 500);
+    recuperationEtatRlay();
 
     const relay_22_ON = new Gpio(22, 'out');
 
@@ -264,6 +302,9 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
       } else {
         etatRelay = valEtatRelay - 40000;
       }
+
+      actionRelay = 0;
+      miseAjourActionRelay();
 
       miseAjourEtatRelay();
     }, 40000);
