@@ -8,6 +8,7 @@ const sequelize = require('sequelize');
 const db = require('../../models');
 const gestionCo2Models = db.gestionCo2;
 const gestionCo2DataModels = db.gestionCo2Data;
+const axios = require('axios');
 //! -----------------------------------------------------------
 
 //! Les variables.
@@ -150,32 +151,41 @@ actionGetTauxCo2(data)
 
           //* Date du jour.
           dateDuJour = new Date();
-          // console.log('Date du Jour :---------------------:', dateDuJour);
+          console.log('Date du Jour :---------------------:', dateDuJour);
           //* --------------------------------------------------
 
           //* Date de demarrage du cycle
           dateDemarrageCycle = new Date(
             response.data.dateDemarrageCycle.dateDemarrageCycle
           );
-          // console.log('La date de démarrage du cycle :----:', dateDemarrageCycle);
+          console.log(
+            'La date de démarrage du cycle :----:',
+            dateDemarrageCycle
+          );
           //* --------------------------------------------------
 
           //* Affichage du nombre de jour du cycle.
           difference = Math.abs(dateDuJour - dateDemarrageCycle);
-          jourDuCycle = Math.round(difference / (1000 * 3600 * 24)) + 1;
-          console.log('Nombre de jour du cycle :----------:', jourDuCycle);
+          if (dateDuJour == dateDemarrageCycle) {
+            jourDuCycle = 1;
+            console.log('Nombre de jour du cycle :----------:', jourDuCycle);
+          } else {
+            jourDuCycle = Math.round(difference / (1000 * 3600 * 24));
+            console.log('Nombre de jour du cycle :----------:', jourDuCycle);
+          }
+
           //* --------------------------------------------------
 
           //* Affichage de l'heure.
           heureDuCycle = new Date().getHours();
           minuteDuCycle = new Date().getMinutes();
           heureMinute = heureDuCycle + 'h' + minuteDuCycle;
-          // console.log("l'heure du cycle :-----------------:", heureMinute);
+          console.log("l'heure du cycle :-----------------:", heureMinute);
           //* --------------------------------------------------
 
           //* Valeure de l'axe x.
           valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
-          // console.log("Valeure de l'axe x :---------------:", valeurAxeX);
+          console.log("Valeure de l'axe x :---------------:", valeurAxeX);
           //* --------------------------------------------------
         })
         .catch((error) => {
@@ -196,6 +206,8 @@ actionGetTauxCo2(data)
           .create({
             tauxCo2: data,
             deltaCo2: deltaCo2,
+            daysCo2: daysCo2,
+            heuresCo2: heuresCo2,
             consigne: consigne,
             valeurAxeX: valeurAxeX,
             jourDuCycle: jourDuCycle,
@@ -222,5 +234,5 @@ actionGetTauxCo2(data)
   })
 
   .catch(() => {
-    console.log(cyan, '[ GESTION CO2 CALCULES  ] Erreur Co2', err);
+    console.log(cyan, '[ GESTION CO2 CALCULES  ] Erreur Co2');
   });

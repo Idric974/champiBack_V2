@@ -216,10 +216,10 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
     setTimeout(() => {
       const relay_22_OFF = new Gpio(23, 'in');
 
-      if (valEtatRelay >= 40000) {
-        etatRelay = 40000;
+      if (valEtatRelay >= 100) {
+        etatRelay = 100;
       } else {
-        etatRelay = valEtatRelay + 5000;
+        etatRelay = valEtatRelay + 12.5;
       }
 
       actionRelay = 0;
@@ -242,7 +242,7 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
       if (valEtatRelay <= 0) {
         etatRelay = 0;
       } else {
-        etatRelay = valEtatRelay - 5000;
+        etatRelay = valEtatRelay - 12.5;
       }
 
       actionRelay = 0;
@@ -274,10 +274,10 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
     setTimeout(() => {
       const relay_22_OFF = new Gpio(23, 'in');
 
-      if (valEtatRelay >= 40000) {
-        etatRelay = 40000;
+      if (valEtatRelay >= 100) {
+        etatRelay = 100;
       } else {
-        etatRelay = valEtatRelay + 40000;
+        etatRelay = valEtatRelay + 100;
       }
 
       actionRelay = 0;
@@ -300,7 +300,7 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
       if (valEtatRelay <= 0) {
         etatRelay = 0;
       } else {
-        etatRelay = valEtatRelay - 40000;
+        etatRelay = valEtatRelay - 100;
       }
 
       actionRelay = 0;

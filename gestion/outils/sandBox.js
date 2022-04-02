@@ -1,7 +1,6 @@
 const axios = require('axios');
-
-let date = new Date();
 let dateDuJour;
+// let dateDemarrageCycle = new Date('2022-03-31');
 let dateDemarrageCycle;
 let difference;
 let jourDuCycle;
@@ -33,8 +32,14 @@ let getDateDemarrageCycle = () => {
 
       //* Affichage du nombre de jour du cycle.
       difference = Math.abs(dateDuJour - dateDemarrageCycle);
-      jourDuCycle = Math.round(difference / (1000 * 3600 * 24)) + 1;
-      console.log('Nombre de jour du cycle :----------:', jourDuCycle);
+      if (dateDuJour == dateDemarrageCycle) {
+        jourDuCycle = 1;
+        console.log('Nombre de jour du cycle :----------:', jourDuCycle);
+      } else {
+        jourDuCycle = Math.round(difference / (1000 * 3600 * 24));
+        console.log('Nombre de jour du cycle :----------:', jourDuCycle);
+      }
+
       //* --------------------------------------------------
 
       //* Affichage de l'heure.

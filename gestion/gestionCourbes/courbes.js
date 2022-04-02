@@ -33,14 +33,14 @@ const options = {
 let getJourDuCycle = () => {
   //
   axios({
-    url: 'http://localhost:3003/api/gestionCourbeRoutes/getJourDuCycle/',
+    url: 'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/',
     method: 'get',
   })
     //* Récupération du jour du cycle.
     .then((response) => {
-      console.log('Jour du cycle : ', response.data.jourDuCycle.jourDuCycle);
+      console.log('Jour du cycle : ', response.data.temperatureAir.jourDuCycle);
 
-      jourDuCycle = response.data.jourDuCycle.jourDuCycle;
+      jourDuCycle = response.data.temperatureAir.jourDuCycle;
 
       localStorage.setItem('Jour du cycle : ', jourDuCycle);
 
@@ -125,6 +125,8 @@ btnAir.addEventListener(
       const infoSmall = document.getElementById('infoSmallButton');
 
       infoSmallId.classList.remove('infoSmallDisplay');
+
+      getJourDuCycle();
 
       setTimeout(() => {
         infoSmallId.classList.add('infoSmallDisplay');
@@ -372,7 +374,14 @@ let getDataCourbeAirVanne = () => {
         scales: {
           x: {},
 
-          y: {},
+          y: {
+            ticks: {
+              // Include a dollar sign in the ticks
+              callback: function (item, index, ticks) {
+                return item + '%';
+              },
+            },
+          },
         },
       };
       //! ---------------------------------

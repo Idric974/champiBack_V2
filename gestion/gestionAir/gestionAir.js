@@ -10,7 +10,6 @@ const db = require('../../models');
 const gestionAirModels = db.gestionAir;
 const gestionAirsDataModels = db.gestionAirData;
 const gestionAirEtalonnageModels = db.etalonnageAir;
-const gestionAirEtatRelayModels = db.gestionAirEtatRelay;
 const gestionLogsModels = db.gestionLogsBack;
 const logger = require('../../src/logger');
 const axios = require('axios');
@@ -32,7 +31,6 @@ let days;
 let heures;
 let etatRelay;
 let actionRelay;
-let etatVanne;
 let etatVanneBDD;
 let dateDuJour;
 let dateDemarrageCycle;
@@ -80,7 +78,7 @@ let miseAjourEtatRelay = () => {
     });
 };
 
-//! -------------------------------------------------- !
+//! -------------------------------------------------- *
 
 //! Récupération de la consigne
 
@@ -105,7 +103,11 @@ let recuperationConsigneAir = () => {
             // console.log('LastId :   ', lastId);
 
             consigne = result['consigneAir'];
-            // console.log('Consigne : ', consigne);
+            console.log(
+              jaune,
+              '[ GESTION AIR CALCULES  ] La consigne : ',
+              consigne
+            );
 
             pas = result['pasAir'];
             // console.log('Pas :      ', pas);
@@ -189,7 +191,11 @@ let recuperationEtatRelay = () => {
             // console.log(result);
 
             etatVanneBDD = result['etatRelay'];
-            // console.log('etatVanneBDD ========> ', etatVanneBDD);
+            console.log(
+              jaune,
+              '[ GESTION AIR CALCULES  ] Dernier état vanne de la BDD : ',
+              etatVanneBDD
+            );
           });
       });
   } catch (error) {
@@ -228,8 +234,16 @@ let getDateDemarrageCycle = () => {
 
       //* Affichage du nombre de jour du cycle.
       difference = Math.abs(dateDuJour - dateDemarrageCycle);
-      jourDuCycle = Math.round(difference / (1000 * 3600 * 24) + 1);
-      console.log('Nombre de jour du cycle :----------:', jourDuCycle);
+      if (dateDuJour === dateDemarrageCycle) {
+        jourDuCycle = 1;
+        // console.log('dateDuJour === dateDemarrageCycle');
+        // console.log('Nombre de jour du cycle :----------:', jourDuCycle);
+      } else {
+        jourDuCycle = Math.round(difference / (1000 * 3600 * 24)) + 1;
+        // console.log('dateDuJour > dateDemarrageCycle');
+        // console.log('Nombre de jour du cycle :----------:', jourDuCycle);
+      }
+
       //* --------------------------------------------------
 
       //* Affichage de l'heure.
@@ -241,7 +255,11 @@ let getDateDemarrageCycle = () => {
 
       //* Valeure de l'axe x.
       valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
-      // console.log("Valeure de l'axe x :---------------:", valeurAxeX);
+      console.log(
+        jaune,
+        "[ GESTION AIR CALCULES  ] Valeure de l'axe x : ",
+        valeurAxeX
+      );
       //* --------------------------------------------------
     })
     .catch((error) => {
@@ -323,11 +341,11 @@ resultats()
     temperatureCorrigée =
       parseFloat(temperatureMoyenneAir.toFixed(1)) + etalonnage;
     ValTemp = temperatureCorrigée;
-    // console.log(
-    //   jaune,
-    //   "[ GESTION AIR CALCULES  ] Temperature Moyenne de l'air corrigée affichée : ",
-    //   ValTemp
-    // );
+    console.log(
+      jaune,
+      "[ GESTION AIR CALCULES  ] Temperature Moyenne de l'air corrigée affichée : ",
+      ValTemp
+    );
 
     // Affichage de la consigne.
     // console.log(
@@ -340,7 +358,7 @@ resultats()
 
     delta = parseFloat((ValTemp - consigne).toFixed(1));
 
-    // console.log(jaune, '[ GESTION AIR CALCULES  ] Le delta est de : ', delta);
+    console.log(jaune, '[ GESTION AIR CALCULES  ] Le delta est de : ', delta);
   })
   //
   //! Définition des actions.
@@ -355,13 +373,14 @@ resultats()
 
         console.log('Ouverture du froid');
 
-        if (etatVanneBDD >= 40000) {
-          etatRelay = 40000;
+        if (etatVanneBDD >= 100) {
+          etatRelay = 100;
         } else {
-          etatRelay = preconisation;
+          etatRelay = 100;
         }
 
         actionRelay = 1;
+
         miseAjourEtatRelay();
 
         setTimeout(() => {
@@ -382,10 +401,10 @@ resultats()
 
         const relay_22_ON = new Gpio(23, 'out');
 
-        if (etatVanneBDD >= 40000) {
-          etatRelay = 40000;
+        if (etatVanneBDD >= 100) {
+          etatRelay = 100;
         } else {
-          etatRelay = preconisation;
+          etatRelay = 37.5;
         }
 
         actionRelay = 1;
@@ -408,10 +427,10 @@ resultats()
 
         const relay_22_ON = new Gpio(23, 'out');
 
-        if (etatVanneBDD >= 40000) {
-          etatRelay = 40000;
+        if (etatVanneBDD >= 100) {
+          etatRelay = 100;
         } else {
-          etatRelay = preconisation;
+          etatRelay = 12.5;
         }
 
         actionRelay = 1;
@@ -430,6 +449,8 @@ resultats()
       } else if (delta <= 0.3 && delta >= -0.3) {
         //***************************************************************
         //! Pas d'action car interval entre -0.3 et 0.3"
+        etatRelay = etatVanneBDD;
+        miseAjourEtatRelay();
         //***************************************************************
       } else if (delta <= -0.4 && delta >= -0.5) {
         //
@@ -445,7 +466,7 @@ resultats()
           etatRelay = preconisation;
         }
 
-        etatRelay = preconisation;
+        etatRelay = 12.5;
         actionRelay = 1;
         miseAjourEtatRelay();
 
@@ -469,7 +490,7 @@ resultats()
         if (etatVanneBDD <= 0) {
           etatRelay = 0;
         } else {
-          etatRelay = preconisation;
+          etatRelay = 37.5;
         }
 
         actionRelay = 1;
@@ -496,7 +517,7 @@ resultats()
         if (etatVanneBDD <= 0) {
           etatRelay = 0;
         } else {
-          etatRelay = preconisation;
+          etatRelay = 100;
         }
 
         actionRelay = 1;
@@ -522,6 +543,7 @@ resultats()
   })
   //
   //
+
   .then(() => {
     //! Enregistrement des datas dans la base.
     try {

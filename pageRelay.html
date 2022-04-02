@@ -276,50 +276,51 @@
             etatRelayBrute = response.data.temperatureAir.etatRelay;
             console.log('etatRelayBrute ===> ' + etatRelayBrute);
             // console.log('etatRelayBrute ===> ' + typeof etatRelayBrute);
+            etatRelayLocalStorage = etatRelayBrute;
           })
-          .then(() => {
-            if (etatRelayBrute >= 40000) {
-              etatRelayLocalStorage = 100;
-              // console.log('Select etatRalayBDD : ' + etatRelayBrute);
-              //
-            } else if (etatRelayBrute == 35000) {
-              etatRelayLocalStorage = 87.5;
-              // console.log('Select etatRalayBDD : ' + etatRelayBrute);
-              //
-            } else if (etatRelayBrute == 30000) {
-              etatRelayLocalStorage = 75;
-              // console.log('Select etatRalayBDD : ' + etatRelayBrute);
-              //
-            } else if (etatRelayBrute == 25000) {
-              etatRelayLocalStorage = 62.5;
-              // console.log('Select etatRalayBDD : ' + etatRelayBrute);
-              //
-            } else if (etatRelayBrute == 20000) {
-              etatRelayLocalStorage = 50;
-              // console.log('Select etatRalayBDD : ' + etatRelayBrute);
-              //
-            } else if (etatRelayBrute == 15000) {
-              etatRelayLocalStorage = 37.5;
-              // console.log('Select etatRalayBDD : ' + etatRelayBrute);
-              //
-            } else if (etatRelayBrute == 10000) {
-              etatRelayLocalStorage = 25;
-              // console.log('Select etatRalayBDD : ' + etatRelayBrute);
-              //
-            } else if (etatRelayBrute == 5000) {
-              etatRelayLocalStorage = 12.5;
-              // console.log('Select etatRalayBDD : ' + etatRelayBrute);
-              //
-            } else if (etatRelayBrute <= 0) {
-              etatRelayLocalStorage = 0;
-              miseAZeroEtatVanne();
-              // console.log('Select etatRalayBDD : ' + etatRelayBrute);
-              //
-            } else {
-              console.log('Erreur d affichage');
-              console.log('Select etatRalayBDD : ' + etatRelayBrute);
-            }
-          })
+          // .then(() => {
+          //   if (etatRelayBrute >= 40000) {
+          //     etatRelayLocalStorage = 100;
+          //     // console.log('Select etatRalayBDD : ' + etatRelayBrute);
+          //     //
+          //   } else if (etatRelayBrute == 35000) {
+          //     etatRelayLocalStorage = 87.5;
+          //     // console.log('Select etatRalayBDD : ' + etatRelayBrute);
+          //     //
+          //   } else if (etatRelayBrute == 30000) {
+          //     etatRelayLocalStorage = 75;
+          //     // console.log('Select etatRalayBDD : ' + etatRelayBrute);
+          //     //
+          //   } else if (etatRelayBrute == 25000) {
+          //     etatRelayLocalStorage = 62.5;
+          //     // console.log('Select etatRalayBDD : ' + etatRelayBrute);
+          //     //
+          //   } else if (etatRelayBrute == 20000) {
+          //     etatRelayLocalStorage = 50;
+          //     // console.log('Select etatRalayBDD : ' + etatRelayBrute);
+          //     //
+          //   } else if (etatRelayBrute == 15000) {
+          //     etatRelayLocalStorage = 37.5;
+          //     // console.log('Select etatRalayBDD : ' + etatRelayBrute);
+          //     //
+          //   } else if (etatRelayBrute == 10000) {
+          //     etatRelayLocalStorage = 25;
+          //     // console.log('Select etatRalayBDD : ' + etatRelayBrute);
+          //     //
+          //   } else if (etatRelayBrute == 5000) {
+          //     etatRelayLocalStorage = 12.5;
+          //     // console.log('Select etatRalayBDD : ' + etatRelayBrute);
+          //     //
+          //   } else if (etatRelayBrute <= 0) {
+          //     etatRelayLocalStorage = 0;
+          //     miseAZeroEtatVanne();
+          //     // console.log('Select etatRalayBDD : ' + etatRelayBrute);
+          //     //
+          //   } else {
+          //     console.log('Erreur d affichage');
+          //     console.log('Select etatRalayBDD : ' + etatRelayBrute);
+          //   }
+          // })
 
           .then(() => {
             etatRelay = JSON.stringify(etatRelayLocalStorage);
@@ -365,7 +366,7 @@
                 afficheEtatRelay();
                 alert('ATTENTION!! ACTION VANNE EN COURS');
                 return;
-              } else if (etatRelayBrute >= 40000) {
+              } else if (etatRelayBrute >= 100) {
                 alert('VANNE DEJA OUVERTE À 100%');
                 return;
               } else {
@@ -490,7 +491,7 @@
                 afficheEtatRelay();
                 alert('ATTENTION!! ACTION VANNE EN COURS');
                 return;
-              } else if (etatRelayBrute >= 40000) {
+              } else if (etatRelayBrute >= 100) {
                 alert('VANNE DEJA OUVERTE À 100%');
                 return;
               } else {
