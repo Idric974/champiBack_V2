@@ -71,7 +71,7 @@ let miseAjourEtatRelay = () => {
         )
 
         .then(function (result) {
-          console.log('Nb mise à jour data =======> ' + result);
+          // console.log('Nb mise à jour data =======> ' + result);
         })
 
         .catch((err) => console.log(err));
@@ -103,11 +103,11 @@ let recuperationConsigneAir = () => {
             // console.log('LastId :   ', lastId);
 
             consigne = result['consigneAir'];
-            console.log(
-              jaune,
-              '[ GESTION AIR CALCULES  ] La consigne : ',
-              consigne
-            );
+            // console.log(
+            //   jaune,
+            //   '[ GESTION AIR CALCULES  ] La consigne : ',
+            //   consigne
+            // );
 
             pas = result['pasAir'];
             // console.log('Pas :      ', pas);
@@ -191,11 +191,11 @@ let recuperationEtatRelay = () => {
             // console.log(result);
 
             etatVanneBDD = result['etatRelay'];
-            console.log(
-              jaune,
-              '[ GESTION AIR CALCULES  ] Dernier état vanne de la BDD : ',
-              etatVanneBDD
-            );
+            // console.log(
+            //   jaune,
+            //   '[ GESTION AIR CALCULES  ] Dernier état vanne de la BDD : ',
+            //   etatVanneBDD
+            // );
           });
       });
   } catch (error) {
@@ -255,11 +255,11 @@ let getDateDemarrageCycle = () => {
 
       //* Valeure de l'axe x.
       valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
-      console.log(
-        jaune,
-        "[ GESTION AIR CALCULES  ] Valeure de l'axe x : ",
-        valeurAxeX
-      );
+      // console.log(
+      //   jaune,
+      //   "[ GESTION AIR CALCULES  ] Valeure de l'axe x : ",
+      //   valeurAxeX
+      // );
       //* --------------------------------------------------
     })
     .catch((error) => {
@@ -341,11 +341,11 @@ resultats()
     temperatureCorrigée =
       parseFloat(temperatureMoyenneAir.toFixed(1)) + etalonnage;
     ValTemp = temperatureCorrigée;
-    console.log(
-      jaune,
-      "[ GESTION AIR CALCULES  ] Temperature Moyenne de l'air corrigée affichée : ",
-      ValTemp
-    );
+    // console.log(
+    //   jaune,
+    //   "[ GESTION AIR CALCULES  ] Temperature Moyenne de l'air corrigée affichée : ",
+    //   ValTemp
+    // );
 
     // Affichage de la consigne.
     // console.log(
@@ -358,7 +358,7 @@ resultats()
 
     delta = parseFloat((ValTemp - consigne).toFixed(1));
 
-    console.log(jaune, '[ GESTION AIR CALCULES  ] Le delta est de : ', delta);
+    // console.log(jaune, '[ GESTION AIR CALCULES  ] Le delta est de : ', delta);
   })
   //
   //! Définition des actions.
@@ -367,11 +367,11 @@ resultats()
       if (delta >= 1.1) {
         //
         let preconisation = 40000;
-        console.log('preconisation : ' + preconisation);
+        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(23, 'out');
 
-        console.log('Ouverture du froid');
+        // console.log('Ouverture du froid');
 
         if (etatVanneBDD >= 100) {
           etatRelay = 100;
@@ -387,7 +387,7 @@ resultats()
           //
           const relay_22_OFF = new Gpio(23, 'in');
 
-          console.log('Fermeture du froid');
+          // console.log('Fermeture du froid');
 
           actionRelay = 0;
           miseAjourEtatRelay();
@@ -397,7 +397,7 @@ resultats()
       } else if (delta <= 1 && delta >= 0.6) {
         //
         let preconisation = 15000;
-        console.log('preconisation : ' + preconisation);
+        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(23, 'out');
 
@@ -423,7 +423,7 @@ resultats()
       } else if (delta <= 0.5 && delta >= 0.4) {
         //
         let preconisation = 5000;
-        console.log('preconisation : ' + preconisation);
+        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(23, 'out');
 
@@ -456,7 +456,7 @@ resultats()
         //
 
         let preconisation = 5000;
-        console.log('preconisation : ' + preconisation);
+        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(22, 'out');
 
@@ -483,7 +483,7 @@ resultats()
       } else if (delta <= -0.6 && delta >= -1) {
         //
         let preconisation = 15000;
-        console.log('preconisation : ' + preconisation);
+        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(22, 'out');
 
@@ -510,7 +510,7 @@ resultats()
         //
 
         let preconisation = 40000;
-        console.log('preconisation : ' + preconisation);
+        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(22, 'out');
 

@@ -18,7 +18,7 @@ const newEtatRelay = majGestionAirModels
     etatRelay: 0,
     consigne: '0',
     valeurAxeX: '0',
-    jourDuCycle: '0',
+    jourDuCycle: '1',
   })
   .then((result) => {
     console.log('Table mise à jour');
