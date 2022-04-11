@@ -221,28 +221,26 @@ let getDateDemarrageCycle = () => {
       //   );
 
       //* Date du jour.
+
       dateDuJour = new Date();
-      // console.log('Date du Jour :---------------------:', dateDuJour);
+      console.log('Date du Jour :---------------------:', dateDuJour);
+
       //* --------------------------------------------------
 
       //* Date de demarrage du cycle
+
       dateDemarrageCycle = new Date(
         response.data.dateDemarrageCycle.dateDemarrageCycle
       );
       // console.log('La date de démarrage du cycle :----:', dateDemarrageCycle);
+
       //* --------------------------------------------------
 
-      //* Affichage du nombre de jour du cycle.
-      difference = Math.abs(dateDuJour - dateDemarrageCycle);
-      if (dateDuJour === dateDemarrageCycle) {
-        jourDuCycle = 1;
-        // console.log('dateDuJour === dateDemarrageCycle');
-        // console.log('Nombre de jour du cycle :----------:', jourDuCycle);
-      } else {
-        jourDuCycle = Math.round(difference / (1000 * 3600 * 24)) + 1;
-        // console.log('dateDuJour > dateDemarrageCycle');
-        // console.log('Nombre de jour du cycle :----------:', jourDuCycle);
-      }
+      //* Calcul du nombre de jour du cycle.
+
+      let nbJourBrut = dateDuJour.getTime() - dateDemarrageCycle.getTime();
+      jourDuCycle = Math.round(nbJourBrut / (1000 * 3600 * 24)) + 1;
+      // console.log('Le jour du cycle  ', jourDuCycle, ' jours');
 
       //* --------------------------------------------------
 

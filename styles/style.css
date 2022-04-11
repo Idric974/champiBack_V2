@@ -463,6 +463,19 @@
   justify-items: center;
   color: white;
   font-weight: bolder;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.cont3 {
+  /* border: solid green 1px; */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+  color: white;
+  font-weight: bolder;
   font-size: 2.5rem;
   text-align: center;
 }

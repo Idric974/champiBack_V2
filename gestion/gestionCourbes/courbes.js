@@ -71,6 +71,61 @@ getJourDuCycle();
 
 //! --------------------------------------------------
 
+//! Affichage date démarrage cycle.
+
+let dateDemarrageDuCycle;
+let dateDemarrageDuCycleStorage;
+
+let getDateDemarrageDuCycle = () => {
+  //
+  axios({
+    url: 'http://localhost:3003/api/gestionCourbeRoutes/getDateDemarrageCycle/',
+    method: 'get',
+  })
+    //* Récupération date démarrage du cycle.
+    .then((response) => {
+      console.log(
+        'Date démarrage du cycle : ',
+        response.data.dateDemarrageCycle.dateDemarrageCycle
+      );
+
+      dateDemarrageDuCycle = new Date(
+        response.data.dateDemarrageCycle.dateDemarrageCycle
+      )
+        .toLocaleString()
+        .split(',')[0];
+
+      localStorage.setItem('Date démarrage cycle : ', dateDemarrageDuCycle);
+
+      dateDemarrageDuCycleStorage = localStorage.getItem(
+        'Date démarrage cycle : '
+      );
+
+      document.getElementById('dateDemarrageCycle').innerHTML =
+        'DÉMARRAGE : ' + dateDemarrageDuCycleStorage;
+    })
+    //* -------------------------*
+
+    //* Date du jour.
+    .then(() => {
+      // dateDuJour = new Date();
+      // // console.log('Date du Jour : ', dateDuJour);
+      // document.getElementById('dateDuJourCycle').innerHTML = dateDuJour
+      //   .toLocaleString('fr-FR', options)
+      //   .toLocaleUpperCase();
+    })
+    //* -------------------------*
+
+    .catch((error) => {
+      console.log(error);
+      console.log(JSON.stringify(error));
+    });
+};
+
+getDateDemarrageDuCycle();
+
+//! --------------------------------------------------
+
 //? LOGIQUE POUR LA GESTION DES ONGLETS.
 
 const onglets = Array.from(document.querySelectorAll('.onglets'));
@@ -105,7 +160,7 @@ btnAir.addEventListener(
     let text = 'Etes-vous sûre de vouloir démarrer un cycle ?';
     if (confirm(text) == true) {
       //
-      let dateDemarrageCycle = format(new Date(), 'yyyy-MM-dd');
+      let dateDemarrageCycle = new Date();
       console.log('Date de demarrage du cycle : ', dateDemarrageCycle);
 
       axios
@@ -182,10 +237,10 @@ let getDataCourbeAir = () => {
         })
       );
 
-      // console.log(
-      //   'Tableau des valeurs temperature air à afficher : ',
-      //   valeurTemperatureAir
-      // );
+      console.log(
+        'Tableau des valeurs temperature air à afficher : ',
+        valeurTemperatureAir
+      );
 
       //*---------------------------------------------
 
@@ -206,10 +261,10 @@ let getDataCourbeAir = () => {
         })
       );
 
-      // console.log(
-      //   'Tableau des valeurs consigne air à afficher : ',
-      //   valeurConsigneAir
-      // );
+      console.log(
+        'Tableau des valeurs consigne air à afficher : ',
+        valeurConsigneAir
+      );
 
       //*---------------------------------------------
     })

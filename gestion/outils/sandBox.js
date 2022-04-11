@@ -1,61 +1,159 @@
-const axios = require('axios');
-let dateDuJour;
-// let dateDemarrageCycle = new Date('2022-03-31');
-let dateDemarrageCycle;
-let difference;
-let jourDuCycle;
-let heureDuCycle;
-let minuteDuCycle;
-let heureMinute;
-let valeurAxeX;
+//! les constaantes.
 
-let getDateDemarrageCycle = () => {
-  axios
-    .get('http://localhost:3003/api/gestionCourbeRoutes/getDateDemarrageCycle')
-    .then((response) => {
-      //   console.log(
-      //     'Date démarrage du cycle :---:',
-      //     response.data.dateDemarrageCycle.dateDemarrageCycle
-      //   );
+const mcpadc = require('mcp-spi-adc');
+const mcpBroche = 2;
+const logger = require('../../src/logger');
+const jaune = '\x1b[33m';
+const sequelize = require('sequelize');
+const db = require('../../models');
 
-      //* Date du jour.
-      dateDuJour = new Date();
-      console.log('Date du Jour :---------------------:', dateDuJour);
-      //* --------------------------------------------------
+//! --------------------------------------------------
 
-      //* Date de demarrage du cycle
-      dateDemarrageCycle = new Date(
-        response.data.dateDemarrageCycle.dateDemarrageCycle
-      );
-      console.log('La date de démarrage du cycle :----:', dateDemarrageCycle);
-      //* --------------------------------------------------
+//! les variables.
 
-      //* Affichage du nombre de jour du cycle.
-      difference = Math.abs(dateDuJour - dateDemarrageCycle);
-      if (dateDuJour == dateDemarrageCycle) {
-        jourDuCycle = 1;
-        console.log('Nombre de jour du cycle :----------:', jourDuCycle);
-      } else {
-        jourDuCycle = Math.round(difference / (1000 * 3600 * 24));
-        console.log('Nombre de jour du cycle :----------:', jourDuCycle);
-      }
+let nombreDeBoucle = 0;
+let temperatureEtalonnee;
+let temperatureAirMoyenne;
+let etalonnage;
 
-      //* --------------------------------------------------
+//! --------------------------------------------------
 
-      //* Affichage de l'heure.
-      heureDuCycle = new Date().getHours();
-      minuteDuCycle = new Date().getMinutes();
-      heureMinute = heureDuCycle + 'h' + minuteDuCycle;
-      console.log("l'heure du cycle :-----------------:", heureMinute);
-      //* --------------------------------------------------
+//! Les tableaux.
 
-      //* Valeure de l'axe x.
-      valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
-      console.log("Valeure de l'axe x :---------------:", valeurAxeX);
-      //* --------------------------------------------------
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+let tableauTemperatureAir = [];
+
+//! --------------------------------------------------
+
+//! I) LES FONCTIONS.
+
+//* Récupération de la valeur étalonnage.
+
+const gestionAirEtalonnageModels = db.etalonnageAir;
+
+let recuperationEtalonnage = () => {
+  try {
+    gestionAirEtalonnageModels
+      .findOne({
+        attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
+        raw: true,
+      })
+      .then((id) => {
+        // console.log(id.maxid);
+
+        gestionAirEtalonnageModels
+          .findOne({
+            where: { id: id.maxid },
+          })
+          .then((result) => {
+            // console.log(result);
+
+            etalonnage = result['etalonnageAir'];
+
+            console.log('Type etalonnage', typeof etalonnage);
+
+            console.log(
+              jaune,
+              '[ GESTION AIR CALCULES  ] Valeur etalonage Air : ' +
+                etalonnage +
+                '°C'
+            );
+          });
+      });
+  } catch (error) {
+    console.log('Erreur recuperation Etalonnage');
+
+    logger.info(
+      'Fchier source : gestionAir | Module : recuperation Etalonnage | Type erreur : ',
+      error
+    );
+  }
 };
-getDateDemarrageCycle();
+recuperationEtalonnage();
+
+//* --------------------------------------------------
+
+//! --------------------------------------------------
+
+//! II) CALCUL DE LA TEMPÉRATURE MOYENNE.
+
+const calculTemperatureMoyenne = new Promise((resolve, reject) => {
+  setInterval((stopInteval) => {
+    if (nombreDeBoucle <= 3) {
+      nombreDeBoucle++;
+
+      //* Fonction qui mesure la température.
+
+      const tempSensor = mcpadc.open(mcpBroche, { speedHz: 20000 }, (err) => {
+        if (err) throw err;
+
+        tempSensor.read((err, reading) => {
+          if (err) throw err;
+          let temperature = reading.value * 40;
+          tableauTemperatureAir.push(temperature);
+
+          console.log(
+            jaune,
+            '[ GESTION AIR CALCULES  ] Tableau des tempratures : ',
+            tableauTemperatureAir
+          );
+        });
+      });
+
+      //* --------------------------------------------------
+    } else {
+      clearInterval(stopInteval);
+      resolve();
+      return;
+    }
+  }, 1000);
+});
+
+let actionGestionAir = async () => {
+  let go = await calculTemperatureMoyenne;
+  return go;
+};
+
+//! III) LES ACTIONS.
+
+actionGestionAir()
+  //
+  //! Calcule de la température moyenne.
+
+  .then(() => {
+    const array = tableauTemperatureAir;
+    let sum = 0;
+
+    for (let i = 0; i < array.length; i++) {
+      sum += array[i];
+    }
+    let temperatureBrut = sum / array.length;
+
+    temperatureAirMoyenne = Math.round(temperatureBrut * 100) / 100;
+
+    console.log(
+      jaune,
+      '[ GESTION AIR CALCULES  ] La température air moyenne brute est de : ' +
+        temperatureAirMoyenne +
+        '°C'
+    );
+  })
+
+  //! --------------------------------------------------
+
+  //! Calcule de la température étalonnée.
+
+  .then(() => {
+    temperatureEtalonnee = temperatureAirMoyenne + etalonnage;
+
+    console.log(
+      jaune,
+      '[ GESTION AIR CALCULES  ] La température air moyenne corrigée est de ' +
+        temperatureEtalonnee +
+        '°C'
+    );
+  })
+
+  //! --------------------------------------------------
+  .catch((e) => {
+    console.log(jaune, '[ GESTION AIR CALCULES  ] Erreur gestion Air : ', e);
+  });

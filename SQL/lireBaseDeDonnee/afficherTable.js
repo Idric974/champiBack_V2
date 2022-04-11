@@ -9,7 +9,7 @@ const con = mysql.createConnection({
 
 //* gestionAir.
 
-let table = 'gestion_airs';
+// let table = 'gestion_airs';
 // let table = 'gestion_airs_datas';
 // let table = 'gestion_airs_etalonnages';
 // let table = 'gestion_airs_etat_relays';
@@ -33,7 +33,7 @@ let table = 'gestion_airs';
 // let table = 'gestion_logs';
 
 //* Gestion des courbes
-// let table = 'gestion_courbes';
+let table = 'gestion_courbes';
 
 //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 con.connect(function (err) {

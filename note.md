@@ -1,6 +1,6 @@
 //! --------------------------------------------------
 
-//* -------------------------*
+//_ -------------------------_
 
 Installer Vs Code.
 ===> sudo apt install code
@@ -134,3 +134,5 @@ free -h
 browserify /home/pi/Desktop/champiBack_V2/gestion/gestionCourbes/courbes.js > bundle.js
 
 //!--------------------------------------------------------------
+
+git reset --hard 1a7d28ddecf8791d8cee1316ac2539bb26264068

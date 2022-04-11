@@ -9,6 +9,7 @@ const db = require('../../models');
 const gestionCo2Models = db.gestionCo2;
 const gestionCo2DataModels = db.gestionCo2Data;
 const axios = require('axios');
+
 //! -----------------------------------------------------------
 
 //! Les variables.
@@ -26,6 +27,7 @@ let heureDuCycle;
 let minuteDuCycle;
 let heureMinute;
 let valeurAxeX;
+
 //! ----------------------------------
 
 const getTauxCo2 = new Promise((resolve, reject) => {
