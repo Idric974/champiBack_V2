@@ -26,7 +26,7 @@ const gestionCourbesModels = db.gestionCourbes;
 //! Le variables
 let dateDuJour = new Date();
 let dateDemarrageCycle;
-let dateDemarrageCycle2 = '2022 - 03 - 20';
+// let dateDemarrageCycle2 = '2022-03-20';
 //! --------------------------------------------------
 
 //! Les fonctions.
@@ -58,7 +58,7 @@ recuperationDateDemarrageCycle = () => {
 
 //? I) ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ GESTION DATE DE DÉMARRAGE CYCLE ➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-//! POST Date de dmarrage du Cycle.
+//! POST Date de démarrage du Cycle.
 
 exports.dateDemarrageCycle = (req, res) => {
   //

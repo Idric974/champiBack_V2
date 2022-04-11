@@ -255,7 +255,6 @@ let getDataCourbeAir = () => {
 
       consigneCourbeAir.forEach((item, index) =>
         valeurConsigneAir.push({
-          // x: item['createdAt'].split('.')[0].split('T')[0],
           x: item['valeurAxeX'],
           y: item['consigne'],
         })
