@@ -223,7 +223,7 @@ let getDateDemarrageCycle = () => {
       //* Date du jour.
 
       dateDuJour = new Date();
-      console.log('Date du Jour :---------------------:', dateDuJour);
+      // console.log('Date du Jour :---------------------:', dateDuJour);
 
       //* --------------------------------------------------
 
