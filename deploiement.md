@@ -7,7 +7,11 @@
 
 ## 2) Puller le code.
 
-https://github.com/Idric974/champiBack_V2.git
+1. ChampiBack V2.
+   https://github.com/Idric974/champiBack_V2.git
+
+2. Champi Etalonnage.
+   https://github.com/Idric974/champiEtalonnage.git
 
 ## 3) Installer Vs Code.
 
