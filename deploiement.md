@@ -19,7 +19,7 @@
 
 ## 4) Installer MariaDB.
 
-1. Installer :
+1. Installer : Utiliser un terminale hors vs-code.
    ===> sudo apt-get install mariadb-server mariadb-client.
    . Tapez "Y" et Enter pour continuer.
 
@@ -68,62 +68,62 @@ CREATE USER 'idric'@'localhost' IDENTIFIED BY 'Kup33uC4W6';
 4. Créé de base de données
    CREATE DATABASE champyresi DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-   ## 8) Création des table en utilisant SQL.
+   ## 8) Création des table en utilisant SQL. (12 Tables à créer)
 
-5. gestion Air.
+5. **gestion Air.**
    gestion_airs
    gestion_airs_data
    gestion_airs_etalonnage
    gestion_airs_etat_relays
 
-6. Gestion Humidité.
+6. **Gestion Humidité.**
    gestion_hums
    gestion_hums_datas
    gestion_hums_etalonnage_secs
    gestion_hums_etalonnage_hums
 
-7. Gestion Co2.
+7. **Gestion Co2.**
    gestion_co2s
    gestion_co2s_datas
 
-8. Gestion des Logs.
+8. **Gestion des Logs.**
    gestion_logs
 
-9. Gestion des courbes.
+9. **Gestion des courbes.**
    gestion_courbes
 
    ## 9) Mise à jour des table en utilisant SQL.
 
-10. Gestion Air.
+10. **Gestion Air.**
     ==> Valeurs.
     ==> Data.
 
-11. Gestion Humidité.
+11. **Gestion Humidité.**
     ==> Valeurs.
     ==> Data.
 
-12. Gestion Co2.
+12. **Gestion Co2.**
     ==> Valeurs.
     ==> Data.
 
-13. Etalonnage.
+13. **Etalonnage.**
     ==> Air
     ==> Hum Sec
     ==> Hum Hum
 
-14. Etat relay.
+14. **Etat relay.**
 
 ## 7) Installer dépendances.
 
-1. npm install axios
-2. npm install chartjs-adapter-moment
-3. npm install concurrently
-4. npm install cors
-5. npm install dotenv
-6. npm install express
-7. npm install fs
-8. npm install gpio
-9. npm install mcp-spi-adc
+1.  npm install axios
+2.  npm install chartjs-adapter-moment
+3.  npm install concurrently
+4.  npm install cors
+5.  npm install dotenv
+6.  npm install express
+7.  npm install fs
+8.  npm install gpio
+9.  npm install mcp-spi-adc
 10. npm install moment
 11. npm install mysql
 12. npm install mysql2

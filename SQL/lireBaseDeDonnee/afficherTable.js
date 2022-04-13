@@ -19,7 +19,7 @@ const con = mysql.createConnection({
 // let table = 'gestion_hums';
 // let table = 'gestion_hums_datas';
 // let table = 'gestion_hums_etalonnage_hums';
-// let table = 'gestion_hums_etalonnage_secs';
+let table = 'gestion_hums_etalonnage_secs';
 
 //* gestion Co2
 
@@ -33,7 +33,7 @@ const con = mysql.createConnection({
 // let table = 'gestion_logs';
 
 //* Gestion des courbes
-let table = 'gestion_courbes';
+// let table = 'gestion_courbes';
 
 //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 con.connect(function (err) {

@@ -14,25 +14,25 @@ db.connect(function (err) {
 
   //* gestion Air
 
-  let sql =
-    'CREATE TABLE gestion_airs (id int auto_increment, temperatureAir FLOAT, deltaAir FLOAT, days FLOAT, heures FLOAT, etatRelay FLOAT, actionRelay FLOAT,  consigne varchar(255), valeurAxeX varchar(255), jourDuCycle varchar(255), createdAt DATE, updatedAt DATE, primary key(id))';
-  db.query(sql, function (err, result) {
-    if (err) throw err;
-    console.log('Table gestion_airs créé', result);
-  });
-
   // let sql =
-  //   'CREATE TABLE gestion_airs_data (id int auto_increment, consigneAir FLOAT, pasAir FLOAT, objectifAir FLOAT, deltaAir FLOAT, days INTEGER, heures INTEGER, createdAt DATE, updatedAt DATE, primary key(id))';
+  //   'CREATE TABLE gestion_airs (id int auto_increment, temperatureAir FLOAT, deltaAir FLOAT, days FLOAT, heures FLOAT, etatRelay FLOAT, actionRelay FLOAT,  consigne varchar(255), valeurAxeX varchar(255), jourDuCycle varchar(255), createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_airs_data créé', result);
+  //   console.log('Table gestion_airs créé', result);
   // });
 
   // let sql =
-  //   'CREATE TABLE gestion_airs_etalonnage (id int auto_increment, etalonnageAir FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
+  //   'CREATE TABLE gestion_airs_datas (id int auto_increment, consigneAir FLOAT, pasAir FLOAT, objectifAir FLOAT, deltaAir FLOAT, days INTEGER, heures INTEGER, createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_airs_etalonnage créé', result);
+  //   console.log('Table gestion_airs_datas créé', result);
+  // });
+
+  // let sql =
+  //   'CREATE TABLE gestion_airs_etalonnages (id int auto_increment, etalonnageAir FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
+  // db.query(sql, function (err, result) {
+  //   if (err) throw err;
+  //   console.log('Table gestion_airs_etalonnages créé', result);
   // });
 
   // let sql =
@@ -61,14 +61,14 @@ db.connect(function (err) {
   // });
 
   // let sql =
-  //   'CREATE TABLE gestion_hums_etalonnage_secs (id int auto_increment, etalonnageHum FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
+  //   'CREATE TABLE gestion_hums_etalonnage_secs (id int auto_increment, etalonnageHums FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
   //   console.log('Table gestion_airs_etalonnage créé', result);
   // });
 
   // let sql =
-  //   'CREATE TABLE gestion_hums_etalonnage_hums (id int auto_increment, etalonnageSec FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
+  //   'CREATE TABLE gestion_hums_etalonnage_hums (id int auto_increment, etalonnageSecs FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
   //   console.log('Table gestion_airs_etalonnage créé', result);

@@ -6,28 +6,30 @@ const Sequelize = require('sequelize');
 
 //* Valeurs.
 
-const majGestionAirModels = db.gestionAir;
+// const majGestionAirModels = db.gestionAir;
 
-const newEtatRelay = majGestionAirModels
-  .create({
-    temperatureAir: 0,
-    deltaAir: 0,
-    days: 0,
-    heures: 0,
-    actionRelay: 0,
-    etatRelay: 0,
-    consigne: '0',
-    valeurAxeX: '0',
-    jourDuCycle: '1',
-  })
-  .then((result) => {
-    console.log('Table mise à jour');
-  })
-  .catch((error) => {
-    console.log('Table non mise à jour', error);
-  });
+// const newEtatRelay = majGestionAirModels
+//   .create({
+//     temperatureAir: 0,
+//     deltaAir: 0,
+//     days: 0,
+//     heures: 0,
+//     actionRelay: 0,
+//     etatRelay: 0,
+//     consigne: '0',
+//     valeurAxeX: '0',
+//     jourDuCycle: '1',
+//   })
+//   .then((result) => {
+//     console.log('Table mise à jour');
+//   })
+//   .catch((error) => {
+//     console.log('Table non mise à jour', error);
+//   });
 
 //* -------------------------*
+
+//! Gestion Air.
 
 //* Data.
 
@@ -50,7 +52,7 @@ const newEtatRelay = majGestionAirModels
 
 //! --------------------------------------------------
 
-//! Gestion Humidité
+//! Gestion Humidité.
 
 //* Valeurs.
 
@@ -98,11 +100,11 @@ const newEtatRelay = majGestionAirModels
 
 //! --------------------------------------------------
 
-//! Gestion Co2
+//! Gestion Co2.
 
 // Valeurs.
 
-// Data.
+//* Data.
 
 // const miseAJourGestionCo2 = db.gestionCo2;
 
@@ -123,9 +125,10 @@ const newEtatRelay = majGestionAirModels
 //     console.log('Table non mise à jour', error);
 //   });
 
-// -------------------------
+//* -------------------------
 
-// Data.
+//* Data.
+
 // const miseAJourGestionCo2Data = db.gestionCo2Data;
 
 // const newDataCo2 = miseAJourGestionCo2Data
@@ -162,18 +165,18 @@ const newEtatRelay = majGestionAirModels
 
 //* Etalonnage Hum Sec.
 
-// const miseAJourEtalonnageHumSec = db.etalonnageSec;
+const miseAJourEtalonnageHumSec = db.etalonnageSec;
 
-// const newEtalAir = miseAJourEtalonnageHumSec
-//   .create({
-//     etalonnageSec: 0,
-//   })
-//   .then((result) => {
-//     console.log('Table mise à jour');
-//   })
-//   .catch((error) => {
-//     console.log('Table non mise à jour', error);
-//   });
+const newEtalAir = miseAJourEtalonnageHumSec
+  .create({
+    etalonnageSec: 0,
+  })
+  .then((result) => {
+    console.log('Table mise à jour');
+  })
+  .catch((error) => {
+    console.log('Table non mise à jour', error);
+  });
 
 //! --------------------------------------------------
 

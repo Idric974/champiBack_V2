@@ -1,6 +1,8 @@
 //! --------------------------------------------------
 
-//_ -------------------------_
+Pour supprimer la base de données
+DROP DATABASE ma*base
+//* -------------------------\_
 
 Installer Vs Code.
 ===> sudo apt install code
