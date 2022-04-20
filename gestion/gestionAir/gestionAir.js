@@ -354,6 +354,8 @@ resultats()
 
     // Calcule du delta.
 
+    //?
+
     delta = parseFloat((ValTemp - consigne).toFixed(1));
 
     // console.log(jaune, '[ GESTION AIR CALCULES  ] Le delta est de : ', delta);
@@ -362,7 +364,7 @@ resultats()
   //! Définition des actions.
   .then(() => {
     try {
-      if (delta >= 1.1) {
+      if (delta >= 1.5) {
         //
         //! Condition à 40 secondes.
 
