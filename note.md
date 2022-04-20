@@ -1,4 +1,5 @@
 //! --------------------------------------------------
+OK
 
 Pour supprimer la base de données
 DROP DATABASE ma*base
