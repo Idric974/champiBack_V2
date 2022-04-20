@@ -155,18 +155,20 @@ exports.relayEau = (req, res, next) => {
   // console.log('relayEau', relayEau);
 
   if (relayEau == 1) {
-    let relay27On = () => {
+    let relay16On = () => {
       new Gpio(eauAuSol, 'out');
     };
-    relay27On();
-    // console.log('Le relayEau est ON');
+    relay16On();
+
+    console.log('Le relayEau est ON');
   }
   if (relayEau == 0) {
-    let relay27Off = () => {
+    let relay16Off = () => {
       new Gpio(eauAuSol, 'in');
     };
-    relay27Off();
-    // console.log('Le relayEau est OFF');
+    relay16Off();
+
+    console.log('Le relayEau est OFF');
   }
 
   res.status(200).json({ message: 'Requete relayEau : OK' });

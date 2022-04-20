@@ -189,6 +189,7 @@ process.umask = function() { return 0; };
 
 const axios = require('axios');
 const Chart = require('chart.js');
+const zoomPlugin = require('chartjs-plugin-zoom');
 const {
   format,
   time,
@@ -506,6 +507,15 @@ let getDataCourbeAir = () => {
           x: {},
 
           y: {},
+        },
+        plugins: {
+          zoom: {
+            zoom: {
+              wheel: {
+                enabled: true,
+              },
+            },
+          },
         },
       };
       //! ---------------------------------
@@ -1012,7 +1022,7 @@ getDataCourbeCo2();
 //! --------------------------------------------------------------
 //? III) ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ FIN GESTION COURBES Co2 ➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-},{"axios":3,"chart.js":32,"date-fns":159}],3:[function(require,module,exports){
+},{"axios":3,"chart.js":32,"chartjs-plugin-zoom":34,"date-fns":161}],3:[function(require,module,exports){
 module.exports = require('./lib/axios');
 },{"./lib/axios":5}],4:[function(require,module,exports){
 'use strict';
@@ -16174,6 +16184,987 @@ return Chart;
 }));
 
 },{}],33:[function(require,module,exports){
+module.exports = require('..').helpers;
+
+},{"..":32}],34:[function(require,module,exports){
+/*!
+* chartjs-plugin-zoom v1.2.1
+* undefined
+ * (c) 2016-2022 chartjs-plugin-zoom Contributors
+ * Released under the MIT License
+ */
+(function (global, factory) {
+typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('chart.js'), require('hammerjs'), require('chart.js/helpers')) :
+typeof define === 'function' && define.amd ? define(['chart.js', 'hammerjs', 'chart.js/helpers'], factory) :
+(global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.ChartZoom = factory(global.Chart, global.Hammer, global.Chart.helpers));
+})(this, (function (chart_js, Hammer, helpers) { 'use strict';
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var Hammer__default = /*#__PURE__*/_interopDefaultLegacy(Hammer);
+
+const getModifierKey = opts => opts && opts.enabled && opts.modifierKey;
+const keyPressed = (key, event) => key && event[key + 'Key'];
+const keyNotPressed = (key, event) => key && !event[key + 'Key'];
+
+/**
+ * @param {string|function} mode can be 'x', 'y' or 'xy'
+ * @param {string} dir can be 'x' or 'y'
+ * @param {import('chart.js').Chart} chart instance of the chart in question
+ * @returns {boolean}
+ */
+function directionEnabled(mode, dir, chart) {
+  if (mode === undefined) {
+    return true;
+  } else if (typeof mode === 'string') {
+    return mode.indexOf(dir) !== -1;
+  } else if (typeof mode === 'function') {
+    return mode({chart}).indexOf(dir) !== -1;
+  }
+
+  return false;
+}
+
+/**
+ * Debounces calling `fn` for `delay` ms
+ * @param {function} fn - Function to call. No arguments are passed.
+ * @param {number} delay - Delay in ms. 0 = immediate invocation.
+ * @returns {function}
+ */
+function debounce(fn, delay) {
+  let timeout;
+  return function() {
+    clearTimeout(timeout);
+    timeout = setTimeout(fn, delay);
+    return delay;
+  };
+}
+
+/** This function use for check what axis now under mouse cursor.
+ * @param {{x: number, y: number}} point - the mouse location
+ * @param {import('chart.js').Chart} [chart] instance of the chart in question
+ * @return {import('chart.js').Scale}
+ */
+function getScaleUnderPoint({x, y}, chart) {
+  const scales = chart.scales;
+  const scaleIds = Object.keys(scales);
+  for (let i = 0; i < scaleIds.length; i++) {
+    const scale = scales[scaleIds[i]];
+    if (y >= scale.top && y <= scale.bottom && x >= scale.left && x <= scale.right) {
+      return scale;
+    }
+  }
+  return null;
+}
+
+/** This function return only one scale whose position is under mouse cursor and which direction is enabled.
+ * If under mouse hasn't scale, then return all other scales which 'mode' is diffrent with overScaleMode.
+ * So 'overScaleMode' works as a limiter to scale the user-selected scale (in 'mode') only when the cursor is under the scale,
+ * and other directions in 'mode' works as before.
+ * Example: mode = 'xy', overScaleMode = 'y' -> it's means 'x' - works as before, and 'y' only works for one scale when cursor is under it.
+ * options.overScaleMode can be a function if user want zoom only one scale of many for example.
+ * @param {string} mode - 'xy', 'x' or 'y'
+ * @param {{x: number, y: number}} point - the mouse location
+ * @param {import('chart.js').Chart} [chart] instance of the chart in question
+ * @return {import('chart.js').Scale[]}
+ */
+function getEnabledScalesByPoint(mode, point, chart) {
+  const scale = getScaleUnderPoint(point, chart);
+
+  if (scale && directionEnabled(mode, scale.axis, chart)) {
+    return [scale];
+  }
+
+  const enabledScales = [];
+  helpers.each(chart.scales, function(scaleItem) {
+    if (!directionEnabled(mode, scaleItem.axis, chart)) {
+      enabledScales.push(scaleItem);
+    }
+  });
+  return enabledScales;
+}
+
+const chartStates = new WeakMap();
+
+function getState(chart) {
+  let state = chartStates.get(chart);
+  if (!state) {
+    state = {
+      originalScaleLimits: {},
+      updatedScaleLimits: {},
+      handlers: {},
+      panDelta: {}
+    };
+    chartStates.set(chart, state);
+  }
+  return state;
+}
+
+function removeState(chart) {
+  chartStates.delete(chart);
+}
+
+function zoomDelta(scale, zoom, center) {
+  const range = scale.max - scale.min;
+  const newRange = range * (zoom - 1);
+
+  const centerPoint = scale.isHorizontal() ? center.x : center.y;
+  // `scale.getValueForPixel()` can return a value less than the `scale.min` or
+  // greater than `scale.max` when `centerPoint` is outside chartArea.
+  const minPercent = Math.max(0, Math.min(1,
+    (scale.getValueForPixel(centerPoint) - scale.min) / range || 0
+  ));
+
+  const maxPercent = 1 - minPercent;
+
+  return {
+    min: newRange * minPercent,
+    max: newRange * maxPercent
+  };
+}
+
+function getLimit(state, scale, scaleLimits, prop, fallback) {
+  let limit = scaleLimits[prop];
+  if (limit === 'original') {
+    const original = state.originalScaleLimits[scale.id][prop];
+    limit = helpers.valueOrDefault(original.options, original.scale);
+  }
+  return helpers.valueOrDefault(limit, fallback);
+}
+
+function updateRange(scale, {min, max}, limits, zoom = false) {
+  const state = getState(scale.chart);
+  const {id, axis, options: scaleOpts} = scale;
+
+  const scaleLimits = limits && (limits[id] || limits[axis]) || {};
+  const {minRange = 0} = scaleLimits;
+  const minLimit = getLimit(state, scale, scaleLimits, 'min', -Infinity);
+  const maxLimit = getLimit(state, scale, scaleLimits, 'max', Infinity);
+
+  const cmin = Math.max(min, minLimit);
+  const cmax = Math.min(max, maxLimit);
+  const range = zoom ? Math.max(cmax - cmin, minRange) : scale.max - scale.min;
+  if (cmax - cmin !== range) {
+    if (minLimit > cmax - range) {
+      min = cmin;
+      max = cmin + range;
+    } else if (maxLimit < cmin + range) {
+      max = cmax;
+      min = cmax - range;
+    } else {
+      const offset = (range - cmax + cmin) / 2;
+      min = cmin - offset;
+      max = cmax + offset;
+    }
+  } else {
+    min = cmin;
+    max = cmax;
+  }
+  scaleOpts.min = min;
+  scaleOpts.max = max;
+
+  state.updatedScaleLimits[scale.id] = {min, max};
+
+  // return true if the scale range is changed
+  return scale.parse(min) !== scale.min || scale.parse(max) !== scale.max;
+}
+
+function zoomNumericalScale(scale, zoom, center, limits) {
+  const delta = zoomDelta(scale, zoom, center);
+  const newRange = {min: scale.min + delta.min, max: scale.max - delta.max};
+  return updateRange(scale, newRange, limits, true);
+}
+
+const integerChange = (v) => v === 0 || isNaN(v) ? 0 : v < 0 ? Math.min(Math.round(v), -1) : Math.max(Math.round(v), 1);
+
+function existCategoryFromMaxZoom(scale) {
+  const labels = scale.getLabels();
+  const maxIndex = labels.length - 1;
+
+  if (scale.min > 0) {
+    scale.min -= 1;
+  }
+  if (scale.max < maxIndex) {
+    scale.max += 1;
+  }
+}
+
+function zoomCategoryScale(scale, zoom, center, limits) {
+  const delta = zoomDelta(scale, zoom, center);
+  if (scale.min === scale.max && zoom < 1) {
+    existCategoryFromMaxZoom(scale);
+  }
+  const newRange = {min: scale.min + integerChange(delta.min), max: scale.max - integerChange(delta.max)};
+  return updateRange(scale, newRange, limits, true);
+}
+
+function scaleLength(scale) {
+  return scale.isHorizontal() ? scale.width : scale.height;
+}
+
+function panCategoryScale(scale, delta, limits) {
+  const labels = scale.getLabels();
+  const lastLabelIndex = labels.length - 1;
+  let {min, max} = scale;
+  // The visible range. Ticks can be skipped, and thus not reliable.
+  const range = Math.max(max - min, 1);
+  // How many pixels of delta is required before making a step. stepSize, but limited to max 1/10 of the scale length.
+  const stepDelta = Math.round(scaleLength(scale) / Math.max(range, 10));
+  const stepSize = Math.round(Math.abs(delta / stepDelta));
+  let applied;
+  if (delta < -stepDelta) {
+    max = Math.min(max + stepSize, lastLabelIndex);
+    min = range === 1 ? max : max - range;
+    applied = max === lastLabelIndex;
+  } else if (delta > stepDelta) {
+    min = Math.max(0, min - stepSize);
+    max = range === 1 ? min : min + range;
+    applied = min === 0;
+  }
+
+  return updateRange(scale, {min, max}, limits) || applied;
+}
+
+const OFFSETS = {
+  second: 500, // 500 ms
+  minute: 30 * 1000, // 30 s
+  hour: 30 * 60 * 1000, // 30 m
+  day: 12 * 60 * 60 * 1000, // 12 h
+  week: 3.5 * 24 * 60 * 60 * 1000, // 3.5 d
+  month: 15 * 24 * 60 * 60 * 1000, // 15 d
+  quarter: 60 * 24 * 60 * 60 * 1000, // 60 d
+  year: 182 * 24 * 60 * 60 * 1000 // 182 d
+};
+
+function panNumericalScale(scale, delta, limits, canZoom = false) {
+  const {min: prevStart, max: prevEnd, options} = scale;
+  const round = options.time && options.time.round;
+  const offset = OFFSETS[round] || 0;
+  const newMin = scale.getValueForPixel(scale.getPixelForValue(prevStart + offset) - delta);
+  const newMax = scale.getValueForPixel(scale.getPixelForValue(prevEnd + offset) - delta);
+  const {min: minLimit = -Infinity, max: maxLimit = Infinity} = canZoom && limits && limits[scale.axis] || {};
+  if (isNaN(newMin) || isNaN(newMax) || newMin < minLimit || newMax > maxLimit) {
+    // At limit: No change but return true to indicate no need to store the delta.
+    // NaN can happen for 0-dimension scales (either because they were configured
+    // with min === max or because the chart has 0 plottable area).
+    return true;
+  }
+  return updateRange(scale, {min: newMin, max: newMax}, limits, canZoom);
+}
+
+function panNonLinearScale(scale, delta, limits) {
+  return panNumericalScale(scale, delta, limits, true);
+}
+
+const zoomFunctions = {
+  category: zoomCategoryScale,
+  default: zoomNumericalScale,
+};
+
+const panFunctions = {
+  category: panCategoryScale,
+  default: panNumericalScale,
+  logarithmic: panNonLinearScale,
+  timeseries: panNonLinearScale,
+};
+
+function shouldUpdateScaleLimits(scale, originalScaleLimits, updatedScaleLimits) {
+  const {id, options: {min, max}} = scale;
+  if (!originalScaleLimits[id] || !updatedScaleLimits[id]) {
+    return true;
+  }
+  const previous = updatedScaleLimits[id];
+  return previous.min !== min || previous.max !== max;
+}
+
+function removeMissingScales(limits, scales) {
+  helpers.each(limits, (opt, key) => {
+    if (!scales[key]) {
+      delete limits[key];
+    }
+  });
+}
+
+function storeOriginalScaleLimits(chart, state) {
+  const {scales} = chart;
+  const {originalScaleLimits, updatedScaleLimits} = state;
+
+  helpers.each(scales, function(scale) {
+    if (shouldUpdateScaleLimits(scale, originalScaleLimits, updatedScaleLimits)) {
+      originalScaleLimits[scale.id] = {
+        min: {scale: scale.min, options: scale.options.min},
+        max: {scale: scale.max, options: scale.options.max},
+      };
+    }
+  });
+
+  removeMissingScales(originalScaleLimits, scales);
+  removeMissingScales(updatedScaleLimits, scales);
+  return originalScaleLimits;
+}
+
+function doZoom(scale, amount, center, limits) {
+  const fn = zoomFunctions[scale.type] || zoomFunctions.default;
+  helpers.callback(fn, [scale, amount, center, limits]);
+}
+
+function getCenter(chart) {
+  const ca = chart.chartArea;
+  return {
+    x: (ca.left + ca.right) / 2,
+    y: (ca.top + ca.bottom) / 2,
+  };
+}
+
+/**
+ * @param chart The chart instance
+ * @param {number | {x?: number, y?: number, focalPoint?: {x: number, y: number}}} amount The zoom percentage or percentages and focal point
+ * @param {string} [transition] Which transition mode to use. Defaults to 'none'
+ */
+function zoom(chart, amount, transition = 'none') {
+  const {x = 1, y = 1, focalPoint = getCenter(chart)} = typeof amount === 'number' ? {x: amount, y: amount} : amount;
+  const state = getState(chart);
+  const {options: {limits, zoom: zoomOptions}} = state;
+  const {mode = 'xy', overScaleMode} = zoomOptions || {};
+
+  storeOriginalScaleLimits(chart, state);
+
+  const xEnabled = x !== 1 && directionEnabled(mode, 'x', chart);
+  const yEnabled = y !== 1 && directionEnabled(mode, 'y', chart);
+  const enabledScales = overScaleMode && getEnabledScalesByPoint(overScaleMode, focalPoint, chart);
+
+  helpers.each(enabledScales || chart.scales, function(scale) {
+    if (scale.isHorizontal() && xEnabled) {
+      doZoom(scale, x, focalPoint, limits);
+    } else if (!scale.isHorizontal() && yEnabled) {
+      doZoom(scale, y, focalPoint, limits);
+    }
+  });
+
+  chart.update(transition);
+
+  helpers.callback(zoomOptions.onZoom, [{chart}]);
+}
+
+function getRange(scale, pixel0, pixel1) {
+  const v0 = scale.getValueForPixel(pixel0);
+  const v1 = scale.getValueForPixel(pixel1);
+  return {
+    min: Math.min(v0, v1),
+    max: Math.max(v0, v1)
+  };
+}
+
+function zoomRect(chart, p0, p1, transition = 'none') {
+  const state = getState(chart);
+  const {options: {limits, zoom: zoomOptions}} = state;
+  const {mode = 'xy'} = zoomOptions;
+
+  storeOriginalScaleLimits(chart, state);
+  const xEnabled = directionEnabled(mode, 'x', chart);
+  const yEnabled = directionEnabled(mode, 'y', chart);
+
+  helpers.each(chart.scales, function(scale) {
+    if (scale.isHorizontal() && xEnabled) {
+      updateRange(scale, getRange(scale, p0.x, p1.x), limits, true);
+    } else if (!scale.isHorizontal() && yEnabled) {
+      updateRange(scale, getRange(scale, p0.y, p1.y), limits, true);
+    }
+  });
+
+  chart.update(transition);
+
+  helpers.callback(zoomOptions.onZoom, [{chart}]);
+}
+
+function zoomScale(chart, scaleId, range, transition = 'none') {
+  storeOriginalScaleLimits(chart, getState(chart));
+  const scale = chart.scales[scaleId];
+  updateRange(scale, range, undefined, true);
+  chart.update(transition);
+}
+
+function resetZoom(chart, transition = 'default') {
+  const state = getState(chart);
+  const originalScaleLimits = storeOriginalScaleLimits(chart, state);
+
+  helpers.each(chart.scales, function(scale) {
+    const scaleOptions = scale.options;
+    if (originalScaleLimits[scale.id]) {
+      scaleOptions.min = originalScaleLimits[scale.id].min.options;
+      scaleOptions.max = originalScaleLimits[scale.id].max.options;
+    } else {
+      delete scaleOptions.min;
+      delete scaleOptions.max;
+    }
+  });
+  chart.update(transition);
+  helpers.callback(state.options.zoom.onZoomComplete, [{chart}]);
+}
+
+function getOriginalRange(state, scaleId) {
+  const original = state.originalScaleLimits[scaleId];
+  if (!original) {
+    return;
+  }
+  const {min, max} = original;
+  return helpers.valueOrDefault(max.options, max.scale) - helpers.valueOrDefault(min.options, min.scale);
+}
+
+function getZoomLevel(chart) {
+  const state = getState(chart);
+  let min = 1;
+  let max = 1;
+  helpers.each(chart.scales, function(scale) {
+    const origRange = getOriginalRange(state, scale.id);
+    if (origRange) {
+      const level = Math.round(origRange / (scale.max - scale.min) * 100) / 100;
+      min = Math.min(min, level);
+      max = Math.max(max, level);
+    }
+  });
+  return min < 1 ? min : max;
+}
+
+function panScale(scale, delta, limits, state) {
+  const {panDelta} = state;
+  // Add possible cumulative delta from previous pan attempts where scale did not change
+  const storedDelta = panDelta[scale.id] || 0;
+  if (helpers.sign(storedDelta) === helpers.sign(delta)) {
+    delta += storedDelta;
+  }
+  const fn = panFunctions[scale.type] || panFunctions.default;
+  if (helpers.callback(fn, [scale, delta, limits])) {
+    // The scale changed, reset cumulative delta
+    panDelta[scale.id] = 0;
+  } else {
+    // The scale did not change, store cumulative delta
+    panDelta[scale.id] = delta;
+  }
+}
+
+function pan(chart, delta, enabledScales, transition = 'none') {
+  const {x = 0, y = 0} = typeof delta === 'number' ? {x: delta, y: delta} : delta;
+  const state = getState(chart);
+  const {options: {pan: panOptions, limits}} = state;
+  const {mode = 'xy', onPan} = panOptions || {};
+
+  storeOriginalScaleLimits(chart, state);
+
+  const xEnabled = x !== 0 && directionEnabled(mode, 'x', chart);
+  const yEnabled = y !== 0 && directionEnabled(mode, 'y', chart);
+
+  helpers.each(enabledScales || chart.scales, function(scale) {
+    if (scale.isHorizontal() && xEnabled) {
+      panScale(scale, x, limits, state);
+    } else if (!scale.isHorizontal() && yEnabled) {
+      panScale(scale, y, limits, state);
+    }
+  });
+
+  chart.update(transition);
+
+  helpers.callback(onPan, [{chart}]);
+}
+
+function getInitialScaleBounds(chart) {
+  const state = getState(chart);
+  const scaleBounds = {};
+  for (const scaleId of Object.keys(chart.scales)) {
+    const {min, max} = state.originalScaleLimits[scaleId] || {min: {}, max: {}};
+    scaleBounds[scaleId] = {min: min.scale, max: max.scale};
+  }
+
+  return scaleBounds;
+}
+
+function isZoomedOrPanned(chart) {
+  const scaleBounds = getInitialScaleBounds(chart);
+  for (const scaleId of Object.keys(chart.scales)) {
+    const {min: originalMin, max: originalMax} = scaleBounds[scaleId];
+
+    if (originalMin !== undefined && chart.scales[scaleId].min !== originalMin) {
+      return true;
+    }
+
+    if (originalMax !== undefined && chart.scales[scaleId].max !== originalMax) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function removeHandler(chart, type) {
+  const {handlers} = getState(chart);
+  const handler = handlers[type];
+  if (handler && handler.target) {
+    handler.target.removeEventListener(type, handler);
+    delete handlers[type];
+  }
+}
+
+function addHandler(chart, target, type, handler) {
+  const {handlers, options} = getState(chart);
+  const oldHandler = handlers[type];
+  if (oldHandler && oldHandler.target === target) {
+    // already attached
+    return;
+  }
+  removeHandler(chart, type);
+  handlers[type] = (event) => handler(chart, event, options);
+  handlers[type].target = target;
+  target.addEventListener(type, handlers[type]);
+}
+
+function mouseMove(chart, event) {
+  const state = getState(chart);
+  if (state.dragStart) {
+    state.dragging = true;
+    state.dragEnd = event;
+    chart.update('none');
+  }
+}
+
+function zoomStart(chart, event, zoomOptions) {
+  const {onZoomStart, onZoomRejected} = zoomOptions;
+  if (onZoomStart) {
+    const {left: offsetX, top: offsetY} = event.target.getBoundingClientRect();
+    const point = {
+      x: event.clientX - offsetX,
+      y: event.clientY - offsetY
+    };
+    if (helpers.callback(onZoomStart, [{chart, event, point}]) === false) {
+      helpers.callback(onZoomRejected, [{chart, event}]);
+      return false;
+    }
+  }
+}
+
+function mouseDown(chart, event) {
+  const state = getState(chart);
+  const {pan: panOptions, zoom: zoomOptions = {}} = state.options;
+  if (keyPressed(getModifierKey(panOptions), event) || keyNotPressed(getModifierKey(zoomOptions.drag), event)) {
+    return helpers.callback(zoomOptions.onZoomRejected, [{chart, event}]);
+  }
+
+  if (zoomStart(chart, event, zoomOptions) === false) {
+    return;
+  }
+  state.dragStart = event;
+
+  addHandler(chart, chart.canvas, 'mousemove', mouseMove);
+}
+
+function computeDragRect(chart, mode, beginPoint, endPoint) {
+  const {left: offsetX, top: offsetY} = beginPoint.target.getBoundingClientRect();
+  const xEnabled = directionEnabled(mode, 'x', chart);
+  const yEnabled = directionEnabled(mode, 'y', chart);
+  let {top, left, right, bottom, width: chartWidth, height: chartHeight} = chart.chartArea;
+
+  if (xEnabled) {
+    left = Math.min(beginPoint.clientX, endPoint.clientX) - offsetX;
+    right = Math.max(beginPoint.clientX, endPoint.clientX) - offsetX;
+  }
+
+  if (yEnabled) {
+    top = Math.min(beginPoint.clientY, endPoint.clientY) - offsetY;
+    bottom = Math.max(beginPoint.clientY, endPoint.clientY) - offsetY;
+  }
+  const width = right - left;
+  const height = bottom - top;
+
+  return {
+    left,
+    top,
+    right,
+    bottom,
+    width,
+    height,
+    zoomX: xEnabled && width ? 1 + ((chartWidth - width) / chartWidth) : 1,
+    zoomY: yEnabled && height ? 1 + ((chartHeight - height) / chartHeight) : 1
+  };
+}
+
+function mouseUp(chart, event) {
+  const state = getState(chart);
+  if (!state.dragStart) {
+    return;
+  }
+
+  removeHandler(chart, 'mousemove');
+  const {mode, onZoomComplete, drag: {threshold = 0}} = state.options.zoom;
+  const rect = computeDragRect(chart, mode, state.dragStart, event);
+  const distanceX = directionEnabled(mode, 'x', chart) ? rect.width : 0;
+  const distanceY = directionEnabled(mode, 'y', chart) ? rect.height : 0;
+  const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+  // Remove drag start and end before chart update to stop drawing selected area
+  state.dragStart = state.dragEnd = null;
+
+  if (distance <= threshold) {
+    state.dragging = false;
+    chart.update('none');
+    return;
+  }
+
+  zoomRect(chart, {x: rect.left, y: rect.top}, {x: rect.right, y: rect.bottom}, 'zoom');
+
+  setTimeout(() => (state.dragging = false), 500);
+  helpers.callback(onZoomComplete, [{chart}]);
+}
+
+function wheelPreconditions(chart, event, zoomOptions) {
+  // Before preventDefault, check if the modifier key required and pressed
+  if (keyNotPressed(getModifierKey(zoomOptions.wheel), event)) {
+    helpers.callback(zoomOptions.onZoomRejected, [{chart, event}]);
+    return;
+  }
+
+  if (zoomStart(chart, event, zoomOptions) === false) {
+    return;
+  }
+
+  // Prevent the event from triggering the default behavior (eg. Content scrolling).
+  if (event.cancelable) {
+    event.preventDefault();
+  }
+
+  // Firefox always fires the wheel event twice:
+  // First without the delta and right after that once with the delta properties.
+  if (event.deltaY === undefined) {
+    return;
+  }
+  return true;
+}
+
+function wheel(chart, event) {
+  const {handlers: {onZoomComplete}, options: {zoom: zoomOptions}} = getState(chart);
+
+  if (!wheelPreconditions(chart, event, zoomOptions)) {
+    return;
+  }
+
+  const rect = event.target.getBoundingClientRect();
+  const speed = 1 + (event.deltaY >= 0 ? -zoomOptions.wheel.speed : zoomOptions.wheel.speed);
+  const amount = {
+    x: speed,
+    y: speed,
+    focalPoint: {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    }
+  };
+
+  zoom(chart, amount);
+
+  if (onZoomComplete) {
+    onZoomComplete();
+  }
+}
+
+function addDebouncedHandler(chart, name, handler, delay) {
+  if (handler) {
+    getState(chart).handlers[name] = debounce(() => helpers.callback(handler, [{chart}]), delay);
+  }
+}
+
+function addListeners(chart, options) {
+  const canvas = chart.canvas;
+  const {wheel: wheelOptions, drag: dragOptions, onZoomComplete} = options.zoom;
+
+  // Install listeners. Do this dynamically based on options so that we can turn zoom on and off
+  // We also want to make sure listeners aren't always on. E.g. if you're scrolling down a page
+  // and the mouse goes over a chart you don't want it intercepted unless the plugin is enabled
+  if (wheelOptions.enabled) {
+    addHandler(chart, canvas, 'wheel', wheel);
+    addDebouncedHandler(chart, 'onZoomComplete', onZoomComplete, 250);
+  } else {
+    removeHandler(chart, 'wheel');
+  }
+  if (dragOptions.enabled) {
+    addHandler(chart, canvas, 'mousedown', mouseDown);
+    addHandler(chart, canvas.ownerDocument, 'mouseup', mouseUp);
+  } else {
+    removeHandler(chart, 'mousedown');
+    removeHandler(chart, 'mousemove');
+    removeHandler(chart, 'mouseup');
+  }
+}
+
+function removeListeners(chart) {
+  removeHandler(chart, 'mousedown');
+  removeHandler(chart, 'mousemove');
+  removeHandler(chart, 'mouseup');
+  removeHandler(chart, 'wheel');
+  removeHandler(chart, 'click');
+}
+
+function createEnabler(chart, state) {
+  return function(recognizer, event) {
+    const {pan: panOptions, zoom: zoomOptions = {}} = state.options;
+    if (!panOptions || !panOptions.enabled) {
+      return false;
+    }
+    const srcEvent = event && event.srcEvent;
+    if (!srcEvent) { // Sometimes Hammer queries this with a null event.
+      return true;
+    }
+    if (!state.panning && event.pointerType === 'mouse' && (
+      keyNotPressed(getModifierKey(panOptions), srcEvent) || keyPressed(getModifierKey(zoomOptions.drag), srcEvent))
+    ) {
+      helpers.callback(panOptions.onPanRejected, [{chart, event}]);
+      return false;
+    }
+    return true;
+  };
+}
+
+function pinchAxes(p0, p1) {
+  // fingers position difference
+  const pinchX = Math.abs(p0.clientX - p1.clientX);
+  const pinchY = Math.abs(p0.clientY - p1.clientY);
+
+  // diagonal fingers will change both (xy) axes
+  const p = pinchX / pinchY;
+  let x, y;
+  if (p > 0.3 && p < 1.7) {
+    x = y = true;
+  } else if (pinchX > pinchY) {
+    x = true;
+  } else {
+    y = true;
+  }
+  return {x, y};
+}
+
+function handlePinch(chart, state, e) {
+  if (state.scale) {
+    const {center, pointers} = e;
+    // Hammer reports the total scaling. We need the incremental amount
+    const zoomPercent = 1 / state.scale * e.scale;
+    const rect = e.target.getBoundingClientRect();
+    const pinch = pinchAxes(pointers[0], pointers[1]);
+    const mode = state.options.zoom.mode;
+    const amount = {
+      x: pinch.x && directionEnabled(mode, 'x', chart) ? zoomPercent : 1,
+      y: pinch.y && directionEnabled(mode, 'y', chart) ? zoomPercent : 1,
+      focalPoint: {
+        x: center.x - rect.left,
+        y: center.y - rect.top
+      }
+    };
+
+    zoom(chart, amount);
+
+    // Keep track of overall scale
+    state.scale = e.scale;
+  }
+}
+
+function startPinch(chart, state) {
+  if (state.options.zoom.pinch.enabled) {
+    state.scale = 1;
+  }
+}
+
+function endPinch(chart, state, e) {
+  if (state.scale) {
+    handlePinch(chart, state, e);
+    state.scale = null; // reset
+    helpers.callback(state.options.zoom.onZoomComplete, [{chart}]);
+  }
+}
+
+function handlePan(chart, state, e) {
+  const delta = state.delta;
+  if (delta) {
+    state.panning = true;
+    pan(chart, {x: e.deltaX - delta.x, y: e.deltaY - delta.y}, state.panScales);
+    state.delta = {x: e.deltaX, y: e.deltaY};
+  }
+}
+
+function startPan(chart, state, event) {
+  const {enabled, overScaleMode, onPanStart, onPanRejected} = state.options.pan;
+  if (!enabled) {
+    return;
+  }
+  const rect = event.target.getBoundingClientRect();
+  const point = {
+    x: event.center.x - rect.left,
+    y: event.center.y - rect.top
+  };
+
+  if (helpers.callback(onPanStart, [{chart, event, point}]) === false) {
+    return helpers.callback(onPanRejected, [{chart, event}]);
+  }
+
+  state.panScales = overScaleMode && getEnabledScalesByPoint(overScaleMode, point, chart);
+  state.delta = {x: 0, y: 0};
+  clearTimeout(state.panEndTimeout);
+  handlePan(chart, state, event);
+}
+
+function endPan(chart, state) {
+  state.delta = null;
+  if (state.panning) {
+    state.panEndTimeout = setTimeout(() => (state.panning = false), 500);
+    helpers.callback(state.options.pan.onPanComplete, [{chart}]);
+  }
+}
+
+const hammers = new WeakMap();
+function startHammer(chart, options) {
+  const state = getState(chart);
+  const canvas = chart.canvas;
+  const {pan: panOptions, zoom: zoomOptions} = options;
+
+  const mc = new Hammer__default["default"].Manager(canvas);
+  if (zoomOptions && zoomOptions.pinch.enabled) {
+    mc.add(new Hammer__default["default"].Pinch());
+    mc.on('pinchstart', () => startPinch(chart, state));
+    mc.on('pinch', (e) => handlePinch(chart, state, e));
+    mc.on('pinchend', (e) => endPinch(chart, state, e));
+  }
+
+  if (panOptions && panOptions.enabled) {
+    mc.add(new Hammer__default["default"].Pan({
+      threshold: panOptions.threshold,
+      enable: createEnabler(chart, state)
+    }));
+    mc.on('panstart', (e) => startPan(chart, state, e));
+    mc.on('panmove', (e) => handlePan(chart, state, e));
+    mc.on('panend', () => endPan(chart, state));
+  }
+
+  hammers.set(chart, mc);
+}
+
+function stopHammer(chart) {
+  const mc = hammers.get(chart);
+  if (mc) {
+    mc.remove('pinchstart');
+    mc.remove('pinch');
+    mc.remove('pinchend');
+    mc.remove('panstart');
+    mc.remove('pan');
+    mc.remove('panend');
+    mc.destroy();
+    hammers.delete(chart);
+  }
+}
+
+var version = "1.2.1";
+
+var Zoom = {
+  id: 'zoom',
+
+  version,
+
+  defaults: {
+    pan: {
+      enabled: false,
+      mode: 'xy',
+      threshold: 10,
+      modifierKey: null,
+    },
+    zoom: {
+      wheel: {
+        enabled: false,
+        speed: 0.1,
+        modifierKey: null
+      },
+      drag: {
+        enabled: false,
+        modifierKey: null
+      },
+      pinch: {
+        enabled: false
+      },
+      mode: 'xy',
+    }
+  },
+
+  start: function(chart, _args, options) {
+    const state = getState(chart);
+    state.options = options;
+
+    if (Object.prototype.hasOwnProperty.call(options.zoom, 'enabled')) {
+      console.warn('The option `zoom.enabled` is no longer supported. Please use `zoom.wheel.enabled`, `zoom.drag.enabled`, or `zoom.pinch.enabled`.');
+    }
+
+    if (Hammer__default["default"]) {
+      startHammer(chart, options);
+    }
+
+    chart.pan = (delta, panScales, transition) => pan(chart, delta, panScales, transition);
+    chart.zoom = (args, transition) => zoom(chart, args, transition);
+    chart.zoomScale = (id, range, transition) => zoomScale(chart, id, range, transition);
+    chart.resetZoom = (transition) => resetZoom(chart, transition);
+    chart.getZoomLevel = () => getZoomLevel(chart);
+    chart.getInitialScaleBounds = () => getInitialScaleBounds(chart);
+    chart.isZoomedOrPanned = () => isZoomedOrPanned(chart);
+  },
+
+  beforeEvent(chart) {
+    const state = getState(chart);
+    if (state.panning || state.dragging) {
+      // cancel any event handling while panning or dragging
+      return false;
+    }
+  },
+
+  beforeUpdate: function(chart, args, options) {
+    const state = getState(chart);
+    state.options = options;
+    addListeners(chart, options);
+  },
+
+  beforeDatasetsDraw: function(chart, args, options) {
+    const {dragStart, dragEnd} = getState(chart);
+
+    if (dragEnd) {
+      const {left, top, width, height} = computeDragRect(chart, options.zoom.mode, dragStart, dragEnd);
+
+      const dragOptions = options.zoom.drag;
+      const ctx = chart.ctx;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.fillStyle = dragOptions.backgroundColor || 'rgba(225,225,225,0.3)';
+      ctx.fillRect(left, top, width, height);
+
+      if (dragOptions.borderWidth > 0) {
+        ctx.lineWidth = dragOptions.borderWidth;
+        ctx.strokeStyle = dragOptions.borderColor || 'rgba(225,225,225)';
+        ctx.strokeRect(left, top, width, height);
+      }
+      ctx.restore();
+    }
+  },
+
+  stop: function(chart) {
+    removeListeners(chart);
+
+    if (Hammer__default["default"]) {
+      stopHammer(chart);
+    }
+    removeState(chart);
+  },
+
+  panFunctions,
+
+  zoomFunctions
+};
+
+chart_js.Chart.register(Zoom);
+
+return Zoom;
+
+}));
+
+},{"chart.js":32,"chart.js/helpers":33,"hammerjs":308}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -16193,7 +17184,7 @@ function addLeadingZeros(number, targetLength) {
 }
 
 module.exports = exports.default;
-},{}],34:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -16218,7 +17209,7 @@ function assign(target, dirtyObject) {
 }
 
 module.exports = exports.default;
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -16235,7 +17226,7 @@ function cloneObject(dirtyObject) {
 }
 
 module.exports = exports.default;
-},{"../assign/index.js":34}],36:[function(require,module,exports){
+},{"../assign/index.js":36}],38:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17120,7 +18111,7 @@ function formatTimezone(offset, dirtyDelimiter) {
 var _default = formatters;
 exports.default = _default;
 module.exports = exports.default;
-},{"../../../_lib/getUTCDayOfYear/index.js":40,"../../../_lib/getUTCISOWeek/index.js":41,"../../../_lib/getUTCISOWeekYear/index.js":42,"../../../_lib/getUTCWeek/index.js":43,"../../../_lib/getUTCWeekYear/index.js":44,"../../addLeadingZeros/index.js":33,"../lightFormatters/index.js":37}],37:[function(require,module,exports){
+},{"../../../_lib/getUTCDayOfYear/index.js":42,"../../../_lib/getUTCISOWeek/index.js":43,"../../../_lib/getUTCISOWeekYear/index.js":44,"../../../_lib/getUTCWeek/index.js":45,"../../../_lib/getUTCWeekYear/index.js":46,"../../addLeadingZeros/index.js":35,"../lightFormatters/index.js":39}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17216,7 +18207,7 @@ var formatters = {
 var _default = formatters;
 exports.default = _default;
 module.exports = exports.default;
-},{"../../addLeadingZeros/index.js":33}],38:[function(require,module,exports){
+},{"../../addLeadingZeros/index.js":35}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17322,7 +18313,7 @@ var longFormatters = {
 var _default = longFormatters;
 exports.default = _default;
 module.exports = exports.default;
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17348,7 +18339,7 @@ function getTimezoneOffsetInMilliseconds(date) {
 }
 
 module.exports = exports.default;
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17377,7 +18368,7 @@ function getUTCDayOfYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../../toDate/index.js":302,"../requiredArgs/index.js":46}],41:[function(require,module,exports){
+},{"../../toDate/index.js":304,"../requiredArgs/index.js":48}],43:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17409,7 +18400,7 @@ function getUTCISOWeek(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../../toDate/index.js":302,"../requiredArgs/index.js":46,"../startOfUTCISOWeek/index.js":52,"../startOfUTCISOWeekYear/index.js":53}],42:[function(require,module,exports){
+},{"../../toDate/index.js":304,"../requiredArgs/index.js":48,"../startOfUTCISOWeek/index.js":54,"../startOfUTCISOWeekYear/index.js":55}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17450,7 +18441,7 @@ function getUTCISOWeekYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../../toDate/index.js":302,"../requiredArgs/index.js":46,"../startOfUTCISOWeek/index.js":52}],43:[function(require,module,exports){
+},{"../../toDate/index.js":304,"../requiredArgs/index.js":48,"../startOfUTCISOWeek/index.js":54}],45:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17482,7 +18473,7 @@ function getUTCWeek(dirtyDate, options) {
 }
 
 module.exports = exports.default;
-},{"../../toDate/index.js":302,"../requiredArgs/index.js":46,"../startOfUTCWeek/index.js":54,"../startOfUTCWeekYear/index.js":55}],44:[function(require,module,exports){
+},{"../../toDate/index.js":304,"../requiredArgs/index.js":48,"../startOfUTCWeek/index.js":56,"../startOfUTCWeekYear/index.js":57}],46:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17535,7 +18526,7 @@ function getUTCWeekYear(dirtyDate, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../../toDate/index.js":302,"../requiredArgs/index.js":46,"../startOfUTCWeek/index.js":54,"../toInteger/index.js":56}],45:[function(require,module,exports){
+},{"../../toDate/index.js":304,"../requiredArgs/index.js":48,"../startOfUTCWeek/index.js":56,"../toInteger/index.js":58}],47:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17566,7 +18557,7 @@ function throwProtectedError(token, format, input) {
     throw new RangeError("Use `dd` instead of `DD` (in `".concat(format, "`) for formatting days of the month to the input `").concat(input, "`; see: https://git.io/fxCyr"));
   }
 }
-},{}],46:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17581,7 +18572,7 @@ function requiredArgs(required, args) {
 }
 
 module.exports = exports.default;
-},{}],47:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17602,7 +18593,7 @@ var defaultRoundingMethod = 'trunc';
 function getRoundingMethod(method) {
   return method ? roundingMap[method] : roundingMap[defaultRoundingMethod];
 }
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17643,7 +18634,7 @@ function setUTCDay(dirtyDate, dirtyDay, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../../toDate/index.js":302,"../requiredArgs/index.js":46,"../toInteger/index.js":56}],49:[function(require,module,exports){
+},{"../../toDate/index.js":304,"../requiredArgs/index.js":48,"../toInteger/index.js":58}],51:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17680,7 +18671,7 @@ function setUTCISODay(dirtyDate, dirtyDay) {
 }
 
 module.exports = exports.default;
-},{"../../toDate/index.js":302,"../requiredArgs/index.js":46,"../toInteger/index.js":56}],50:[function(require,module,exports){
+},{"../../toDate/index.js":304,"../requiredArgs/index.js":48,"../toInteger/index.js":58}],52:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17710,7 +18701,7 @@ function setUTCISOWeek(dirtyDate, dirtyISOWeek) {
 }
 
 module.exports = exports.default;
-},{"../../toDate/index.js":302,"../getUTCISOWeek/index.js":41,"../requiredArgs/index.js":46,"../toInteger/index.js":56}],51:[function(require,module,exports){
+},{"../../toDate/index.js":304,"../getUTCISOWeek/index.js":43,"../requiredArgs/index.js":48,"../toInteger/index.js":58}],53:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17740,7 +18731,7 @@ function setUTCWeek(dirtyDate, dirtyWeek, options) {
 }
 
 module.exports = exports.default;
-},{"../../toDate/index.js":302,"../getUTCWeek/index.js":43,"../requiredArgs/index.js":46,"../toInteger/index.js":56}],52:[function(require,module,exports){
+},{"../../toDate/index.js":304,"../getUTCWeek/index.js":45,"../requiredArgs/index.js":48,"../toInteger/index.js":58}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17768,7 +18759,7 @@ function startOfUTCISOWeek(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../../toDate/index.js":302,"../requiredArgs/index.js":46}],53:[function(require,module,exports){
+},{"../../toDate/index.js":304,"../requiredArgs/index.js":48}],55:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17797,7 +18788,7 @@ function startOfUTCISOWeekYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../getUTCISOWeekYear/index.js":42,"../requiredArgs/index.js":46,"../startOfUTCISOWeek/index.js":52}],54:[function(require,module,exports){
+},{"../getUTCISOWeekYear/index.js":44,"../requiredArgs/index.js":48,"../startOfUTCISOWeek/index.js":54}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17836,7 +18827,7 @@ function startOfUTCWeek(dirtyDate, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../../toDate/index.js":302,"../requiredArgs/index.js":46,"../toInteger/index.js":56}],55:[function(require,module,exports){
+},{"../../toDate/index.js":304,"../requiredArgs/index.js":48,"../toInteger/index.js":58}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17872,7 +18863,7 @@ function startOfUTCWeekYear(dirtyDate, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../getUTCWeekYear/index.js":44,"../requiredArgs/index.js":46,"../startOfUTCWeek/index.js":54,"../toInteger/index.js":56}],56:[function(require,module,exports){
+},{"../getUTCWeekYear/index.js":46,"../requiredArgs/index.js":48,"../startOfUTCWeek/index.js":56,"../toInteger/index.js":58}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17895,7 +18886,7 @@ function toInteger(dirtyNumber) {
 }
 
 module.exports = exports.default;
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17978,7 +18969,7 @@ function add(dirtyDate, duration) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addDays/index.js":59,"../addMonths/index.js":64,"../toDate/index.js":302}],58:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addDays/index.js":61,"../addMonths/index.js":66,"../toDate/index.js":304}],60:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18052,7 +19043,7 @@ function addBusinessDays(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../isSaturday/index.js":185,"../isSunday/index.js":186,"../isWeekend/index.js":201,"../toDate/index.js":302}],59:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../isSaturday/index.js":187,"../isSunday/index.js":188,"../isWeekend/index.js":203,"../toDate/index.js":304}],61:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18109,7 +19100,7 @@ function addDays(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],60:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18156,7 +19147,7 @@ function addHours(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addMilliseconds/index.js":62}],61:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addMilliseconds/index.js":64}],63:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18210,7 +19201,7 @@ function addISOWeekYears(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../getISOWeekYear/index.js":141,"../setISOWeekYear/index.js":266}],62:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../getISOWeekYear/index.js":143,"../setISOWeekYear/index.js":268}],64:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18256,7 +19247,7 @@ function addMilliseconds(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],63:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],65:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18303,7 +19294,7 @@ function addMinutes(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addMilliseconds/index.js":62}],64:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addMilliseconds/index.js":64}],66:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18386,7 +19377,7 @@ function addMonths(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],65:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],67:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18432,7 +19423,7 @@ function addQuarters(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addMonths/index.js":64}],66:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addMonths/index.js":66}],68:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18477,7 +19468,7 @@ function addSeconds(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addMilliseconds/index.js":62}],67:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addMilliseconds/index.js":64}],69:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18523,7 +19514,7 @@ function addWeeks(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addDays/index.js":59}],68:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addDays/index.js":61}],70:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18568,7 +19559,7 @@ function addYears(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addMonths/index.js":64}],69:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addMonths/index.js":66}],71:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18695,7 +19686,7 @@ function areIntervalsOverlapping(dirtyIntervalLeft, dirtyIntervalRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],70:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],72:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18745,7 +19736,7 @@ function clamp(date, _ref) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../max/index.js":222,"../min/index.js":227}],71:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../max/index.js":224,"../min/index.js":229}],73:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18827,7 +19818,7 @@ function closestIndexTo(dirtyDateToCompare, dirtyDatesArray) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],72:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],74:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18907,7 +19898,7 @@ function closestTo(dirtyDateToCompare, dirtyDatesArray) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],73:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],75:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18973,7 +19964,7 @@ function compareAsc(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],74:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],76:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19039,7 +20030,7 @@ function compareDesc(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],75:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],77:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19178,7 +20169,7 @@ var secondsInHour = 3600;
 exports.secondsInHour = secondsInHour;
 var secondsInMinute = 60;
 exports.secondsInMinute = secondsInMinute;
-},{}],76:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19222,7 +20213,7 @@ function daysToWeeks(days) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],77:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],79:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19318,7 +20309,7 @@ function differenceInBusinessDays(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addDays/index.js":59,"../differenceInCalendarDays/index.js":78,"../isSameDay/index.js":175,"../isValid/index.js":199,"../isWeekend/index.js":201,"../toDate/index.js":302}],78:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addDays/index.js":61,"../differenceInCalendarDays/index.js":80,"../isSameDay/index.js":177,"../isValid/index.js":201,"../isWeekend/index.js":203,"../toDate/index.js":304}],80:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19383,7 +20374,7 @@ function differenceInCalendarDays(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/getTimezoneOffsetInMilliseconds/index.js":39,"../_lib/requiredArgs/index.js":46,"../startOfDay/index.js":275}],79:[function(require,module,exports){
+},{"../_lib/getTimezoneOffsetInMilliseconds/index.js":41,"../_lib/requiredArgs/index.js":48,"../startOfDay/index.js":277}],81:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19435,7 +20426,7 @@ function differenceInCalendarISOWeekYears(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../getISOWeekYear/index.js":141}],80:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../getISOWeekYear/index.js":143}],82:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19493,7 +20484,7 @@ function differenceInCalendarISOWeeks(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/getTimezoneOffsetInMilliseconds/index.js":39,"../_lib/requiredArgs/index.js":46,"../startOfISOWeek/index.js":278}],81:[function(require,module,exports){
+},{"../_lib/getTimezoneOffsetInMilliseconds/index.js":41,"../_lib/requiredArgs/index.js":48,"../startOfISOWeek/index.js":280}],83:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19542,7 +20533,7 @@ function differenceInCalendarMonths(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],82:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],84:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19593,7 +20584,7 @@ function differenceInCalendarQuarters(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../getQuarter/index.js":147,"../toDate/index.js":302}],83:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../getQuarter/index.js":149,"../toDate/index.js":304}],85:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19663,7 +20654,7 @@ function differenceInCalendarWeeks(dirtyDateLeft, dirtyDateRight, dirtyOptions) 
 }
 
 module.exports = exports.default;
-},{"../_lib/getTimezoneOffsetInMilliseconds/index.js":39,"../_lib/requiredArgs/index.js":46,"../startOfWeek/index.js":286}],84:[function(require,module,exports){
+},{"../_lib/getTimezoneOffsetInMilliseconds/index.js":41,"../_lib/requiredArgs/index.js":48,"../startOfWeek/index.js":288}],86:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19710,7 +20701,7 @@ function differenceInCalendarYears(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],85:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],87:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19812,7 +20803,7 @@ function differenceInDays(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../differenceInCalendarDays/index.js":78,"../toDate/index.js":302}],86:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../differenceInCalendarDays/index.js":80,"../toDate/index.js":304}],88:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19866,7 +20857,7 @@ function differenceInHours(dateLeft, dateRight, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/roundingMethods/index.js":47,"../constants/index.js":75,"../differenceInMilliseconds/index.js":88}],87:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/roundingMethods/index.js":49,"../constants/index.js":77,"../differenceInMilliseconds/index.js":90}],89:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19935,7 +20926,7 @@ function differenceInISOWeekYears(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../compareAsc/index.js":73,"../differenceInCalendarISOWeekYears/index.js":79,"../subISOWeekYears/index.js":294,"../toDate/index.js":302}],88:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../compareAsc/index.js":75,"../differenceInCalendarISOWeekYears/index.js":81,"../subISOWeekYears/index.js":296,"../toDate/index.js":304}],90:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19981,7 +20972,7 @@ function differenceInMilliseconds(dateLeft, dateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],89:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],91:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20043,7 +21034,7 @@ function differenceInMinutes(dateLeft, dateRight, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/roundingMethods/index.js":47,"../constants/index.js":75,"../differenceInMilliseconds/index.js":88}],90:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/roundingMethods/index.js":49,"../constants/index.js":77,"../differenceInMilliseconds/index.js":90}],92:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20119,7 +21110,7 @@ function differenceInMonths(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../compareAsc/index.js":73,"../differenceInCalendarMonths/index.js":81,"../isLastDayOfMonth/index.js":170,"../toDate/index.js":302}],91:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../compareAsc/index.js":75,"../differenceInCalendarMonths/index.js":83,"../isLastDayOfMonth/index.js":172,"../toDate/index.js":304}],93:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20166,7 +21157,7 @@ function differenceInQuarters(dateLeft, dateRight, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/roundingMethods/index.js":47,"../differenceInMonths/index.js":90}],92:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/roundingMethods/index.js":49,"../differenceInMonths/index.js":92}],94:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20217,7 +21208,7 @@ function differenceInSeconds(dateLeft, dateRight, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/roundingMethods/index.js":47,"../differenceInMilliseconds/index.js":88}],93:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/roundingMethods/index.js":49,"../differenceInMilliseconds/index.js":90}],95:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20285,7 +21276,7 @@ function differenceInWeeks(dateLeft, dateRight, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/roundingMethods/index.js":47,"../differenceInDays/index.js":85}],94:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/roundingMethods/index.js":49,"../differenceInDays/index.js":87}],96:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20344,7 +21335,7 @@ function differenceInYears(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../compareAsc/index.js":73,"../differenceInCalendarYears/index.js":84,"../toDate/index.js":302}],95:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../compareAsc/index.js":75,"../differenceInCalendarYears/index.js":86,"../toDate/index.js":304}],97:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20446,7 +21437,7 @@ function eachDayOfInterval(dirtyInterval, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],96:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],98:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20519,7 +21510,7 @@ function eachHourOfInterval(dirtyInterval, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../addHours/index.js":60,"../toDate/index.js":302}],97:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../addHours/index.js":62,"../toDate/index.js":304}],99:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20592,7 +21583,7 @@ function eachMinuteOfInterval(interval, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../addMinutes/index.js":63,"../startOfMinute/index.js":280,"../toDate/index.js":302}],98:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../addMinutes/index.js":65,"../startOfMinute/index.js":282,"../toDate/index.js":304}],100:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20661,7 +21652,7 @@ function eachMonthOfInterval(dirtyInterval) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],99:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],101:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20731,7 +21722,7 @@ function eachQuarterOfInterval(dirtyInterval) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../addQuarters/index.js":65,"../startOfQuarter/index.js":282,"../toDate/index.js":302}],100:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../addQuarters/index.js":67,"../startOfQuarter/index.js":284,"../toDate/index.js":304}],102:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20819,7 +21810,7 @@ function eachWeekOfInterval(dirtyInterval, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../addWeeks/index.js":67,"../startOfWeek/index.js":286,"../toDate/index.js":302}],101:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../addWeeks/index.js":69,"../startOfWeek/index.js":288,"../toDate/index.js":304}],103:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20883,7 +21874,7 @@ function eachWeekendOfInterval(interval) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../eachDayOfInterval/index.js":95,"../isSunday/index.js":186,"../isWeekend/index.js":201}],102:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../eachDayOfInterval/index.js":97,"../isSunday/index.js":188,"../isWeekend/index.js":203}],104:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20940,7 +21931,7 @@ function eachWeekendOfMonth(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../eachWeekendOfInterval/index.js":101,"../endOfMonth/index.js":111,"../startOfMonth/index.js":281}],103:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../eachWeekendOfInterval/index.js":103,"../endOfMonth/index.js":113,"../startOfMonth/index.js":283}],105:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20994,7 +21985,7 @@ function eachWeekendOfYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../eachWeekendOfInterval/index.js":101,"../endOfYear/index.js":117,"../startOfYear/index.js":288}],104:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../eachWeekendOfInterval/index.js":103,"../endOfYear/index.js":119,"../startOfYear/index.js":290}],106:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21060,7 +22051,7 @@ function eachYearOfInterval(dirtyInterval) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],105:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],107:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21104,7 +22095,7 @@ function endOfDay(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],106:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21153,7 +22144,7 @@ function endOfDecade(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],107:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21197,7 +22188,7 @@ function endOfHour(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],108:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],110:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21243,7 +22234,7 @@ function endOfISOWeek(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../endOfWeek/index.js":116}],109:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../endOfWeek/index.js":118}],111:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21301,7 +22292,7 @@ function endOfISOWeekYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../getISOWeekYear/index.js":141,"../startOfISOWeek/index.js":278}],110:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../getISOWeekYear/index.js":143,"../startOfISOWeek/index.js":280}],112:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21345,7 +22336,7 @@ function endOfMinute(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],111:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],113:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21391,7 +22382,7 @@ function endOfMonth(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],112:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],114:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21438,7 +22429,7 @@ function endOfQuarter(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],113:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],115:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21482,7 +22473,7 @@ function endOfSecond(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],114:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],116:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21522,7 +22513,7 @@ function endOfToday() {
 }
 
 module.exports = exports.default;
-},{"../endOfDay/index.js":105}],115:[function(require,module,exports){
+},{"../endOfDay/index.js":107}],117:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21565,7 +22556,7 @@ function endOfTomorrow() {
 }
 
 module.exports = exports.default;
-},{}],116:[function(require,module,exports){
+},{}],118:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21633,7 +22624,7 @@ function endOfWeek(dirtyDate, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],117:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],119:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21679,7 +22670,7 @@ function endOfYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],118:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],120:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21722,7 +22713,7 @@ function endOfYesterday() {
 }
 
 module.exports = exports.default;
-},{}],119:[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -22177,7 +23168,7 @@ function cleanEscapedString(input) {
 }
 
 module.exports = exports.default;
-},{"../_lib/format/formatters/index.js":36,"../_lib/format/longFormatters/index.js":38,"../_lib/getTimezoneOffsetInMilliseconds/index.js":39,"../_lib/protectedTokens/index.js":45,"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../isValid/index.js":199,"../locale/en-US/index.js":221,"../subMilliseconds/index.js":295,"../toDate/index.js":302}],120:[function(require,module,exports){
+},{"../_lib/format/formatters/index.js":38,"../_lib/format/longFormatters/index.js":40,"../_lib/getTimezoneOffsetInMilliseconds/index.js":41,"../_lib/protectedTokens/index.js":47,"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../isValid/index.js":201,"../locale/en-US/index.js":223,"../subMilliseconds/index.js":297,"../toDate/index.js":304}],122:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -22410,7 +23401,7 @@ function formatDistance(dirtyDate, dirtyBaseDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/cloneObject/index.js":35,"../_lib/getTimezoneOffsetInMilliseconds/index.js":39,"../_lib/requiredArgs/index.js":46,"../compareAsc/index.js":73,"../differenceInMonths/index.js":90,"../differenceInSeconds/index.js":92,"../locale/en-US/index.js":221,"../toDate/index.js":302}],121:[function(require,module,exports){
+},{"../_lib/cloneObject/index.js":37,"../_lib/getTimezoneOffsetInMilliseconds/index.js":41,"../_lib/requiredArgs/index.js":48,"../compareAsc/index.js":75,"../differenceInMonths/index.js":92,"../differenceInSeconds/index.js":94,"../locale/en-US/index.js":223,"../toDate/index.js":304}],123:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -22680,7 +23671,7 @@ function formatDistanceStrict(dirtyDate, dirtyBaseDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/cloneObject/index.js":35,"../_lib/getTimezoneOffsetInMilliseconds/index.js":39,"../_lib/requiredArgs/index.js":46,"../compareAsc/index.js":73,"../locale/en-US/index.js":221,"../toDate/index.js":302}],122:[function(require,module,exports){
+},{"../_lib/cloneObject/index.js":37,"../_lib/getTimezoneOffsetInMilliseconds/index.js":41,"../_lib/requiredArgs/index.js":48,"../compareAsc/index.js":75,"../locale/en-US/index.js":223,"../toDate/index.js":304}],124:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -22805,7 +23796,7 @@ function formatDistanceToNow(dirtyDate, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../formatDistance/index.js":120}],123:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../formatDistance/index.js":122}],125:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -22899,7 +23890,7 @@ function formatDistanceToNowStrict(dirtyDate, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../formatDistanceStrict/index.js":121}],124:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../formatDistanceStrict/index.js":123}],126:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -22997,7 +23988,7 @@ function formatDuration(duration) {
 }
 
 module.exports = exports.default;
-},{"../locale/en-US/index.js":221}],125:[function(require,module,exports){
+},{"../locale/en-US/index.js":223}],127:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23114,7 +24105,7 @@ function formatISO(date, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/addLeadingZeros/index.js":33,"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],126:[function(require,module,exports){
+},{"../_lib/addLeadingZeros/index.js":35,"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],128:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23218,7 +24209,7 @@ function formatISO9075(dirtyDate, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../_lib/addLeadingZeros/index.js":33,"../isValid/index.js":199,"../toDate/index.js":302}],127:[function(require,module,exports){
+},{"../_lib/addLeadingZeros/index.js":35,"../isValid/index.js":201,"../toDate/index.js":304}],129:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23275,7 +24266,7 @@ function formatISODuration(duration) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46}],128:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48}],130:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23376,7 +24367,7 @@ function formatRFC3339(dirtyDate, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../_lib/addLeadingZeros/index.js":33,"../_lib/toInteger/index.js":56,"../isValid/index.js":199,"../toDate/index.js":302}],129:[function(require,module,exports){
+},{"../_lib/addLeadingZeros/index.js":35,"../_lib/toInteger/index.js":58,"../isValid/index.js":201,"../toDate/index.js":304}],131:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23437,7 +24428,7 @@ function formatRFC7231(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/addLeadingZeros/index.js":33,"../isValid/index.js":199,"../toDate/index.js":302}],130:[function(require,module,exports){
+},{"../_lib/addLeadingZeros/index.js":35,"../isValid/index.js":201,"../toDate/index.js":304}],132:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23561,7 +24552,7 @@ function formatRelative(dirtyDate, dirtyBaseDate, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../_lib/getTimezoneOffsetInMilliseconds/index.js":39,"../_lib/requiredArgs/index.js":46,"../differenceInCalendarDays/index.js":78,"../format/index.js":119,"../locale/en-US/index.js":221,"../subMilliseconds/index.js":295,"../toDate/index.js":302}],131:[function(require,module,exports){
+},{"../_lib/getTimezoneOffsetInMilliseconds/index.js":41,"../_lib/requiredArgs/index.js":48,"../differenceInCalendarDays/index.js":80,"../format/index.js":121,"../locale/en-US/index.js":223,"../subMilliseconds/index.js":297,"../toDate/index.js":304}],133:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23605,7 +24596,7 @@ function fromUnixTime(dirtyUnixTime) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],132:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],134:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23648,7 +24639,7 @@ function getDate(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],133:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],135:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23691,7 +24682,7 @@ function getDay(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],134:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],136:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23739,7 +24730,7 @@ function getDayOfYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../differenceInCalendarDays/index.js":78,"../startOfYear/index.js":288,"../toDate/index.js":302}],135:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../differenceInCalendarDays/index.js":80,"../startOfYear/index.js":290,"../toDate/index.js":304}],137:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23786,7 +24777,7 @@ function getDaysInMonth(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],136:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],138:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23835,7 +24826,7 @@ function getDaysInYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isLeapYear/index.js":171,"../toDate/index.js":302}],137:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isLeapYear/index.js":173,"../toDate/index.js":304}],139:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23879,7 +24870,7 @@ function getDecade(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],138:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],140:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23922,7 +24913,7 @@ function getHours(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],139:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],141:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23973,7 +24964,7 @@ function getISODay(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],140:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],142:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24027,7 +25018,7 @@ function getISOWeek(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../startOfISOWeek/index.js":278,"../startOfISOWeekYear/index.js":279,"../toDate/index.js":302}],141:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../startOfISOWeek/index.js":280,"../startOfISOWeekYear/index.js":281,"../toDate/index.js":304}],143:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24095,7 +25086,7 @@ function getISOWeekYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../startOfISOWeek/index.js":278,"../toDate/index.js":302}],142:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../startOfISOWeek/index.js":280,"../toDate/index.js":304}],144:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24148,7 +25139,7 @@ function getISOWeeksInYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../addWeeks/index.js":67,"../startOfISOWeekYear/index.js":279}],143:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../addWeeks/index.js":69,"../startOfISOWeekYear/index.js":281}],145:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24191,7 +25182,7 @@ function getMilliseconds(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],144:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],146:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24234,7 +25225,7 @@ function getMinutes(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],145:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],147:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24277,7 +25268,7 @@ function getMonth(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],146:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],148:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24384,7 +25375,7 @@ function getOverlappingDaysInIntervals(dirtyIntervalLeft, dirtyIntervalRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],147:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],149:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24427,7 +25418,7 @@ function getQuarter(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],148:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],150:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24470,7 +25461,7 @@ function getSeconds(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],149:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],151:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24513,7 +25504,7 @@ function getTime(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],150:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],152:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24554,7 +25545,7 @@ function getUnixTime(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../getTime/index.js":149}],151:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../getTime/index.js":151}],153:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24627,7 +25618,7 @@ function getWeek(dirtyDate, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../startOfWeek/index.js":286,"../startOfWeekYear/index.js":287,"../toDate/index.js":302}],152:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../startOfWeek/index.js":288,"../startOfWeekYear/index.js":289,"../toDate/index.js":304}],154:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24693,7 +25684,7 @@ function getWeekOfMonth(date, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../getDate/index.js":132,"../getDay/index.js":133,"../startOfMonth/index.js":281}],153:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../getDate/index.js":134,"../getDay/index.js":135,"../startOfMonth/index.js":283}],155:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24787,7 +25778,7 @@ function getWeekYear(dirtyDate, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../startOfWeek/index.js":286,"../toDate/index.js":302}],154:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../startOfWeek/index.js":288,"../toDate/index.js":304}],156:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24842,7 +25833,7 @@ function getWeeksInMonth(date, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../differenceInCalendarWeeks/index.js":83,"../lastDayOfMonth/index.js":207,"../startOfMonth/index.js":281}],155:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../differenceInCalendarWeeks/index.js":85,"../lastDayOfMonth/index.js":209,"../startOfMonth/index.js":283}],157:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24883,7 +25874,7 @@ function getYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],156:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],158:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24921,7 +25912,7 @@ function hoursToMilliseconds(hours) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],157:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],159:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24959,7 +25950,7 @@ function hoursToMinutes(hours) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],158:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],160:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24997,7 +25988,7 @@ function hoursToSeconds(hours) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],159:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],161:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27144,7 +28135,7 @@ Object.keys(_index237).forEach(function (key) {
 });
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-},{"./add/index.js":57,"./addBusinessDays/index.js":58,"./addDays/index.js":59,"./addHours/index.js":60,"./addISOWeekYears/index.js":61,"./addMilliseconds/index.js":62,"./addMinutes/index.js":63,"./addMonths/index.js":64,"./addQuarters/index.js":65,"./addSeconds/index.js":66,"./addWeeks/index.js":67,"./addYears/index.js":68,"./areIntervalsOverlapping/index.js":69,"./clamp/index.js":70,"./closestIndexTo/index.js":71,"./closestTo/index.js":72,"./compareAsc/index.js":73,"./compareDesc/index.js":74,"./constants/index.js":75,"./daysToWeeks/index.js":76,"./differenceInBusinessDays/index.js":77,"./differenceInCalendarDays/index.js":78,"./differenceInCalendarISOWeekYears/index.js":79,"./differenceInCalendarISOWeeks/index.js":80,"./differenceInCalendarMonths/index.js":81,"./differenceInCalendarQuarters/index.js":82,"./differenceInCalendarWeeks/index.js":83,"./differenceInCalendarYears/index.js":84,"./differenceInDays/index.js":85,"./differenceInHours/index.js":86,"./differenceInISOWeekYears/index.js":87,"./differenceInMilliseconds/index.js":88,"./differenceInMinutes/index.js":89,"./differenceInMonths/index.js":90,"./differenceInQuarters/index.js":91,"./differenceInSeconds/index.js":92,"./differenceInWeeks/index.js":93,"./differenceInYears/index.js":94,"./eachDayOfInterval/index.js":95,"./eachHourOfInterval/index.js":96,"./eachMinuteOfInterval/index.js":97,"./eachMonthOfInterval/index.js":98,"./eachQuarterOfInterval/index.js":99,"./eachWeekOfInterval/index.js":100,"./eachWeekendOfInterval/index.js":101,"./eachWeekendOfMonth/index.js":102,"./eachWeekendOfYear/index.js":103,"./eachYearOfInterval/index.js":104,"./endOfDay/index.js":105,"./endOfDecade/index.js":106,"./endOfHour/index.js":107,"./endOfISOWeek/index.js":108,"./endOfISOWeekYear/index.js":109,"./endOfMinute/index.js":110,"./endOfMonth/index.js":111,"./endOfQuarter/index.js":112,"./endOfSecond/index.js":113,"./endOfToday/index.js":114,"./endOfTomorrow/index.js":115,"./endOfWeek/index.js":116,"./endOfYear/index.js":117,"./endOfYesterday/index.js":118,"./format/index.js":119,"./formatDistance/index.js":120,"./formatDistanceStrict/index.js":121,"./formatDistanceToNow/index.js":122,"./formatDistanceToNowStrict/index.js":123,"./formatDuration/index.js":124,"./formatISO/index.js":125,"./formatISO9075/index.js":126,"./formatISODuration/index.js":127,"./formatRFC3339/index.js":128,"./formatRFC7231/index.js":129,"./formatRelative/index.js":130,"./fromUnixTime/index.js":131,"./getDate/index.js":132,"./getDay/index.js":133,"./getDayOfYear/index.js":134,"./getDaysInMonth/index.js":135,"./getDaysInYear/index.js":136,"./getDecade/index.js":137,"./getHours/index.js":138,"./getISODay/index.js":139,"./getISOWeek/index.js":140,"./getISOWeekYear/index.js":141,"./getISOWeeksInYear/index.js":142,"./getMilliseconds/index.js":143,"./getMinutes/index.js":144,"./getMonth/index.js":145,"./getOverlappingDaysInIntervals/index.js":146,"./getQuarter/index.js":147,"./getSeconds/index.js":148,"./getTime/index.js":149,"./getUnixTime/index.js":150,"./getWeek/index.js":151,"./getWeekOfMonth/index.js":152,"./getWeekYear/index.js":153,"./getWeeksInMonth/index.js":154,"./getYear/index.js":155,"./hoursToMilliseconds/index.js":156,"./hoursToMinutes/index.js":157,"./hoursToSeconds/index.js":158,"./intervalToDuration/index.js":160,"./intlFormat/index.js":161,"./isAfter/index.js":162,"./isBefore/index.js":163,"./isDate/index.js":164,"./isEqual/index.js":165,"./isExists/index.js":166,"./isFirstDayOfMonth/index.js":167,"./isFriday/index.js":168,"./isFuture/index.js":169,"./isLastDayOfMonth/index.js":170,"./isLeapYear/index.js":171,"./isMatch/index.js":172,"./isMonday/index.js":173,"./isPast/index.js":174,"./isSameDay/index.js":175,"./isSameHour/index.js":176,"./isSameISOWeek/index.js":177,"./isSameISOWeekYear/index.js":178,"./isSameMinute/index.js":179,"./isSameMonth/index.js":180,"./isSameQuarter/index.js":181,"./isSameSecond/index.js":182,"./isSameWeek/index.js":183,"./isSameYear/index.js":184,"./isSaturday/index.js":185,"./isSunday/index.js":186,"./isThisHour/index.js":187,"./isThisISOWeek/index.js":188,"./isThisMinute/index.js":189,"./isThisMonth/index.js":190,"./isThisQuarter/index.js":191,"./isThisSecond/index.js":192,"./isThisWeek/index.js":193,"./isThisYear/index.js":194,"./isThursday/index.js":195,"./isToday/index.js":196,"./isTomorrow/index.js":197,"./isTuesday/index.js":198,"./isValid/index.js":199,"./isWednesday/index.js":200,"./isWeekend/index.js":201,"./isWithinInterval/index.js":202,"./isYesterday/index.js":203,"./lastDayOfDecade/index.js":204,"./lastDayOfISOWeek/index.js":205,"./lastDayOfISOWeekYear/index.js":206,"./lastDayOfMonth/index.js":207,"./lastDayOfQuarter/index.js":208,"./lastDayOfWeek/index.js":209,"./lastDayOfYear/index.js":210,"./lightFormat/index.js":211,"./max/index.js":222,"./milliseconds/index.js":223,"./millisecondsToHours/index.js":224,"./millisecondsToMinutes/index.js":225,"./millisecondsToSeconds/index.js":226,"./min/index.js":227,"./minutesToHours/index.js":228,"./minutesToMilliseconds/index.js":229,"./minutesToSeconds/index.js":230,"./monthsToQuarters/index.js":231,"./monthsToYears/index.js":232,"./nextDay/index.js":233,"./nextFriday/index.js":234,"./nextMonday/index.js":235,"./nextSaturday/index.js":236,"./nextSunday/index.js":237,"./nextThursday/index.js":238,"./nextTuesday/index.js":239,"./nextWednesday/index.js":240,"./parse/index.js":242,"./parseISO/index.js":243,"./parseJSON/index.js":244,"./previousDay/index.js":245,"./previousFriday/index.js":246,"./previousMonday/index.js":247,"./previousSaturday/index.js":248,"./previousSunday/index.js":249,"./previousThursday/index.js":250,"./previousTuesday/index.js":251,"./previousWednesday/index.js":252,"./quartersToMonths/index.js":253,"./quartersToYears/index.js":254,"./roundToNearestMinutes/index.js":255,"./secondsToHours/index.js":256,"./secondsToMilliseconds/index.js":257,"./secondsToMinutes/index.js":258,"./set/index.js":259,"./setDate/index.js":260,"./setDay/index.js":261,"./setDayOfYear/index.js":262,"./setHours/index.js":263,"./setISODay/index.js":264,"./setISOWeek/index.js":265,"./setISOWeekYear/index.js":266,"./setMilliseconds/index.js":267,"./setMinutes/index.js":268,"./setMonth/index.js":269,"./setQuarter/index.js":270,"./setSeconds/index.js":271,"./setWeek/index.js":272,"./setWeekYear/index.js":273,"./setYear/index.js":274,"./startOfDay/index.js":275,"./startOfDecade/index.js":276,"./startOfHour/index.js":277,"./startOfISOWeek/index.js":278,"./startOfISOWeekYear/index.js":279,"./startOfMinute/index.js":280,"./startOfMonth/index.js":281,"./startOfQuarter/index.js":282,"./startOfSecond/index.js":283,"./startOfToday/index.js":284,"./startOfTomorrow/index.js":285,"./startOfWeek/index.js":286,"./startOfWeekYear/index.js":287,"./startOfYear/index.js":288,"./startOfYesterday/index.js":289,"./sub/index.js":290,"./subBusinessDays/index.js":291,"./subDays/index.js":292,"./subHours/index.js":293,"./subISOWeekYears/index.js":294,"./subMilliseconds/index.js":295,"./subMinutes/index.js":296,"./subMonths/index.js":297,"./subQuarters/index.js":298,"./subSeconds/index.js":299,"./subWeeks/index.js":300,"./subYears/index.js":301,"./toDate/index.js":302,"./weeksToDays/index.js":303,"./yearsToMonths/index.js":304,"./yearsToQuarters/index.js":305}],160:[function(require,module,exports){
+},{"./add/index.js":59,"./addBusinessDays/index.js":60,"./addDays/index.js":61,"./addHours/index.js":62,"./addISOWeekYears/index.js":63,"./addMilliseconds/index.js":64,"./addMinutes/index.js":65,"./addMonths/index.js":66,"./addQuarters/index.js":67,"./addSeconds/index.js":68,"./addWeeks/index.js":69,"./addYears/index.js":70,"./areIntervalsOverlapping/index.js":71,"./clamp/index.js":72,"./closestIndexTo/index.js":73,"./closestTo/index.js":74,"./compareAsc/index.js":75,"./compareDesc/index.js":76,"./constants/index.js":77,"./daysToWeeks/index.js":78,"./differenceInBusinessDays/index.js":79,"./differenceInCalendarDays/index.js":80,"./differenceInCalendarISOWeekYears/index.js":81,"./differenceInCalendarISOWeeks/index.js":82,"./differenceInCalendarMonths/index.js":83,"./differenceInCalendarQuarters/index.js":84,"./differenceInCalendarWeeks/index.js":85,"./differenceInCalendarYears/index.js":86,"./differenceInDays/index.js":87,"./differenceInHours/index.js":88,"./differenceInISOWeekYears/index.js":89,"./differenceInMilliseconds/index.js":90,"./differenceInMinutes/index.js":91,"./differenceInMonths/index.js":92,"./differenceInQuarters/index.js":93,"./differenceInSeconds/index.js":94,"./differenceInWeeks/index.js":95,"./differenceInYears/index.js":96,"./eachDayOfInterval/index.js":97,"./eachHourOfInterval/index.js":98,"./eachMinuteOfInterval/index.js":99,"./eachMonthOfInterval/index.js":100,"./eachQuarterOfInterval/index.js":101,"./eachWeekOfInterval/index.js":102,"./eachWeekendOfInterval/index.js":103,"./eachWeekendOfMonth/index.js":104,"./eachWeekendOfYear/index.js":105,"./eachYearOfInterval/index.js":106,"./endOfDay/index.js":107,"./endOfDecade/index.js":108,"./endOfHour/index.js":109,"./endOfISOWeek/index.js":110,"./endOfISOWeekYear/index.js":111,"./endOfMinute/index.js":112,"./endOfMonth/index.js":113,"./endOfQuarter/index.js":114,"./endOfSecond/index.js":115,"./endOfToday/index.js":116,"./endOfTomorrow/index.js":117,"./endOfWeek/index.js":118,"./endOfYear/index.js":119,"./endOfYesterday/index.js":120,"./format/index.js":121,"./formatDistance/index.js":122,"./formatDistanceStrict/index.js":123,"./formatDistanceToNow/index.js":124,"./formatDistanceToNowStrict/index.js":125,"./formatDuration/index.js":126,"./formatISO/index.js":127,"./formatISO9075/index.js":128,"./formatISODuration/index.js":129,"./formatRFC3339/index.js":130,"./formatRFC7231/index.js":131,"./formatRelative/index.js":132,"./fromUnixTime/index.js":133,"./getDate/index.js":134,"./getDay/index.js":135,"./getDayOfYear/index.js":136,"./getDaysInMonth/index.js":137,"./getDaysInYear/index.js":138,"./getDecade/index.js":139,"./getHours/index.js":140,"./getISODay/index.js":141,"./getISOWeek/index.js":142,"./getISOWeekYear/index.js":143,"./getISOWeeksInYear/index.js":144,"./getMilliseconds/index.js":145,"./getMinutes/index.js":146,"./getMonth/index.js":147,"./getOverlappingDaysInIntervals/index.js":148,"./getQuarter/index.js":149,"./getSeconds/index.js":150,"./getTime/index.js":151,"./getUnixTime/index.js":152,"./getWeek/index.js":153,"./getWeekOfMonth/index.js":154,"./getWeekYear/index.js":155,"./getWeeksInMonth/index.js":156,"./getYear/index.js":157,"./hoursToMilliseconds/index.js":158,"./hoursToMinutes/index.js":159,"./hoursToSeconds/index.js":160,"./intervalToDuration/index.js":162,"./intlFormat/index.js":163,"./isAfter/index.js":164,"./isBefore/index.js":165,"./isDate/index.js":166,"./isEqual/index.js":167,"./isExists/index.js":168,"./isFirstDayOfMonth/index.js":169,"./isFriday/index.js":170,"./isFuture/index.js":171,"./isLastDayOfMonth/index.js":172,"./isLeapYear/index.js":173,"./isMatch/index.js":174,"./isMonday/index.js":175,"./isPast/index.js":176,"./isSameDay/index.js":177,"./isSameHour/index.js":178,"./isSameISOWeek/index.js":179,"./isSameISOWeekYear/index.js":180,"./isSameMinute/index.js":181,"./isSameMonth/index.js":182,"./isSameQuarter/index.js":183,"./isSameSecond/index.js":184,"./isSameWeek/index.js":185,"./isSameYear/index.js":186,"./isSaturday/index.js":187,"./isSunday/index.js":188,"./isThisHour/index.js":189,"./isThisISOWeek/index.js":190,"./isThisMinute/index.js":191,"./isThisMonth/index.js":192,"./isThisQuarter/index.js":193,"./isThisSecond/index.js":194,"./isThisWeek/index.js":195,"./isThisYear/index.js":196,"./isThursday/index.js":197,"./isToday/index.js":198,"./isTomorrow/index.js":199,"./isTuesday/index.js":200,"./isValid/index.js":201,"./isWednesday/index.js":202,"./isWeekend/index.js":203,"./isWithinInterval/index.js":204,"./isYesterday/index.js":205,"./lastDayOfDecade/index.js":206,"./lastDayOfISOWeek/index.js":207,"./lastDayOfISOWeekYear/index.js":208,"./lastDayOfMonth/index.js":209,"./lastDayOfQuarter/index.js":210,"./lastDayOfWeek/index.js":211,"./lastDayOfYear/index.js":212,"./lightFormat/index.js":213,"./max/index.js":224,"./milliseconds/index.js":225,"./millisecondsToHours/index.js":226,"./millisecondsToMinutes/index.js":227,"./millisecondsToSeconds/index.js":228,"./min/index.js":229,"./minutesToHours/index.js":230,"./minutesToMilliseconds/index.js":231,"./minutesToSeconds/index.js":232,"./monthsToQuarters/index.js":233,"./monthsToYears/index.js":234,"./nextDay/index.js":235,"./nextFriday/index.js":236,"./nextMonday/index.js":237,"./nextSaturday/index.js":238,"./nextSunday/index.js":239,"./nextThursday/index.js":240,"./nextTuesday/index.js":241,"./nextWednesday/index.js":242,"./parse/index.js":244,"./parseISO/index.js":245,"./parseJSON/index.js":246,"./previousDay/index.js":247,"./previousFriday/index.js":248,"./previousMonday/index.js":249,"./previousSaturday/index.js":250,"./previousSunday/index.js":251,"./previousThursday/index.js":252,"./previousTuesday/index.js":253,"./previousWednesday/index.js":254,"./quartersToMonths/index.js":255,"./quartersToYears/index.js":256,"./roundToNearestMinutes/index.js":257,"./secondsToHours/index.js":258,"./secondsToMilliseconds/index.js":259,"./secondsToMinutes/index.js":260,"./set/index.js":261,"./setDate/index.js":262,"./setDay/index.js":263,"./setDayOfYear/index.js":264,"./setHours/index.js":265,"./setISODay/index.js":266,"./setISOWeek/index.js":267,"./setISOWeekYear/index.js":268,"./setMilliseconds/index.js":269,"./setMinutes/index.js":270,"./setMonth/index.js":271,"./setQuarter/index.js":272,"./setSeconds/index.js":273,"./setWeek/index.js":274,"./setWeekYear/index.js":275,"./setYear/index.js":276,"./startOfDay/index.js":277,"./startOfDecade/index.js":278,"./startOfHour/index.js":279,"./startOfISOWeek/index.js":280,"./startOfISOWeekYear/index.js":281,"./startOfMinute/index.js":282,"./startOfMonth/index.js":283,"./startOfQuarter/index.js":284,"./startOfSecond/index.js":285,"./startOfToday/index.js":286,"./startOfTomorrow/index.js":287,"./startOfWeek/index.js":288,"./startOfWeekYear/index.js":289,"./startOfYear/index.js":290,"./startOfYesterday/index.js":291,"./sub/index.js":292,"./subBusinessDays/index.js":293,"./subDays/index.js":294,"./subHours/index.js":295,"./subISOWeekYears/index.js":296,"./subMilliseconds/index.js":297,"./subMinutes/index.js":298,"./subMonths/index.js":299,"./subQuarters/index.js":300,"./subSeconds/index.js":301,"./subWeeks/index.js":302,"./subYears/index.js":303,"./toDate/index.js":304,"./weeksToDays/index.js":305,"./yearsToMonths/index.js":306,"./yearsToQuarters/index.js":307}],162:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27248,7 +28239,7 @@ function intervalToDuration(_ref) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../compareAsc/index.js":73,"../differenceInDays/index.js":85,"../differenceInHours/index.js":86,"../differenceInMinutes/index.js":89,"../differenceInMonths/index.js":90,"../differenceInSeconds/index.js":92,"../differenceInYears/index.js":94,"../isValid/index.js":199,"../sub/index.js":290,"../toDate/index.js":302}],161:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../compareAsc/index.js":75,"../differenceInDays/index.js":87,"../differenceInHours/index.js":88,"../differenceInMinutes/index.js":91,"../differenceInMonths/index.js":92,"../differenceInSeconds/index.js":94,"../differenceInYears/index.js":96,"../isValid/index.js":201,"../sub/index.js":292,"../toDate/index.js":304}],163:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27350,7 +28341,7 @@ function isFormatOptions(opts) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46}],162:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48}],164:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27394,7 +28385,7 @@ function isAfter(dirtyDate, dirtyDateToCompare) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],163:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],165:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27438,7 +28429,7 @@ function isBefore(dirtyDate, dirtyDateToCompare) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],164:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],166:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27492,7 +28483,7 @@ function isDate(value) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46}],165:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48}],167:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27539,7 +28530,7 @@ function isEqual(dirtyLeftDate, dirtyRightDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],166:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],168:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27581,7 +28572,7 @@ function isExists(year, month, day) {
 }
 
 module.exports = exports.default;
-},{}],167:[function(require,module,exports){
+},{}],169:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27622,7 +28613,7 @@ function isFirstDayOfMonth(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],168:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],170:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27663,7 +28654,7 @@ function isFriday(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],169:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],171:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27708,7 +28699,7 @@ function isFuture(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],170:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],172:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27754,7 +28745,7 @@ function isLastDayOfMonth(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../endOfDay/index.js":105,"../endOfMonth/index.js":111,"../toDate/index.js":302}],171:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../endOfDay/index.js":107,"../endOfMonth/index.js":113,"../toDate/index.js":304}],173:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27797,7 +28788,7 @@ function isLeapYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],172:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],174:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28111,7 +29102,7 @@ function isMatch(dateString, formatString, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isValid/index.js":199,"../parse/index.js":242}],173:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isValid/index.js":201,"../parse/index.js":244}],175:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28152,7 +29143,7 @@ function isMonday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],174:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],176:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28197,7 +29188,7 @@ function isPast(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],175:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],177:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28251,7 +29242,7 @@ function isSameDay(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../startOfDay/index.js":275}],176:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../startOfDay/index.js":277}],178:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28300,7 +29291,7 @@ function isSameHour(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../startOfHour/index.js":277}],177:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../startOfHour/index.js":279}],179:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28351,7 +29342,7 @@ function isSameISOWeek(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isSameWeek/index.js":183}],178:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isSameWeek/index.js":185}],180:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28402,7 +29393,7 @@ function isSameISOWeekYear(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../startOfISOWeekYear/index.js":279}],179:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../startOfISOWeekYear/index.js":281}],181:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28457,7 +29448,7 @@ function isSameMinute(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../startOfMinute/index.js":280}],180:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../startOfMinute/index.js":282}],182:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28506,7 +29497,7 @@ function isSameMonth(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],181:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],183:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28555,7 +29546,7 @@ function isSameQuarter(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../startOfQuarter/index.js":282}],182:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../startOfQuarter/index.js":284}],184:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28618,7 +29609,7 @@ function isSameSecond(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../startOfSecond/index.js":283}],183:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../startOfSecond/index.js":285}],185:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28679,7 +29670,7 @@ function isSameWeek(dirtyDateLeft, dirtyDateRight, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../startOfWeek/index.js":286}],184:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../startOfWeek/index.js":288}],186:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28723,7 +29714,7 @@ function isSameYear(dirtyDateLeft, dirtyDateRight) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],185:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],187:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28764,7 +29755,7 @@ function isSaturday(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],186:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],188:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28805,7 +29796,7 @@ function isSunday(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],187:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],189:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28851,7 +29842,7 @@ function isThisHour(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isSameHour/index.js":176}],188:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isSameHour/index.js":178}],190:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28898,7 +29889,7 @@ function isThisISOWeek(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isSameISOWeek/index.js":177}],189:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isSameISOWeek/index.js":179}],191:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28944,7 +29935,7 @@ function isThisMinute(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isSameMinute/index.js":179}],190:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isSameMinute/index.js":181}],192:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28989,7 +29980,7 @@ function isThisMonth(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isSameMonth/index.js":180}],191:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isSameMonth/index.js":182}],193:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29034,7 +30025,7 @@ function isThisQuarter(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isSameQuarter/index.js":181}],192:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isSameQuarter/index.js":183}],194:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29080,7 +30071,7 @@ function isThisSecond(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isSameSecond/index.js":182}],193:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isSameSecond/index.js":184}],195:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29135,7 +30126,7 @@ function isThisWeek(dirtyDate, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isSameWeek/index.js":183}],194:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isSameWeek/index.js":185}],196:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29180,7 +30171,7 @@ function isThisYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isSameYear/index.js":184}],195:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isSameYear/index.js":186}],197:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29221,7 +30212,7 @@ function isThursday(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],196:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],198:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29266,7 +30257,7 @@ function isToday(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isSameDay/index.js":175}],197:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isSameDay/index.js":177}],199:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29313,7 +30304,7 @@ function isTomorrow(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../addDays/index.js":59,"../isSameDay/index.js":175}],198:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../addDays/index.js":61,"../isSameDay/index.js":177}],200:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29354,7 +30345,7 @@ function isTuesday(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],199:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],201:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29439,7 +30430,7 @@ function isValid(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isDate/index.js":164,"../toDate/index.js":302}],200:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isDate/index.js":166,"../toDate/index.js":304}],202:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29480,7 +30471,7 @@ function isWednesday(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],201:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],203:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29523,7 +30514,7 @@ function isWeekend(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],202:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],204:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29624,7 +30615,7 @@ function isWithinInterval(dirtyDate, interval) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],203:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],205:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29671,7 +30662,7 @@ function isYesterday(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../isSameDay/index.js":175,"../subDays/index.js":292}],204:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../isSameDay/index.js":177,"../subDays/index.js":294}],206:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29717,7 +30708,7 @@ function lastDayOfDecade(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],205:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],207:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29763,7 +30754,7 @@ function lastDayOfISOWeek(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../lastDayOfWeek/index.js":209}],206:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../lastDayOfWeek/index.js":211}],208:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29821,7 +30812,7 @@ function lastDayOfISOWeekYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../getISOWeekYear/index.js":141,"../startOfISOWeek/index.js":278}],207:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../getISOWeekYear/index.js":143,"../startOfISOWeek/index.js":280}],209:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29867,7 +30858,7 @@ function lastDayOfMonth(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],208:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],210:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29917,7 +30908,7 @@ function lastDayOfQuarter(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],209:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],211:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29985,7 +30976,7 @@ function lastDayOfWeek(dirtyDate, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],210:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],212:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30031,7 +31022,7 @@ function lastDayOfYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],211:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],213:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30176,7 +31167,7 @@ function cleanEscapedString(input) {
 }
 
 module.exports = exports.default;
-},{"../_lib/format/lightFormatters/index.js":37,"../_lib/getTimezoneOffsetInMilliseconds/index.js":39,"../_lib/requiredArgs/index.js":46,"../isValid/index.js":199,"../subMilliseconds/index.js":295,"../toDate/index.js":302}],212:[function(require,module,exports){
+},{"../_lib/format/lightFormatters/index.js":39,"../_lib/getTimezoneOffsetInMilliseconds/index.js":41,"../_lib/requiredArgs/index.js":48,"../isValid/index.js":201,"../subMilliseconds/index.js":297,"../toDate/index.js":304}],214:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30195,7 +31186,7 @@ function buildFormatLongFn(args) {
 }
 
 module.exports = exports.default;
-},{}],213:[function(require,module,exports){
+},{}],215:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30228,7 +31219,7 @@ function buildLocalizeFn(args) {
 }
 
 module.exports = exports.default;
-},{}],214:[function(require,module,exports){
+},{}],216:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30286,7 +31277,7 @@ function findIndex(array, predicate) {
 }
 
 module.exports = exports.default;
-},{}],215:[function(require,module,exports){
+},{}],217:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30313,7 +31304,7 @@ function buildMatchPatternFn(args) {
 }
 
 module.exports = exports.default;
-},{}],216:[function(require,module,exports){
+},{}],218:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30410,7 +31401,7 @@ var formatDistance = function (token, count, options) {
 var _default = formatDistance;
 exports.default = _default;
 module.exports = exports.default;
-},{}],217:[function(require,module,exports){
+},{}],219:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30457,7 +31448,7 @@ var formatLong = {
 var _default = formatLong;
 exports.default = _default;
 module.exports = exports.default;
-},{"../../../_lib/buildFormatLongFn/index.js":212}],218:[function(require,module,exports){
+},{"../../../_lib/buildFormatLongFn/index.js":214}],220:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30480,7 +31471,7 @@ var formatRelative = function (token, _date, _baseDate, _options) {
 var _default = formatRelative;
 exports.default = _default;
 module.exports = exports.default;
-},{}],219:[function(require,module,exports){
+},{}],221:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30639,7 +31630,7 @@ var localize = {
 var _default = localize;
 exports.default = _default;
 module.exports = exports.default;
-},{"../../../_lib/buildLocalizeFn/index.js":213}],220:[function(require,module,exports){
+},{"../../../_lib/buildLocalizeFn/index.js":215}],222:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30751,7 +31742,7 @@ var match = {
 var _default = match;
 exports.default = _default;
 module.exports = exports.default;
-},{"../../../_lib/buildMatchFn/index.js":214,"../../../_lib/buildMatchPatternFn/index.js":215}],221:[function(require,module,exports){
+},{"../../../_lib/buildMatchFn/index.js":216,"../../../_lib/buildMatchPatternFn/index.js":217}],223:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30797,7 +31788,7 @@ var locale = {
 var _default = locale;
 exports.default = _default;
 module.exports = exports.default;
-},{"./_lib/formatDistance/index.js":216,"./_lib/formatLong/index.js":217,"./_lib/formatRelative/index.js":218,"./_lib/localize/index.js":219,"./_lib/match/index.js":220}],222:[function(require,module,exports){
+},{"./_lib/formatDistance/index.js":218,"./_lib/formatLong/index.js":219,"./_lib/formatRelative/index.js":220,"./_lib/localize/index.js":221,"./_lib/match/index.js":222}],224:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30875,7 +31866,7 @@ function max(dirtyDatesArray) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],223:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],225:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30942,7 +31933,7 @@ function milliseconds(_ref) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46}],224:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48}],226:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30986,7 +31977,7 @@ function millisecondsToHours(milliseconds) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],225:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],227:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31030,7 +32021,7 @@ function millisecondsToMinutes(milliseconds) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],226:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],228:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31074,7 +32065,7 @@ function millisecondsToSeconds(milliseconds) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],227:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],229:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31152,7 +32143,7 @@ function min(dirtyDatesArray) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],228:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],230:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31196,7 +32187,7 @@ function minutesToHours(minutes) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],229:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],231:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31234,7 +32225,7 @@ function minutesToMilliseconds(minutes) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],230:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],232:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31272,7 +32263,7 @@ function minutesToSeconds(minutes) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],231:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],233:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31316,7 +32307,7 @@ function monthsToQuarters(months) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],232:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],234:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31359,7 +32350,7 @@ function monthsToYears(months) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],233:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],235:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31406,7 +32397,7 @@ function nextDay(date, day) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../addDays/index.js":59,"../getDay/index.js":133}],234:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../addDays/index.js":61,"../getDay/index.js":135}],236:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31443,7 +32434,7 @@ function nextFriday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../nextDay/index.js":233}],235:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../nextDay/index.js":235}],237:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31480,7 +32471,7 @@ function nextMonday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../nextDay/index.js":233}],236:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../nextDay/index.js":235}],238:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31517,7 +32508,7 @@ function nextSaturday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../nextDay/index.js":233}],237:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../nextDay/index.js":235}],239:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31554,7 +32545,7 @@ function nextSunday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../nextDay/index.js":233}],238:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../nextDay/index.js":235}],240:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31591,7 +32582,7 @@ function nextThursday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../nextDay/index.js":233}],239:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../nextDay/index.js":235}],241:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31628,7 +32619,7 @@ function nextTuesday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../nextDay/index.js":233}],240:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../nextDay/index.js":235}],242:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31665,7 +32656,7 @@ function nextWednesday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../nextDay/index.js":233}],241:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../nextDay/index.js":235}],243:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33187,7 +34178,7 @@ var parsers = {
 var _default = parsers;
 exports.default = _default;
 module.exports = exports.default;
-},{"../../../_lib/getUTCWeekYear/index.js":44,"../../../_lib/setUTCDay/index.js":48,"../../../_lib/setUTCISODay/index.js":49,"../../../_lib/setUTCISOWeek/index.js":50,"../../../_lib/setUTCWeek/index.js":51,"../../../_lib/startOfUTCISOWeek/index.js":52,"../../../_lib/startOfUTCWeek/index.js":54}],242:[function(require,module,exports){
+},{"../../../_lib/getUTCWeekYear/index.js":46,"../../../_lib/setUTCDay/index.js":50,"../../../_lib/setUTCISODay/index.js":51,"../../../_lib/setUTCISOWeek/index.js":52,"../../../_lib/setUTCWeek/index.js":53,"../../../_lib/startOfUTCISOWeek/index.js":54,"../../../_lib/startOfUTCWeek/index.js":56}],244:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33760,7 +34751,7 @@ function cleanEscapedString(input) {
 }
 
 module.exports = exports.default;
-},{"../_lib/assign/index.js":34,"../_lib/format/longFormatters/index.js":38,"../_lib/getTimezoneOffsetInMilliseconds/index.js":39,"../_lib/protectedTokens/index.js":45,"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../locale/en-US/index.js":221,"../subMilliseconds/index.js":295,"../toDate/index.js":302,"./_lib/parsers/index.js":241}],243:[function(require,module,exports){
+},{"../_lib/assign/index.js":36,"../_lib/format/longFormatters/index.js":40,"../_lib/getTimezoneOffsetInMilliseconds/index.js":41,"../_lib/protectedTokens/index.js":47,"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../locale/en-US/index.js":223,"../subMilliseconds/index.js":297,"../toDate/index.js":304,"./_lib/parsers/index.js":243}],245:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34065,7 +35056,7 @@ function validateTimezone(_hours, minutes) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../constants/index.js":75}],244:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../constants/index.js":77}],246:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34131,7 +35122,7 @@ function parseJSON(argument) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],245:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],247:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34178,7 +35169,7 @@ function previousDay(date, day) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../getDay/index.js":133,"../subDays/index.js":292}],246:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../getDay/index.js":135,"../subDays/index.js":294}],248:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34215,7 +35206,7 @@ function previousFriday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../previousDay/index.js":245}],247:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../previousDay/index.js":247}],249:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34252,7 +35243,7 @@ function previousMonday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../previousDay/index.js":245}],248:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../previousDay/index.js":247}],250:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34289,7 +35280,7 @@ function previousSaturday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../previousDay/index.js":245}],249:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../previousDay/index.js":247}],251:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34326,7 +35317,7 @@ function previousSunday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../previousDay/index.js":245}],250:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../previousDay/index.js":247}],252:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34363,7 +35354,7 @@ function previousThursday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../previousDay/index.js":245}],251:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../previousDay/index.js":247}],253:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34400,7 +35391,7 @@ function previousTuesday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../previousDay/index.js":245}],252:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../previousDay/index.js":247}],254:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34437,7 +35428,7 @@ function previousWednesday(date) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../previousDay/index.js":245}],253:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../previousDay/index.js":247}],255:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34475,7 +35466,7 @@ function quartersToMonths(quarters) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],254:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],256:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34519,7 +35510,7 @@ function quartersToYears(quarters) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],255:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],257:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34586,7 +35577,7 @@ function roundToNearestMinutes(dirtyDate, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],256:[function(require,module,exports){
+},{"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],258:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34630,7 +35621,7 @@ function secondsToHours(seconds) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],257:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],259:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34668,7 +35659,7 @@ function secondsToMilliseconds(seconds) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],258:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],260:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34712,7 +35703,7 @@ function secondsToMinutes(seconds) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],259:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],261:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34813,7 +35804,7 @@ function set(dirtyDate, values) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../setMonth/index.js":269,"../toDate/index.js":302}],260:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../setMonth/index.js":271,"../toDate/index.js":304}],262:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34860,7 +35851,7 @@ function setDate(dirtyDate, dirtyDayOfMonth) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],261:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],263:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34932,7 +35923,7 @@ function setDay(dirtyDate, dirtyDay, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addDays/index.js":59,"../toDate/index.js":302}],262:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addDays/index.js":61,"../toDate/index.js":304}],264:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34980,7 +35971,7 @@ function setDayOfYear(dirtyDate, dirtyDayOfYear) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],263:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],265:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35027,7 +36018,7 @@ function setHours(dirtyDate, dirtyHours) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],264:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],266:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35081,7 +36072,7 @@ function setISODay(dirtyDate, dirtyDay) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addDays/index.js":59,"../getISODay/index.js":139,"../toDate/index.js":302}],265:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addDays/index.js":61,"../getISODay/index.js":141,"../toDate/index.js":304}],267:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35133,7 +36124,7 @@ function setISOWeek(dirtyDate, dirtyISOWeek) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../getISOWeek/index.js":140,"../toDate/index.js":302}],266:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../getISOWeek/index.js":142,"../toDate/index.js":304}],268:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35197,7 +36188,7 @@ function setISOWeekYear(dirtyDate, dirtyISOWeekYear) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../differenceInCalendarDays/index.js":78,"../startOfISOWeekYear/index.js":279,"../toDate/index.js":302}],267:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../differenceInCalendarDays/index.js":80,"../startOfISOWeekYear/index.js":281,"../toDate/index.js":304}],269:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35244,7 +36235,7 @@ function setMilliseconds(dirtyDate, dirtyMilliseconds) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],268:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],270:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35291,7 +36282,7 @@ function setMinutes(dirtyDate, dirtyMinutes) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],269:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],271:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35348,7 +36339,7 @@ function setMonth(dirtyDate, dirtyMonth) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../getDaysInMonth/index.js":135,"../toDate/index.js":302}],270:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../getDaysInMonth/index.js":137,"../toDate/index.js":304}],272:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35398,7 +36389,7 @@ function setQuarter(dirtyDate, dirtyQuarter) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../setMonth/index.js":269,"../toDate/index.js":302}],271:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../setMonth/index.js":271,"../toDate/index.js":304}],273:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35445,7 +36436,7 @@ function setSeconds(dirtyDate, dirtySeconds) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],272:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],274:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35517,7 +36508,7 @@ function setWeek(dirtyDate, dirtyWeek, options) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../getWeek/index.js":151,"../toDate/index.js":302}],273:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../getWeek/index.js":153,"../toDate/index.js":304}],275:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35601,7 +36592,7 @@ function setWeekYear(dirtyDate, dirtyWeekYear) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../differenceInCalendarDays/index.js":78,"../startOfWeekYear/index.js":287,"../toDate/index.js":302}],274:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../differenceInCalendarDays/index.js":80,"../startOfWeekYear/index.js":289,"../toDate/index.js":304}],276:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35653,7 +36644,7 @@ function setYear(dirtyDate, dirtyYear) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],275:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],277:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35697,7 +36688,7 @@ function startOfDay(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],276:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],278:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35743,7 +36734,7 @@ function startOfDecade(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],277:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],279:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35787,7 +36778,7 @@ function startOfHour(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],278:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],280:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35833,7 +36824,7 @@ function startOfISOWeek(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../startOfWeek/index.js":286}],279:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../startOfWeek/index.js":288}],281:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35885,7 +36876,7 @@ function startOfISOWeekYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../getISOWeekYear/index.js":141,"../startOfISOWeek/index.js":278}],280:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../getISOWeekYear/index.js":143,"../startOfISOWeek/index.js":280}],282:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35929,7 +36920,7 @@ function startOfMinute(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],281:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],283:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35974,7 +36965,7 @@ function startOfMonth(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],282:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],284:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36021,7 +37012,7 @@ function startOfQuarter(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],283:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],285:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36065,7 +37056,7 @@ function startOfSecond(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],284:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],286:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36105,7 +37096,7 @@ function startOfToday() {
 }
 
 module.exports = exports.default;
-},{"../startOfDay/index.js":275}],285:[function(require,module,exports){
+},{"../startOfDay/index.js":277}],287:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36148,7 +37139,7 @@ function startOfTomorrow() {
 }
 
 module.exports = exports.default;
-},{}],286:[function(require,module,exports){
+},{}],288:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36216,7 +37207,7 @@ function startOfWeek(dirtyDate, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../toDate/index.js":302}],287:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../toDate/index.js":304}],289:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36293,7 +37284,7 @@ function startOfWeekYear(dirtyDate, dirtyOptions) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../getWeekYear/index.js":153,"../startOfWeek/index.js":286}],288:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../getWeekYear/index.js":155,"../startOfWeek/index.js":288}],290:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36339,7 +37330,7 @@ function startOfYear(dirtyDate) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../toDate/index.js":302}],289:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../toDate/index.js":304}],291:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36382,7 +37373,7 @@ function startOfYesterday() {
 }
 
 module.exports = exports.default;
-},{}],290:[function(require,module,exports){
+},{}],292:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36462,7 +37453,7 @@ function sub(date, duration) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../subDays/index.js":292,"../subMonths/index.js":297}],291:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../subDays/index.js":294,"../subMonths/index.js":299}],293:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36503,7 +37494,7 @@ function subBusinessDays(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addBusinessDays/index.js":58}],292:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addBusinessDays/index.js":60}],294:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36548,7 +37539,7 @@ function subDays(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addDays/index.js":59}],293:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addDays/index.js":61}],295:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36593,7 +37584,7 @@ function subHours(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addHours/index.js":60}],294:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addHours/index.js":62}],296:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36645,7 +37636,7 @@ function subISOWeekYears(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addISOWeekYears/index.js":61}],295:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addISOWeekYears/index.js":63}],297:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36690,7 +37681,7 @@ function subMilliseconds(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addMilliseconds/index.js":62}],296:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addMilliseconds/index.js":64}],298:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36735,7 +37726,7 @@ function subMinutes(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addMinutes/index.js":63}],297:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addMinutes/index.js":65}],299:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36780,7 +37771,7 @@ function subMonths(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addMonths/index.js":64}],298:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addMonths/index.js":66}],300:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36825,7 +37816,7 @@ function subQuarters(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addQuarters/index.js":65}],299:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addQuarters/index.js":67}],301:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36870,7 +37861,7 @@ function subSeconds(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addSeconds/index.js":66}],300:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addSeconds/index.js":68}],302:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36915,7 +37906,7 @@ function subWeeks(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addWeeks/index.js":67}],301:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addWeeks/index.js":69}],303:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36960,7 +37951,7 @@ function subYears(dirtyDate, dirtyAmount) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../_lib/toInteger/index.js":56,"../addYears/index.js":68}],302:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../_lib/toInteger/index.js":58,"../addYears/index.js":70}],304:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37024,7 +38015,7 @@ function toDate(argument) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46}],303:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48}],305:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37062,7 +38053,7 @@ function weeksToDays(weeks) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],304:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],306:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37100,7 +38091,7 @@ function yearsToMonths(years) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}],305:[function(require,module,exports){
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],307:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37138,4 +38129,2649 @@ function yearsToQuarters(years) {
 }
 
 module.exports = exports.default;
-},{"../_lib/requiredArgs/index.js":46,"../constants/index.js":75}]},{},[2]);
+},{"../_lib/requiredArgs/index.js":48,"../constants/index.js":77}],308:[function(require,module,exports){
+/*! Hammer.JS - v2.0.7 - 2016-04-22
+ * http://hammerjs.github.io/
+ *
+ * Copyright (c) 2016 Jorik Tangelder;
+ * Licensed under the MIT license */
+(function(window, document, exportName, undefined) {
+  'use strict';
+
+var VENDOR_PREFIXES = ['', 'webkit', 'Moz', 'MS', 'ms', 'o'];
+var TEST_ELEMENT = document.createElement('div');
+
+var TYPE_FUNCTION = 'function';
+
+var round = Math.round;
+var abs = Math.abs;
+var now = Date.now;
+
+/**
+ * set a timeout with a given scope
+ * @param {Function} fn
+ * @param {Number} timeout
+ * @param {Object} context
+ * @returns {number}
+ */
+function setTimeoutContext(fn, timeout, context) {
+    return setTimeout(bindFn(fn, context), timeout);
+}
+
+/**
+ * if the argument is an array, we want to execute the fn on each entry
+ * if it aint an array we don't want to do a thing.
+ * this is used by all the methods that accept a single and array argument.
+ * @param {*|Array} arg
+ * @param {String} fn
+ * @param {Object} [context]
+ * @returns {Boolean}
+ */
+function invokeArrayArg(arg, fn, context) {
+    if (Array.isArray(arg)) {
+        each(arg, context[fn], context);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * walk objects and arrays
+ * @param {Object} obj
+ * @param {Function} iterator
+ * @param {Object} context
+ */
+function each(obj, iterator, context) {
+    var i;
+
+    if (!obj) {
+        return;
+    }
+
+    if (obj.forEach) {
+        obj.forEach(iterator, context);
+    } else if (obj.length !== undefined) {
+        i = 0;
+        while (i < obj.length) {
+            iterator.call(context, obj[i], i, obj);
+            i++;
+        }
+    } else {
+        for (i in obj) {
+            obj.hasOwnProperty(i) && iterator.call(context, obj[i], i, obj);
+        }
+    }
+}
+
+/**
+ * wrap a method with a deprecation warning and stack trace
+ * @param {Function} method
+ * @param {String} name
+ * @param {String} message
+ * @returns {Function} A new function wrapping the supplied method.
+ */
+function deprecate(method, name, message) {
+    var deprecationMessage = 'DEPRECATED METHOD: ' + name + '\n' + message + ' AT \n';
+    return function() {
+        var e = new Error('get-stack-trace');
+        var stack = e && e.stack ? e.stack.replace(/^[^\(]+?[\n$]/gm, '')
+            .replace(/^\s+at\s+/gm, '')
+            .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@') : 'Unknown Stack Trace';
+
+        var log = window.console && (window.console.warn || window.console.log);
+        if (log) {
+            log.call(window.console, deprecationMessage, stack);
+        }
+        return method.apply(this, arguments);
+    };
+}
+
+/**
+ * extend object.
+ * means that properties in dest will be overwritten by the ones in src.
+ * @param {Object} target
+ * @param {...Object} objects_to_assign
+ * @returns {Object} target
+ */
+var assign;
+if (typeof Object.assign !== 'function') {
+    assign = function assign(target) {
+        if (target === undefined || target === null) {
+            throw new TypeError('Cannot convert undefined or null to object');
+        }
+
+        var output = Object(target);
+        for (var index = 1; index < arguments.length; index++) {
+            var source = arguments[index];
+            if (source !== undefined && source !== null) {
+                for (var nextKey in source) {
+                    if (source.hasOwnProperty(nextKey)) {
+                        output[nextKey] = source[nextKey];
+                    }
+                }
+            }
+        }
+        return output;
+    };
+} else {
+    assign = Object.assign;
+}
+
+/**
+ * extend object.
+ * means that properties in dest will be overwritten by the ones in src.
+ * @param {Object} dest
+ * @param {Object} src
+ * @param {Boolean} [merge=false]
+ * @returns {Object} dest
+ */
+var extend = deprecate(function extend(dest, src, merge) {
+    var keys = Object.keys(src);
+    var i = 0;
+    while (i < keys.length) {
+        if (!merge || (merge && dest[keys[i]] === undefined)) {
+            dest[keys[i]] = src[keys[i]];
+        }
+        i++;
+    }
+    return dest;
+}, 'extend', 'Use `assign`.');
+
+/**
+ * merge the values from src in the dest.
+ * means that properties that exist in dest will not be overwritten by src
+ * @param {Object} dest
+ * @param {Object} src
+ * @returns {Object} dest
+ */
+var merge = deprecate(function merge(dest, src) {
+    return extend(dest, src, true);
+}, 'merge', 'Use `assign`.');
+
+/**
+ * simple class inheritance
+ * @param {Function} child
+ * @param {Function} base
+ * @param {Object} [properties]
+ */
+function inherit(child, base, properties) {
+    var baseP = base.prototype,
+        childP;
+
+    childP = child.prototype = Object.create(baseP);
+    childP.constructor = child;
+    childP._super = baseP;
+
+    if (properties) {
+        assign(childP, properties);
+    }
+}
+
+/**
+ * simple function bind
+ * @param {Function} fn
+ * @param {Object} context
+ * @returns {Function}
+ */
+function bindFn(fn, context) {
+    return function boundFn() {
+        return fn.apply(context, arguments);
+    };
+}
+
+/**
+ * let a boolean value also be a function that must return a boolean
+ * this first item in args will be used as the context
+ * @param {Boolean|Function} val
+ * @param {Array} [args]
+ * @returns {Boolean}
+ */
+function boolOrFn(val, args) {
+    if (typeof val == TYPE_FUNCTION) {
+        return val.apply(args ? args[0] || undefined : undefined, args);
+    }
+    return val;
+}
+
+/**
+ * use the val2 when val1 is undefined
+ * @param {*} val1
+ * @param {*} val2
+ * @returns {*}
+ */
+function ifUndefined(val1, val2) {
+    return (val1 === undefined) ? val2 : val1;
+}
+
+/**
+ * addEventListener with multiple events at once
+ * @param {EventTarget} target
+ * @param {String} types
+ * @param {Function} handler
+ */
+function addEventListeners(target, types, handler) {
+    each(splitStr(types), function(type) {
+        target.addEventListener(type, handler, false);
+    });
+}
+
+/**
+ * removeEventListener with multiple events at once
+ * @param {EventTarget} target
+ * @param {String} types
+ * @param {Function} handler
+ */
+function removeEventListeners(target, types, handler) {
+    each(splitStr(types), function(type) {
+        target.removeEventListener(type, handler, false);
+    });
+}
+
+/**
+ * find if a node is in the given parent
+ * @method hasParent
+ * @param {HTMLElement} node
+ * @param {HTMLElement} parent
+ * @return {Boolean} found
+ */
+function hasParent(node, parent) {
+    while (node) {
+        if (node == parent) {
+            return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
+}
+
+/**
+ * small indexOf wrapper
+ * @param {String} str
+ * @param {String} find
+ * @returns {Boolean} found
+ */
+function inStr(str, find) {
+    return str.indexOf(find) > -1;
+}
+
+/**
+ * split string on whitespace
+ * @param {String} str
+ * @returns {Array} words
+ */
+function splitStr(str) {
+    return str.trim().split(/\s+/g);
+}
+
+/**
+ * find if a array contains the object using indexOf or a simple polyFill
+ * @param {Array} src
+ * @param {String} find
+ * @param {String} [findByKey]
+ * @return {Boolean|Number} false when not found, or the index
+ */
+function inArray(src, find, findByKey) {
+    if (src.indexOf && !findByKey) {
+        return src.indexOf(find);
+    } else {
+        var i = 0;
+        while (i < src.length) {
+            if ((findByKey && src[i][findByKey] == find) || (!findByKey && src[i] === find)) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
+    }
+}
+
+/**
+ * convert array-like objects to real arrays
+ * @param {Object} obj
+ * @returns {Array}
+ */
+function toArray(obj) {
+    return Array.prototype.slice.call(obj, 0);
+}
+
+/**
+ * unique array with objects based on a key (like 'id') or just by the array's value
+ * @param {Array} src [{id:1},{id:2},{id:1}]
+ * @param {String} [key]
+ * @param {Boolean} [sort=False]
+ * @returns {Array} [{id:1},{id:2}]
+ */
+function uniqueArray(src, key, sort) {
+    var results = [];
+    var values = [];
+    var i = 0;
+
+    while (i < src.length) {
+        var val = key ? src[i][key] : src[i];
+        if (inArray(values, val) < 0) {
+            results.push(src[i]);
+        }
+        values[i] = val;
+        i++;
+    }
+
+    if (sort) {
+        if (!key) {
+            results = results.sort();
+        } else {
+            results = results.sort(function sortUniqueArray(a, b) {
+                return a[key] > b[key];
+            });
+        }
+    }
+
+    return results;
+}
+
+/**
+ * get the prefixed property
+ * @param {Object} obj
+ * @param {String} property
+ * @returns {String|Undefined} prefixed
+ */
+function prefixed(obj, property) {
+    var prefix, prop;
+    var camelProp = property[0].toUpperCase() + property.slice(1);
+
+    var i = 0;
+    while (i < VENDOR_PREFIXES.length) {
+        prefix = VENDOR_PREFIXES[i];
+        prop = (prefix) ? prefix + camelProp : property;
+
+        if (prop in obj) {
+            return prop;
+        }
+        i++;
+    }
+    return undefined;
+}
+
+/**
+ * get a unique id
+ * @returns {number} uniqueId
+ */
+var _uniqueId = 1;
+function uniqueId() {
+    return _uniqueId++;
+}
+
+/**
+ * get the window object of an element
+ * @param {HTMLElement} element
+ * @returns {DocumentView|Window}
+ */
+function getWindowForElement(element) {
+    var doc = element.ownerDocument || element;
+    return (doc.defaultView || doc.parentWindow || window);
+}
+
+var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i;
+
+var SUPPORT_TOUCH = ('ontouchstart' in window);
+var SUPPORT_POINTER_EVENTS = prefixed(window, 'PointerEvent') !== undefined;
+var SUPPORT_ONLY_TOUCH = SUPPORT_TOUCH && MOBILE_REGEX.test(navigator.userAgent);
+
+var INPUT_TYPE_TOUCH = 'touch';
+var INPUT_TYPE_PEN = 'pen';
+var INPUT_TYPE_MOUSE = 'mouse';
+var INPUT_TYPE_KINECT = 'kinect';
+
+var COMPUTE_INTERVAL = 25;
+
+var INPUT_START = 1;
+var INPUT_MOVE = 2;
+var INPUT_END = 4;
+var INPUT_CANCEL = 8;
+
+var DIRECTION_NONE = 1;
+var DIRECTION_LEFT = 2;
+var DIRECTION_RIGHT = 4;
+var DIRECTION_UP = 8;
+var DIRECTION_DOWN = 16;
+
+var DIRECTION_HORIZONTAL = DIRECTION_LEFT | DIRECTION_RIGHT;
+var DIRECTION_VERTICAL = DIRECTION_UP | DIRECTION_DOWN;
+var DIRECTION_ALL = DIRECTION_HORIZONTAL | DIRECTION_VERTICAL;
+
+var PROPS_XY = ['x', 'y'];
+var PROPS_CLIENT_XY = ['clientX', 'clientY'];
+
+/**
+ * create new input type manager
+ * @param {Manager} manager
+ * @param {Function} callback
+ * @returns {Input}
+ * @constructor
+ */
+function Input(manager, callback) {
+    var self = this;
+    this.manager = manager;
+    this.callback = callback;
+    this.element = manager.element;
+    this.target = manager.options.inputTarget;
+
+    // smaller wrapper around the handler, for the scope and the enabled state of the manager,
+    // so when disabled the input events are completely bypassed.
+    this.domHandler = function(ev) {
+        if (boolOrFn(manager.options.enable, [manager])) {
+            self.handler(ev);
+        }
+    };
+
+    this.init();
+
+}
+
+Input.prototype = {
+    /**
+     * should handle the inputEvent data and trigger the callback
+     * @virtual
+     */
+    handler: function() { },
+
+    /**
+     * bind the events
+     */
+    init: function() {
+        this.evEl && addEventListeners(this.element, this.evEl, this.domHandler);
+        this.evTarget && addEventListeners(this.target, this.evTarget, this.domHandler);
+        this.evWin && addEventListeners(getWindowForElement(this.element), this.evWin, this.domHandler);
+    },
+
+    /**
+     * unbind the events
+     */
+    destroy: function() {
+        this.evEl && removeEventListeners(this.element, this.evEl, this.domHandler);
+        this.evTarget && removeEventListeners(this.target, this.evTarget, this.domHandler);
+        this.evWin && removeEventListeners(getWindowForElement(this.element), this.evWin, this.domHandler);
+    }
+};
+
+/**
+ * create new input type manager
+ * called by the Manager constructor
+ * @param {Hammer} manager
+ * @returns {Input}
+ */
+function createInputInstance(manager) {
+    var Type;
+    var inputClass = manager.options.inputClass;
+
+    if (inputClass) {
+        Type = inputClass;
+    } else if (SUPPORT_POINTER_EVENTS) {
+        Type = PointerEventInput;
+    } else if (SUPPORT_ONLY_TOUCH) {
+        Type = TouchInput;
+    } else if (!SUPPORT_TOUCH) {
+        Type = MouseInput;
+    } else {
+        Type = TouchMouseInput;
+    }
+    return new (Type)(manager, inputHandler);
+}
+
+/**
+ * handle input events
+ * @param {Manager} manager
+ * @param {String} eventType
+ * @param {Object} input
+ */
+function inputHandler(manager, eventType, input) {
+    var pointersLen = input.pointers.length;
+    var changedPointersLen = input.changedPointers.length;
+    var isFirst = (eventType & INPUT_START && (pointersLen - changedPointersLen === 0));
+    var isFinal = (eventType & (INPUT_END | INPUT_CANCEL) && (pointersLen - changedPointersLen === 0));
+
+    input.isFirst = !!isFirst;
+    input.isFinal = !!isFinal;
+
+    if (isFirst) {
+        manager.session = {};
+    }
+
+    // source event is the normalized value of the domEvents
+    // like 'touchstart, mouseup, pointerdown'
+    input.eventType = eventType;
+
+    // compute scale, rotation etc
+    computeInputData(manager, input);
+
+    // emit secret event
+    manager.emit('hammer.input', input);
+
+    manager.recognize(input);
+    manager.session.prevInput = input;
+}
+
+/**
+ * extend the data with some usable properties like scale, rotate, velocity etc
+ * @param {Object} manager
+ * @param {Object} input
+ */
+function computeInputData(manager, input) {
+    var session = manager.session;
+    var pointers = input.pointers;
+    var pointersLength = pointers.length;
+
+    // store the first input to calculate the distance and direction
+    if (!session.firstInput) {
+        session.firstInput = simpleCloneInputData(input);
+    }
+
+    // to compute scale and rotation we need to store the multiple touches
+    if (pointersLength > 1 && !session.firstMultiple) {
+        session.firstMultiple = simpleCloneInputData(input);
+    } else if (pointersLength === 1) {
+        session.firstMultiple = false;
+    }
+
+    var firstInput = session.firstInput;
+    var firstMultiple = session.firstMultiple;
+    var offsetCenter = firstMultiple ? firstMultiple.center : firstInput.center;
+
+    var center = input.center = getCenter(pointers);
+    input.timeStamp = now();
+    input.deltaTime = input.timeStamp - firstInput.timeStamp;
+
+    input.angle = getAngle(offsetCenter, center);
+    input.distance = getDistance(offsetCenter, center);
+
+    computeDeltaXY(session, input);
+    input.offsetDirection = getDirection(input.deltaX, input.deltaY);
+
+    var overallVelocity = getVelocity(input.deltaTime, input.deltaX, input.deltaY);
+    input.overallVelocityX = overallVelocity.x;
+    input.overallVelocityY = overallVelocity.y;
+    input.overallVelocity = (abs(overallVelocity.x) > abs(overallVelocity.y)) ? overallVelocity.x : overallVelocity.y;
+
+    input.scale = firstMultiple ? getScale(firstMultiple.pointers, pointers) : 1;
+    input.rotation = firstMultiple ? getRotation(firstMultiple.pointers, pointers) : 0;
+
+    input.maxPointers = !session.prevInput ? input.pointers.length : ((input.pointers.length >
+        session.prevInput.maxPointers) ? input.pointers.length : session.prevInput.maxPointers);
+
+    computeIntervalInputData(session, input);
+
+    // find the correct target
+    var target = manager.element;
+    if (hasParent(input.srcEvent.target, target)) {
+        target = input.srcEvent.target;
+    }
+    input.target = target;
+}
+
+function computeDeltaXY(session, input) {
+    var center = input.center;
+    var offset = session.offsetDelta || {};
+    var prevDelta = session.prevDelta || {};
+    var prevInput = session.prevInput || {};
+
+    if (input.eventType === INPUT_START || prevInput.eventType === INPUT_END) {
+        prevDelta = session.prevDelta = {
+            x: prevInput.deltaX || 0,
+            y: prevInput.deltaY || 0
+        };
+
+        offset = session.offsetDelta = {
+            x: center.x,
+            y: center.y
+        };
+    }
+
+    input.deltaX = prevDelta.x + (center.x - offset.x);
+    input.deltaY = prevDelta.y + (center.y - offset.y);
+}
+
+/**
+ * velocity is calculated every x ms
+ * @param {Object} session
+ * @param {Object} input
+ */
+function computeIntervalInputData(session, input) {
+    var last = session.lastInterval || input,
+        deltaTime = input.timeStamp - last.timeStamp,
+        velocity, velocityX, velocityY, direction;
+
+    if (input.eventType != INPUT_CANCEL && (deltaTime > COMPUTE_INTERVAL || last.velocity === undefined)) {
+        var deltaX = input.deltaX - last.deltaX;
+        var deltaY = input.deltaY - last.deltaY;
+
+        var v = getVelocity(deltaTime, deltaX, deltaY);
+        velocityX = v.x;
+        velocityY = v.y;
+        velocity = (abs(v.x) > abs(v.y)) ? v.x : v.y;
+        direction = getDirection(deltaX, deltaY);
+
+        session.lastInterval = input;
+    } else {
+        // use latest velocity info if it doesn't overtake a minimum period
+        velocity = last.velocity;
+        velocityX = last.velocityX;
+        velocityY = last.velocityY;
+        direction = last.direction;
+    }
+
+    input.velocity = velocity;
+    input.velocityX = velocityX;
+    input.velocityY = velocityY;
+    input.direction = direction;
+}
+
+/**
+ * create a simple clone from the input used for storage of firstInput and firstMultiple
+ * @param {Object} input
+ * @returns {Object} clonedInputData
+ */
+function simpleCloneInputData(input) {
+    // make a simple copy of the pointers because we will get a reference if we don't
+    // we only need clientXY for the calculations
+    var pointers = [];
+    var i = 0;
+    while (i < input.pointers.length) {
+        pointers[i] = {
+            clientX: round(input.pointers[i].clientX),
+            clientY: round(input.pointers[i].clientY)
+        };
+        i++;
+    }
+
+    return {
+        timeStamp: now(),
+        pointers: pointers,
+        center: getCenter(pointers),
+        deltaX: input.deltaX,
+        deltaY: input.deltaY
+    };
+}
+
+/**
+ * get the center of all the pointers
+ * @param {Array} pointers
+ * @return {Object} center contains `x` and `y` properties
+ */
+function getCenter(pointers) {
+    var pointersLength = pointers.length;
+
+    // no need to loop when only one touch
+    if (pointersLength === 1) {
+        return {
+            x: round(pointers[0].clientX),
+            y: round(pointers[0].clientY)
+        };
+    }
+
+    var x = 0, y = 0, i = 0;
+    while (i < pointersLength) {
+        x += pointers[i].clientX;
+        y += pointers[i].clientY;
+        i++;
+    }
+
+    return {
+        x: round(x / pointersLength),
+        y: round(y / pointersLength)
+    };
+}
+
+/**
+ * calculate the velocity between two points. unit is in px per ms.
+ * @param {Number} deltaTime
+ * @param {Number} x
+ * @param {Number} y
+ * @return {Object} velocity `x` and `y`
+ */
+function getVelocity(deltaTime, x, y) {
+    return {
+        x: x / deltaTime || 0,
+        y: y / deltaTime || 0
+    };
+}
+
+/**
+ * get the direction between two points
+ * @param {Number} x
+ * @param {Number} y
+ * @return {Number} direction
+ */
+function getDirection(x, y) {
+    if (x === y) {
+        return DIRECTION_NONE;
+    }
+
+    if (abs(x) >= abs(y)) {
+        return x < 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
+    }
+    return y < 0 ? DIRECTION_UP : DIRECTION_DOWN;
+}
+
+/**
+ * calculate the absolute distance between two points
+ * @param {Object} p1 {x, y}
+ * @param {Object} p2 {x, y}
+ * @param {Array} [props] containing x and y keys
+ * @return {Number} distance
+ */
+function getDistance(p1, p2, props) {
+    if (!props) {
+        props = PROPS_XY;
+    }
+    var x = p2[props[0]] - p1[props[0]],
+        y = p2[props[1]] - p1[props[1]];
+
+    return Math.sqrt((x * x) + (y * y));
+}
+
+/**
+ * calculate the angle between two coordinates
+ * @param {Object} p1
+ * @param {Object} p2
+ * @param {Array} [props] containing x and y keys
+ * @return {Number} angle
+ */
+function getAngle(p1, p2, props) {
+    if (!props) {
+        props = PROPS_XY;
+    }
+    var x = p2[props[0]] - p1[props[0]],
+        y = p2[props[1]] - p1[props[1]];
+    return Math.atan2(y, x) * 180 / Math.PI;
+}
+
+/**
+ * calculate the rotation degrees between two pointersets
+ * @param {Array} start array of pointers
+ * @param {Array} end array of pointers
+ * @return {Number} rotation
+ */
+function getRotation(start, end) {
+    return getAngle(end[1], end[0], PROPS_CLIENT_XY) + getAngle(start[1], start[0], PROPS_CLIENT_XY);
+}
+
+/**
+ * calculate the scale factor between two pointersets
+ * no scale is 1, and goes down to 0 when pinched together, and bigger when pinched out
+ * @param {Array} start array of pointers
+ * @param {Array} end array of pointers
+ * @return {Number} scale
+ */
+function getScale(start, end) {
+    return getDistance(end[0], end[1], PROPS_CLIENT_XY) / getDistance(start[0], start[1], PROPS_CLIENT_XY);
+}
+
+var MOUSE_INPUT_MAP = {
+    mousedown: INPUT_START,
+    mousemove: INPUT_MOVE,
+    mouseup: INPUT_END
+};
+
+var MOUSE_ELEMENT_EVENTS = 'mousedown';
+var MOUSE_WINDOW_EVENTS = 'mousemove mouseup';
+
+/**
+ * Mouse events input
+ * @constructor
+ * @extends Input
+ */
+function MouseInput() {
+    this.evEl = MOUSE_ELEMENT_EVENTS;
+    this.evWin = MOUSE_WINDOW_EVENTS;
+
+    this.pressed = false; // mousedown state
+
+    Input.apply(this, arguments);
+}
+
+inherit(MouseInput, Input, {
+    /**
+     * handle mouse events
+     * @param {Object} ev
+     */
+    handler: function MEhandler(ev) {
+        var eventType = MOUSE_INPUT_MAP[ev.type];
+
+        // on start we want to have the left mouse button down
+        if (eventType & INPUT_START && ev.button === 0) {
+            this.pressed = true;
+        }
+
+        if (eventType & INPUT_MOVE && ev.which !== 1) {
+            eventType = INPUT_END;
+        }
+
+        // mouse must be down
+        if (!this.pressed) {
+            return;
+        }
+
+        if (eventType & INPUT_END) {
+            this.pressed = false;
+        }
+
+        this.callback(this.manager, eventType, {
+            pointers: [ev],
+            changedPointers: [ev],
+            pointerType: INPUT_TYPE_MOUSE,
+            srcEvent: ev
+        });
+    }
+});
+
+var POINTER_INPUT_MAP = {
+    pointerdown: INPUT_START,
+    pointermove: INPUT_MOVE,
+    pointerup: INPUT_END,
+    pointercancel: INPUT_CANCEL,
+    pointerout: INPUT_CANCEL
+};
+
+// in IE10 the pointer types is defined as an enum
+var IE10_POINTER_TYPE_ENUM = {
+    2: INPUT_TYPE_TOUCH,
+    3: INPUT_TYPE_PEN,
+    4: INPUT_TYPE_MOUSE,
+    5: INPUT_TYPE_KINECT // see https://twitter.com/jacobrossi/status/480596438489890816
+};
+
+var POINTER_ELEMENT_EVENTS = 'pointerdown';
+var POINTER_WINDOW_EVENTS = 'pointermove pointerup pointercancel';
+
+// IE10 has prefixed support, and case-sensitive
+if (window.MSPointerEvent && !window.PointerEvent) {
+    POINTER_ELEMENT_EVENTS = 'MSPointerDown';
+    POINTER_WINDOW_EVENTS = 'MSPointerMove MSPointerUp MSPointerCancel';
+}
+
+/**
+ * Pointer events input
+ * @constructor
+ * @extends Input
+ */
+function PointerEventInput() {
+    this.evEl = POINTER_ELEMENT_EVENTS;
+    this.evWin = POINTER_WINDOW_EVENTS;
+
+    Input.apply(this, arguments);
+
+    this.store = (this.manager.session.pointerEvents = []);
+}
+
+inherit(PointerEventInput, Input, {
+    /**
+     * handle mouse events
+     * @param {Object} ev
+     */
+    handler: function PEhandler(ev) {
+        var store = this.store;
+        var removePointer = false;
+
+        var eventTypeNormalized = ev.type.toLowerCase().replace('ms', '');
+        var eventType = POINTER_INPUT_MAP[eventTypeNormalized];
+        var pointerType = IE10_POINTER_TYPE_ENUM[ev.pointerType] || ev.pointerType;
+
+        var isTouch = (pointerType == INPUT_TYPE_TOUCH);
+
+        // get index of the event in the store
+        var storeIndex = inArray(store, ev.pointerId, 'pointerId');
+
+        // start and mouse must be down
+        if (eventType & INPUT_START && (ev.button === 0 || isTouch)) {
+            if (storeIndex < 0) {
+                store.push(ev);
+                storeIndex = store.length - 1;
+            }
+        } else if (eventType & (INPUT_END | INPUT_CANCEL)) {
+            removePointer = true;
+        }
+
+        // it not found, so the pointer hasn't been down (so it's probably a hover)
+        if (storeIndex < 0) {
+            return;
+        }
+
+        // update the event in the store
+        store[storeIndex] = ev;
+
+        this.callback(this.manager, eventType, {
+            pointers: store,
+            changedPointers: [ev],
+            pointerType: pointerType,
+            srcEvent: ev
+        });
+
+        if (removePointer) {
+            // remove from the store
+            store.splice(storeIndex, 1);
+        }
+    }
+});
+
+var SINGLE_TOUCH_INPUT_MAP = {
+    touchstart: INPUT_START,
+    touchmove: INPUT_MOVE,
+    touchend: INPUT_END,
+    touchcancel: INPUT_CANCEL
+};
+
+var SINGLE_TOUCH_TARGET_EVENTS = 'touchstart';
+var SINGLE_TOUCH_WINDOW_EVENTS = 'touchstart touchmove touchend touchcancel';
+
+/**
+ * Touch events input
+ * @constructor
+ * @extends Input
+ */
+function SingleTouchInput() {
+    this.evTarget = SINGLE_TOUCH_TARGET_EVENTS;
+    this.evWin = SINGLE_TOUCH_WINDOW_EVENTS;
+    this.started = false;
+
+    Input.apply(this, arguments);
+}
+
+inherit(SingleTouchInput, Input, {
+    handler: function TEhandler(ev) {
+        var type = SINGLE_TOUCH_INPUT_MAP[ev.type];
+
+        // should we handle the touch events?
+        if (type === INPUT_START) {
+            this.started = true;
+        }
+
+        if (!this.started) {
+            return;
+        }
+
+        var touches = normalizeSingleTouches.call(this, ev, type);
+
+        // when done, reset the started state
+        if (type & (INPUT_END | INPUT_CANCEL) && touches[0].length - touches[1].length === 0) {
+            this.started = false;
+        }
+
+        this.callback(this.manager, type, {
+            pointers: touches[0],
+            changedPointers: touches[1],
+            pointerType: INPUT_TYPE_TOUCH,
+            srcEvent: ev
+        });
+    }
+});
+
+/**
+ * @this {TouchInput}
+ * @param {Object} ev
+ * @param {Number} type flag
+ * @returns {undefined|Array} [all, changed]
+ */
+function normalizeSingleTouches(ev, type) {
+    var all = toArray(ev.touches);
+    var changed = toArray(ev.changedTouches);
+
+    if (type & (INPUT_END | INPUT_CANCEL)) {
+        all = uniqueArray(all.concat(changed), 'identifier', true);
+    }
+
+    return [all, changed];
+}
+
+var TOUCH_INPUT_MAP = {
+    touchstart: INPUT_START,
+    touchmove: INPUT_MOVE,
+    touchend: INPUT_END,
+    touchcancel: INPUT_CANCEL
+};
+
+var TOUCH_TARGET_EVENTS = 'touchstart touchmove touchend touchcancel';
+
+/**
+ * Multi-user touch events input
+ * @constructor
+ * @extends Input
+ */
+function TouchInput() {
+    this.evTarget = TOUCH_TARGET_EVENTS;
+    this.targetIds = {};
+
+    Input.apply(this, arguments);
+}
+
+inherit(TouchInput, Input, {
+    handler: function MTEhandler(ev) {
+        var type = TOUCH_INPUT_MAP[ev.type];
+        var touches = getTouches.call(this, ev, type);
+        if (!touches) {
+            return;
+        }
+
+        this.callback(this.manager, type, {
+            pointers: touches[0],
+            changedPointers: touches[1],
+            pointerType: INPUT_TYPE_TOUCH,
+            srcEvent: ev
+        });
+    }
+});
+
+/**
+ * @this {TouchInput}
+ * @param {Object} ev
+ * @param {Number} type flag
+ * @returns {undefined|Array} [all, changed]
+ */
+function getTouches(ev, type) {
+    var allTouches = toArray(ev.touches);
+    var targetIds = this.targetIds;
+
+    // when there is only one touch, the process can be simplified
+    if (type & (INPUT_START | INPUT_MOVE) && allTouches.length === 1) {
+        targetIds[allTouches[0].identifier] = true;
+        return [allTouches, allTouches];
+    }
+
+    var i,
+        targetTouches,
+        changedTouches = toArray(ev.changedTouches),
+        changedTargetTouches = [],
+        target = this.target;
+
+    // get target touches from touches
+    targetTouches = allTouches.filter(function(touch) {
+        return hasParent(touch.target, target);
+    });
+
+    // collect touches
+    if (type === INPUT_START) {
+        i = 0;
+        while (i < targetTouches.length) {
+            targetIds[targetTouches[i].identifier] = true;
+            i++;
+        }
+    }
+
+    // filter changed touches to only contain touches that exist in the collected target ids
+    i = 0;
+    while (i < changedTouches.length) {
+        if (targetIds[changedTouches[i].identifier]) {
+            changedTargetTouches.push(changedTouches[i]);
+        }
+
+        // cleanup removed touches
+        if (type & (INPUT_END | INPUT_CANCEL)) {
+            delete targetIds[changedTouches[i].identifier];
+        }
+        i++;
+    }
+
+    if (!changedTargetTouches.length) {
+        return;
+    }
+
+    return [
+        // merge targetTouches with changedTargetTouches so it contains ALL touches, including 'end' and 'cancel'
+        uniqueArray(targetTouches.concat(changedTargetTouches), 'identifier', true),
+        changedTargetTouches
+    ];
+}
+
+/**
+ * Combined touch and mouse input
+ *
+ * Touch has a higher priority then mouse, and while touching no mouse events are allowed.
+ * This because touch devices also emit mouse events while doing a touch.
+ *
+ * @constructor
+ * @extends Input
+ */
+
+var DEDUP_TIMEOUT = 2500;
+var DEDUP_DISTANCE = 25;
+
+function TouchMouseInput() {
+    Input.apply(this, arguments);
+
+    var handler = bindFn(this.handler, this);
+    this.touch = new TouchInput(this.manager, handler);
+    this.mouse = new MouseInput(this.manager, handler);
+
+    this.primaryTouch = null;
+    this.lastTouches = [];
+}
+
+inherit(TouchMouseInput, Input, {
+    /**
+     * handle mouse and touch events
+     * @param {Hammer} manager
+     * @param {String} inputEvent
+     * @param {Object} inputData
+     */
+    handler: function TMEhandler(manager, inputEvent, inputData) {
+        var isTouch = (inputData.pointerType == INPUT_TYPE_TOUCH),
+            isMouse = (inputData.pointerType == INPUT_TYPE_MOUSE);
+
+        if (isMouse && inputData.sourceCapabilities && inputData.sourceCapabilities.firesTouchEvents) {
+            return;
+        }
+
+        // when we're in a touch event, record touches to  de-dupe synthetic mouse event
+        if (isTouch) {
+            recordTouches.call(this, inputEvent, inputData);
+        } else if (isMouse && isSyntheticEvent.call(this, inputData)) {
+            return;
+        }
+
+        this.callback(manager, inputEvent, inputData);
+    },
+
+    /**
+     * remove the event listeners
+     */
+    destroy: function destroy() {
+        this.touch.destroy();
+        this.mouse.destroy();
+    }
+});
+
+function recordTouches(eventType, eventData) {
+    if (eventType & INPUT_START) {
+        this.primaryTouch = eventData.changedPointers[0].identifier;
+        setLastTouch.call(this, eventData);
+    } else if (eventType & (INPUT_END | INPUT_CANCEL)) {
+        setLastTouch.call(this, eventData);
+    }
+}
+
+function setLastTouch(eventData) {
+    var touch = eventData.changedPointers[0];
+
+    if (touch.identifier === this.primaryTouch) {
+        var lastTouch = {x: touch.clientX, y: touch.clientY};
+        this.lastTouches.push(lastTouch);
+        var lts = this.lastTouches;
+        var removeLastTouch = function() {
+            var i = lts.indexOf(lastTouch);
+            if (i > -1) {
+                lts.splice(i, 1);
+            }
+        };
+        setTimeout(removeLastTouch, DEDUP_TIMEOUT);
+    }
+}
+
+function isSyntheticEvent(eventData) {
+    var x = eventData.srcEvent.clientX, y = eventData.srcEvent.clientY;
+    for (var i = 0; i < this.lastTouches.length; i++) {
+        var t = this.lastTouches[i];
+        var dx = Math.abs(x - t.x), dy = Math.abs(y - t.y);
+        if (dx <= DEDUP_DISTANCE && dy <= DEDUP_DISTANCE) {
+            return true;
+        }
+    }
+    return false;
+}
+
+var PREFIXED_TOUCH_ACTION = prefixed(TEST_ELEMENT.style, 'touchAction');
+var NATIVE_TOUCH_ACTION = PREFIXED_TOUCH_ACTION !== undefined;
+
+// magical touchAction value
+var TOUCH_ACTION_COMPUTE = 'compute';
+var TOUCH_ACTION_AUTO = 'auto';
+var TOUCH_ACTION_MANIPULATION = 'manipulation'; // not implemented
+var TOUCH_ACTION_NONE = 'none';
+var TOUCH_ACTION_PAN_X = 'pan-x';
+var TOUCH_ACTION_PAN_Y = 'pan-y';
+var TOUCH_ACTION_MAP = getTouchActionProps();
+
+/**
+ * Touch Action
+ * sets the touchAction property or uses the js alternative
+ * @param {Manager} manager
+ * @param {String} value
+ * @constructor
+ */
+function TouchAction(manager, value) {
+    this.manager = manager;
+    this.set(value);
+}
+
+TouchAction.prototype = {
+    /**
+     * set the touchAction value on the element or enable the polyfill
+     * @param {String} value
+     */
+    set: function(value) {
+        // find out the touch-action by the event handlers
+        if (value == TOUCH_ACTION_COMPUTE) {
+            value = this.compute();
+        }
+
+        if (NATIVE_TOUCH_ACTION && this.manager.element.style && TOUCH_ACTION_MAP[value]) {
+            this.manager.element.style[PREFIXED_TOUCH_ACTION] = value;
+        }
+        this.actions = value.toLowerCase().trim();
+    },
+
+    /**
+     * just re-set the touchAction value
+     */
+    update: function() {
+        this.set(this.manager.options.touchAction);
+    },
+
+    /**
+     * compute the value for the touchAction property based on the recognizer's settings
+     * @returns {String} value
+     */
+    compute: function() {
+        var actions = [];
+        each(this.manager.recognizers, function(recognizer) {
+            if (boolOrFn(recognizer.options.enable, [recognizer])) {
+                actions = actions.concat(recognizer.getTouchAction());
+            }
+        });
+        return cleanTouchActions(actions.join(' '));
+    },
+
+    /**
+     * this method is called on each input cycle and provides the preventing of the browser behavior
+     * @param {Object} input
+     */
+    preventDefaults: function(input) {
+        var srcEvent = input.srcEvent;
+        var direction = input.offsetDirection;
+
+        // if the touch action did prevented once this session
+        if (this.manager.session.prevented) {
+            srcEvent.preventDefault();
+            return;
+        }
+
+        var actions = this.actions;
+        var hasNone = inStr(actions, TOUCH_ACTION_NONE) && !TOUCH_ACTION_MAP[TOUCH_ACTION_NONE];
+        var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y) && !TOUCH_ACTION_MAP[TOUCH_ACTION_PAN_Y];
+        var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X) && !TOUCH_ACTION_MAP[TOUCH_ACTION_PAN_X];
+
+        if (hasNone) {
+            //do not prevent defaults if this is a tap gesture
+
+            var isTapPointer = input.pointers.length === 1;
+            var isTapMovement = input.distance < 2;
+            var isTapTouchTime = input.deltaTime < 250;
+
+            if (isTapPointer && isTapMovement && isTapTouchTime) {
+                return;
+            }
+        }
+
+        if (hasPanX && hasPanY) {
+            // `pan-x pan-y` means browser handles all scrolling/panning, do not prevent
+            return;
+        }
+
+        if (hasNone ||
+            (hasPanY && direction & DIRECTION_HORIZONTAL) ||
+            (hasPanX && direction & DIRECTION_VERTICAL)) {
+            return this.preventSrc(srcEvent);
+        }
+    },
+
+    /**
+     * call preventDefault to prevent the browser's default behavior (scrolling in most cases)
+     * @param {Object} srcEvent
+     */
+    preventSrc: function(srcEvent) {
+        this.manager.session.prevented = true;
+        srcEvent.preventDefault();
+    }
+};
+
+/**
+ * when the touchActions are collected they are not a valid value, so we need to clean things up. *
+ * @param {String} actions
+ * @returns {*}
+ */
+function cleanTouchActions(actions) {
+    // none
+    if (inStr(actions, TOUCH_ACTION_NONE)) {
+        return TOUCH_ACTION_NONE;
+    }
+
+    var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X);
+    var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y);
+
+    // if both pan-x and pan-y are set (different recognizers
+    // for different directions, e.g. horizontal pan but vertical swipe?)
+    // we need none (as otherwise with pan-x pan-y combined none of these
+    // recognizers will work, since the browser would handle all panning
+    if (hasPanX && hasPanY) {
+        return TOUCH_ACTION_NONE;
+    }
+
+    // pan-x OR pan-y
+    if (hasPanX || hasPanY) {
+        return hasPanX ? TOUCH_ACTION_PAN_X : TOUCH_ACTION_PAN_Y;
+    }
+
+    // manipulation
+    if (inStr(actions, TOUCH_ACTION_MANIPULATION)) {
+        return TOUCH_ACTION_MANIPULATION;
+    }
+
+    return TOUCH_ACTION_AUTO;
+}
+
+function getTouchActionProps() {
+    if (!NATIVE_TOUCH_ACTION) {
+        return false;
+    }
+    var touchMap = {};
+    var cssSupports = window.CSS && window.CSS.supports;
+    ['auto', 'manipulation', 'pan-y', 'pan-x', 'pan-x pan-y', 'none'].forEach(function(val) {
+
+        // If css.supports is not supported but there is native touch-action assume it supports
+        // all values. This is the case for IE 10 and 11.
+        touchMap[val] = cssSupports ? window.CSS.supports('touch-action', val) : true;
+    });
+    return touchMap;
+}
+
+/**
+ * Recognizer flow explained; *
+ * All recognizers have the initial state of POSSIBLE when a input session starts.
+ * The definition of a input session is from the first input until the last input, with all it's movement in it. *
+ * Example session for mouse-input: mousedown -> mousemove -> mouseup
+ *
+ * On each recognizing cycle (see Manager.recognize) the .recognize() method is executed
+ * which determines with state it should be.
+ *
+ * If the recognizer has the state FAILED, CANCELLED or RECOGNIZED (equals ENDED), it is reset to
+ * POSSIBLE to give it another change on the next cycle.
+ *
+ *               Possible
+ *                  |
+ *            +-----+---------------+
+ *            |                     |
+ *      +-----+-----+               |
+ *      |           |               |
+ *   Failed      Cancelled          |
+ *                          +-------+------+
+ *                          |              |
+ *                      Recognized       Began
+ *                                         |
+ *                                      Changed
+ *                                         |
+ *                                  Ended/Recognized
+ */
+var STATE_POSSIBLE = 1;
+var STATE_BEGAN = 2;
+var STATE_CHANGED = 4;
+var STATE_ENDED = 8;
+var STATE_RECOGNIZED = STATE_ENDED;
+var STATE_CANCELLED = 16;
+var STATE_FAILED = 32;
+
+/**
+ * Recognizer
+ * Every recognizer needs to extend from this class.
+ * @constructor
+ * @param {Object} options
+ */
+function Recognizer(options) {
+    this.options = assign({}, this.defaults, options || {});
+
+    this.id = uniqueId();
+
+    this.manager = null;
+
+    // default is enable true
+    this.options.enable = ifUndefined(this.options.enable, true);
+
+    this.state = STATE_POSSIBLE;
+
+    this.simultaneous = {};
+    this.requireFail = [];
+}
+
+Recognizer.prototype = {
+    /**
+     * @virtual
+     * @type {Object}
+     */
+    defaults: {},
+
+    /**
+     * set options
+     * @param {Object} options
+     * @return {Recognizer}
+     */
+    set: function(options) {
+        assign(this.options, options);
+
+        // also update the touchAction, in case something changed about the directions/enabled state
+        this.manager && this.manager.touchAction.update();
+        return this;
+    },
+
+    /**
+     * recognize simultaneous with an other recognizer.
+     * @param {Recognizer} otherRecognizer
+     * @returns {Recognizer} this
+     */
+    recognizeWith: function(otherRecognizer) {
+        if (invokeArrayArg(otherRecognizer, 'recognizeWith', this)) {
+            return this;
+        }
+
+        var simultaneous = this.simultaneous;
+        otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
+        if (!simultaneous[otherRecognizer.id]) {
+            simultaneous[otherRecognizer.id] = otherRecognizer;
+            otherRecognizer.recognizeWith(this);
+        }
+        return this;
+    },
+
+    /**
+     * drop the simultaneous link. it doesnt remove the link on the other recognizer.
+     * @param {Recognizer} otherRecognizer
+     * @returns {Recognizer} this
+     */
+    dropRecognizeWith: function(otherRecognizer) {
+        if (invokeArrayArg(otherRecognizer, 'dropRecognizeWith', this)) {
+            return this;
+        }
+
+        otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
+        delete this.simultaneous[otherRecognizer.id];
+        return this;
+    },
+
+    /**
+     * recognizer can only run when an other is failing
+     * @param {Recognizer} otherRecognizer
+     * @returns {Recognizer} this
+     */
+    requireFailure: function(otherRecognizer) {
+        if (invokeArrayArg(otherRecognizer, 'requireFailure', this)) {
+            return this;
+        }
+
+        var requireFail = this.requireFail;
+        otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
+        if (inArray(requireFail, otherRecognizer) === -1) {
+            requireFail.push(otherRecognizer);
+            otherRecognizer.requireFailure(this);
+        }
+        return this;
+    },
+
+    /**
+     * drop the requireFailure link. it does not remove the link on the other recognizer.
+     * @param {Recognizer} otherRecognizer
+     * @returns {Recognizer} this
+     */
+    dropRequireFailure: function(otherRecognizer) {
+        if (invokeArrayArg(otherRecognizer, 'dropRequireFailure', this)) {
+            return this;
+        }
+
+        otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
+        var index = inArray(this.requireFail, otherRecognizer);
+        if (index > -1) {
+            this.requireFail.splice(index, 1);
+        }
+        return this;
+    },
+
+    /**
+     * has require failures boolean
+     * @returns {boolean}
+     */
+    hasRequireFailures: function() {
+        return this.requireFail.length > 0;
+    },
+
+    /**
+     * if the recognizer can recognize simultaneous with an other recognizer
+     * @param {Recognizer} otherRecognizer
+     * @returns {Boolean}
+     */
+    canRecognizeWith: function(otherRecognizer) {
+        return !!this.simultaneous[otherRecognizer.id];
+    },
+
+    /**
+     * You should use `tryEmit` instead of `emit` directly to check
+     * that all the needed recognizers has failed before emitting.
+     * @param {Object} input
+     */
+    emit: function(input) {
+        var self = this;
+        var state = this.state;
+
+        function emit(event) {
+            self.manager.emit(event, input);
+        }
+
+        // 'panstart' and 'panmove'
+        if (state < STATE_ENDED) {
+            emit(self.options.event + stateStr(state));
+        }
+
+        emit(self.options.event); // simple 'eventName' events
+
+        if (input.additionalEvent) { // additional event(panleft, panright, pinchin, pinchout...)
+            emit(input.additionalEvent);
+        }
+
+        // panend and pancancel
+        if (state >= STATE_ENDED) {
+            emit(self.options.event + stateStr(state));
+        }
+    },
+
+    /**
+     * Check that all the require failure recognizers has failed,
+     * if true, it emits a gesture event,
+     * otherwise, setup the state to FAILED.
+     * @param {Object} input
+     */
+    tryEmit: function(input) {
+        if (this.canEmit()) {
+            return this.emit(input);
+        }
+        // it's failing anyway
+        this.state = STATE_FAILED;
+    },
+
+    /**
+     * can we emit?
+     * @returns {boolean}
+     */
+    canEmit: function() {
+        var i = 0;
+        while (i < this.requireFail.length) {
+            if (!(this.requireFail[i].state & (STATE_FAILED | STATE_POSSIBLE))) {
+                return false;
+            }
+            i++;
+        }
+        return true;
+    },
+
+    /**
+     * update the recognizer
+     * @param {Object} inputData
+     */
+    recognize: function(inputData) {
+        // make a new copy of the inputData
+        // so we can change the inputData without messing up the other recognizers
+        var inputDataClone = assign({}, inputData);
+
+        // is is enabled and allow recognizing?
+        if (!boolOrFn(this.options.enable, [this, inputDataClone])) {
+            this.reset();
+            this.state = STATE_FAILED;
+            return;
+        }
+
+        // reset when we've reached the end
+        if (this.state & (STATE_RECOGNIZED | STATE_CANCELLED | STATE_FAILED)) {
+            this.state = STATE_POSSIBLE;
+        }
+
+        this.state = this.process(inputDataClone);
+
+        // the recognizer has recognized a gesture
+        // so trigger an event
+        if (this.state & (STATE_BEGAN | STATE_CHANGED | STATE_ENDED | STATE_CANCELLED)) {
+            this.tryEmit(inputDataClone);
+        }
+    },
+
+    /**
+     * return the state of the recognizer
+     * the actual recognizing happens in this method
+     * @virtual
+     * @param {Object} inputData
+     * @returns {Const} STATE
+     */
+    process: function(inputData) { }, // jshint ignore:line
+
+    /**
+     * return the preferred touch-action
+     * @virtual
+     * @returns {Array}
+     */
+    getTouchAction: function() { },
+
+    /**
+     * called when the gesture isn't allowed to recognize
+     * like when another is being recognized or it is disabled
+     * @virtual
+     */
+    reset: function() { }
+};
+
+/**
+ * get a usable string, used as event postfix
+ * @param {Const} state
+ * @returns {String} state
+ */
+function stateStr(state) {
+    if (state & STATE_CANCELLED) {
+        return 'cancel';
+    } else if (state & STATE_ENDED) {
+        return 'end';
+    } else if (state & STATE_CHANGED) {
+        return 'move';
+    } else if (state & STATE_BEGAN) {
+        return 'start';
+    }
+    return '';
+}
+
+/**
+ * direction cons to string
+ * @param {Const} direction
+ * @returns {String}
+ */
+function directionStr(direction) {
+    if (direction == DIRECTION_DOWN) {
+        return 'down';
+    } else if (direction == DIRECTION_UP) {
+        return 'up';
+    } else if (direction == DIRECTION_LEFT) {
+        return 'left';
+    } else if (direction == DIRECTION_RIGHT) {
+        return 'right';
+    }
+    return '';
+}
+
+/**
+ * get a recognizer by name if it is bound to a manager
+ * @param {Recognizer|String} otherRecognizer
+ * @param {Recognizer} recognizer
+ * @returns {Recognizer}
+ */
+function getRecognizerByNameIfManager(otherRecognizer, recognizer) {
+    var manager = recognizer.manager;
+    if (manager) {
+        return manager.get(otherRecognizer);
+    }
+    return otherRecognizer;
+}
+
+/**
+ * This recognizer is just used as a base for the simple attribute recognizers.
+ * @constructor
+ * @extends Recognizer
+ */
+function AttrRecognizer() {
+    Recognizer.apply(this, arguments);
+}
+
+inherit(AttrRecognizer, Recognizer, {
+    /**
+     * @namespace
+     * @memberof AttrRecognizer
+     */
+    defaults: {
+        /**
+         * @type {Number}
+         * @default 1
+         */
+        pointers: 1
+    },
+
+    /**
+     * Used to check if it the recognizer receives valid input, like input.distance > 10.
+     * @memberof AttrRecognizer
+     * @param {Object} input
+     * @returns {Boolean} recognized
+     */
+    attrTest: function(input) {
+        var optionPointers = this.options.pointers;
+        return optionPointers === 0 || input.pointers.length === optionPointers;
+    },
+
+    /**
+     * Process the input and return the state for the recognizer
+     * @memberof AttrRecognizer
+     * @param {Object} input
+     * @returns {*} State
+     */
+    process: function(input) {
+        var state = this.state;
+        var eventType = input.eventType;
+
+        var isRecognized = state & (STATE_BEGAN | STATE_CHANGED);
+        var isValid = this.attrTest(input);
+
+        // on cancel input and we've recognized before, return STATE_CANCELLED
+        if (isRecognized && (eventType & INPUT_CANCEL || !isValid)) {
+            return state | STATE_CANCELLED;
+        } else if (isRecognized || isValid) {
+            if (eventType & INPUT_END) {
+                return state | STATE_ENDED;
+            } else if (!(state & STATE_BEGAN)) {
+                return STATE_BEGAN;
+            }
+            return state | STATE_CHANGED;
+        }
+        return STATE_FAILED;
+    }
+});
+
+/**
+ * Pan
+ * Recognized when the pointer is down and moved in the allowed direction.
+ * @constructor
+ * @extends AttrRecognizer
+ */
+function PanRecognizer() {
+    AttrRecognizer.apply(this, arguments);
+
+    this.pX = null;
+    this.pY = null;
+}
+
+inherit(PanRecognizer, AttrRecognizer, {
+    /**
+     * @namespace
+     * @memberof PanRecognizer
+     */
+    defaults: {
+        event: 'pan',
+        threshold: 10,
+        pointers: 1,
+        direction: DIRECTION_ALL
+    },
+
+    getTouchAction: function() {
+        var direction = this.options.direction;
+        var actions = [];
+        if (direction & DIRECTION_HORIZONTAL) {
+            actions.push(TOUCH_ACTION_PAN_Y);
+        }
+        if (direction & DIRECTION_VERTICAL) {
+            actions.push(TOUCH_ACTION_PAN_X);
+        }
+        return actions;
+    },
+
+    directionTest: function(input) {
+        var options = this.options;
+        var hasMoved = true;
+        var distance = input.distance;
+        var direction = input.direction;
+        var x = input.deltaX;
+        var y = input.deltaY;
+
+        // lock to axis?
+        if (!(direction & options.direction)) {
+            if (options.direction & DIRECTION_HORIZONTAL) {
+                direction = (x === 0) ? DIRECTION_NONE : (x < 0) ? DIRECTION_LEFT : DIRECTION_RIGHT;
+                hasMoved = x != this.pX;
+                distance = Math.abs(input.deltaX);
+            } else {
+                direction = (y === 0) ? DIRECTION_NONE : (y < 0) ? DIRECTION_UP : DIRECTION_DOWN;
+                hasMoved = y != this.pY;
+                distance = Math.abs(input.deltaY);
+            }
+        }
+        input.direction = direction;
+        return hasMoved && distance > options.threshold && direction & options.direction;
+    },
+
+    attrTest: function(input) {
+        return AttrRecognizer.prototype.attrTest.call(this, input) &&
+            (this.state & STATE_BEGAN || (!(this.state & STATE_BEGAN) && this.directionTest(input)));
+    },
+
+    emit: function(input) {
+
+        this.pX = input.deltaX;
+        this.pY = input.deltaY;
+
+        var direction = directionStr(input.direction);
+
+        if (direction) {
+            input.additionalEvent = this.options.event + direction;
+        }
+        this._super.emit.call(this, input);
+    }
+});
+
+/**
+ * Pinch
+ * Recognized when two or more pointers are moving toward (zoom-in) or away from each other (zoom-out).
+ * @constructor
+ * @extends AttrRecognizer
+ */
+function PinchRecognizer() {
+    AttrRecognizer.apply(this, arguments);
+}
+
+inherit(PinchRecognizer, AttrRecognizer, {
+    /**
+     * @namespace
+     * @memberof PinchRecognizer
+     */
+    defaults: {
+        event: 'pinch',
+        threshold: 0,
+        pointers: 2
+    },
+
+    getTouchAction: function() {
+        return [TOUCH_ACTION_NONE];
+    },
+
+    attrTest: function(input) {
+        return this._super.attrTest.call(this, input) &&
+            (Math.abs(input.scale - 1) > this.options.threshold || this.state & STATE_BEGAN);
+    },
+
+    emit: function(input) {
+        if (input.scale !== 1) {
+            var inOut = input.scale < 1 ? 'in' : 'out';
+            input.additionalEvent = this.options.event + inOut;
+        }
+        this._super.emit.call(this, input);
+    }
+});
+
+/**
+ * Press
+ * Recognized when the pointer is down for x ms without any movement.
+ * @constructor
+ * @extends Recognizer
+ */
+function PressRecognizer() {
+    Recognizer.apply(this, arguments);
+
+    this._timer = null;
+    this._input = null;
+}
+
+inherit(PressRecognizer, Recognizer, {
+    /**
+     * @namespace
+     * @memberof PressRecognizer
+     */
+    defaults: {
+        event: 'press',
+        pointers: 1,
+        time: 251, // minimal time of the pointer to be pressed
+        threshold: 9 // a minimal movement is ok, but keep it low
+    },
+
+    getTouchAction: function() {
+        return [TOUCH_ACTION_AUTO];
+    },
+
+    process: function(input) {
+        var options = this.options;
+        var validPointers = input.pointers.length === options.pointers;
+        var validMovement = input.distance < options.threshold;
+        var validTime = input.deltaTime > options.time;
+
+        this._input = input;
+
+        // we only allow little movement
+        // and we've reached an end event, so a tap is possible
+        if (!validMovement || !validPointers || (input.eventType & (INPUT_END | INPUT_CANCEL) && !validTime)) {
+            this.reset();
+        } else if (input.eventType & INPUT_START) {
+            this.reset();
+            this._timer = setTimeoutContext(function() {
+                this.state = STATE_RECOGNIZED;
+                this.tryEmit();
+            }, options.time, this);
+        } else if (input.eventType & INPUT_END) {
+            return STATE_RECOGNIZED;
+        }
+        return STATE_FAILED;
+    },
+
+    reset: function() {
+        clearTimeout(this._timer);
+    },
+
+    emit: function(input) {
+        if (this.state !== STATE_RECOGNIZED) {
+            return;
+        }
+
+        if (input && (input.eventType & INPUT_END)) {
+            this.manager.emit(this.options.event + 'up', input);
+        } else {
+            this._input.timeStamp = now();
+            this.manager.emit(this.options.event, this._input);
+        }
+    }
+});
+
+/**
+ * Rotate
+ * Recognized when two or more pointer are moving in a circular motion.
+ * @constructor
+ * @extends AttrRecognizer
+ */
+function RotateRecognizer() {
+    AttrRecognizer.apply(this, arguments);
+}
+
+inherit(RotateRecognizer, AttrRecognizer, {
+    /**
+     * @namespace
+     * @memberof RotateRecognizer
+     */
+    defaults: {
+        event: 'rotate',
+        threshold: 0,
+        pointers: 2
+    },
+
+    getTouchAction: function() {
+        return [TOUCH_ACTION_NONE];
+    },
+
+    attrTest: function(input) {
+        return this._super.attrTest.call(this, input) &&
+            (Math.abs(input.rotation) > this.options.threshold || this.state & STATE_BEGAN);
+    }
+});
+
+/**
+ * Swipe
+ * Recognized when the pointer is moving fast (velocity), with enough distance in the allowed direction.
+ * @constructor
+ * @extends AttrRecognizer
+ */
+function SwipeRecognizer() {
+    AttrRecognizer.apply(this, arguments);
+}
+
+inherit(SwipeRecognizer, AttrRecognizer, {
+    /**
+     * @namespace
+     * @memberof SwipeRecognizer
+     */
+    defaults: {
+        event: 'swipe',
+        threshold: 10,
+        velocity: 0.3,
+        direction: DIRECTION_HORIZONTAL | DIRECTION_VERTICAL,
+        pointers: 1
+    },
+
+    getTouchAction: function() {
+        return PanRecognizer.prototype.getTouchAction.call(this);
+    },
+
+    attrTest: function(input) {
+        var direction = this.options.direction;
+        var velocity;
+
+        if (direction & (DIRECTION_HORIZONTAL | DIRECTION_VERTICAL)) {
+            velocity = input.overallVelocity;
+        } else if (direction & DIRECTION_HORIZONTAL) {
+            velocity = input.overallVelocityX;
+        } else if (direction & DIRECTION_VERTICAL) {
+            velocity = input.overallVelocityY;
+        }
+
+        return this._super.attrTest.call(this, input) &&
+            direction & input.offsetDirection &&
+            input.distance > this.options.threshold &&
+            input.maxPointers == this.options.pointers &&
+            abs(velocity) > this.options.velocity && input.eventType & INPUT_END;
+    },
+
+    emit: function(input) {
+        var direction = directionStr(input.offsetDirection);
+        if (direction) {
+            this.manager.emit(this.options.event + direction, input);
+        }
+
+        this.manager.emit(this.options.event, input);
+    }
+});
+
+/**
+ * A tap is ecognized when the pointer is doing a small tap/click. Multiple taps are recognized if they occur
+ * between the given interval and position. The delay option can be used to recognize multi-taps without firing
+ * a single tap.
+ *
+ * The eventData from the emitted event contains the property `tapCount`, which contains the amount of
+ * multi-taps being recognized.
+ * @constructor
+ * @extends Recognizer
+ */
+function TapRecognizer() {
+    Recognizer.apply(this, arguments);
+
+    // previous time and center,
+    // used for tap counting
+    this.pTime = false;
+    this.pCenter = false;
+
+    this._timer = null;
+    this._input = null;
+    this.count = 0;
+}
+
+inherit(TapRecognizer, Recognizer, {
+    /**
+     * @namespace
+     * @memberof PinchRecognizer
+     */
+    defaults: {
+        event: 'tap',
+        pointers: 1,
+        taps: 1,
+        interval: 300, // max time between the multi-tap taps
+        time: 250, // max time of the pointer to be down (like finger on the screen)
+        threshold: 9, // a minimal movement is ok, but keep it low
+        posThreshold: 10 // a multi-tap can be a bit off the initial position
+    },
+
+    getTouchAction: function() {
+        return [TOUCH_ACTION_MANIPULATION];
+    },
+
+    process: function(input) {
+        var options = this.options;
+
+        var validPointers = input.pointers.length === options.pointers;
+        var validMovement = input.distance < options.threshold;
+        var validTouchTime = input.deltaTime < options.time;
+
+        this.reset();
+
+        if ((input.eventType & INPUT_START) && (this.count === 0)) {
+            return this.failTimeout();
+        }
+
+        // we only allow little movement
+        // and we've reached an end event, so a tap is possible
+        if (validMovement && validTouchTime && validPointers) {
+            if (input.eventType != INPUT_END) {
+                return this.failTimeout();
+            }
+
+            var validInterval = this.pTime ? (input.timeStamp - this.pTime < options.interval) : true;
+            var validMultiTap = !this.pCenter || getDistance(this.pCenter, input.center) < options.posThreshold;
+
+            this.pTime = input.timeStamp;
+            this.pCenter = input.center;
+
+            if (!validMultiTap || !validInterval) {
+                this.count = 1;
+            } else {
+                this.count += 1;
+            }
+
+            this._input = input;
+
+            // if tap count matches we have recognized it,
+            // else it has began recognizing...
+            var tapCount = this.count % options.taps;
+            if (tapCount === 0) {
+                // no failing requirements, immediately trigger the tap event
+                // or wait as long as the multitap interval to trigger
+                if (!this.hasRequireFailures()) {
+                    return STATE_RECOGNIZED;
+                } else {
+                    this._timer = setTimeoutContext(function() {
+                        this.state = STATE_RECOGNIZED;
+                        this.tryEmit();
+                    }, options.interval, this);
+                    return STATE_BEGAN;
+                }
+            }
+        }
+        return STATE_FAILED;
+    },
+
+    failTimeout: function() {
+        this._timer = setTimeoutContext(function() {
+            this.state = STATE_FAILED;
+        }, this.options.interval, this);
+        return STATE_FAILED;
+    },
+
+    reset: function() {
+        clearTimeout(this._timer);
+    },
+
+    emit: function() {
+        if (this.state == STATE_RECOGNIZED) {
+            this._input.tapCount = this.count;
+            this.manager.emit(this.options.event, this._input);
+        }
+    }
+});
+
+/**
+ * Simple way to create a manager with a default set of recognizers.
+ * @param {HTMLElement} element
+ * @param {Object} [options]
+ * @constructor
+ */
+function Hammer(element, options) {
+    options = options || {};
+    options.recognizers = ifUndefined(options.recognizers, Hammer.defaults.preset);
+    return new Manager(element, options);
+}
+
+/**
+ * @const {string}
+ */
+Hammer.VERSION = '2.0.7';
+
+/**
+ * default settings
+ * @namespace
+ */
+Hammer.defaults = {
+    /**
+     * set if DOM events are being triggered.
+     * But this is slower and unused by simple implementations, so disabled by default.
+     * @type {Boolean}
+     * @default false
+     */
+    domEvents: false,
+
+    /**
+     * The value for the touchAction property/fallback.
+     * When set to `compute` it will magically set the correct value based on the added recognizers.
+     * @type {String}
+     * @default compute
+     */
+    touchAction: TOUCH_ACTION_COMPUTE,
+
+    /**
+     * @type {Boolean}
+     * @default true
+     */
+    enable: true,
+
+    /**
+     * EXPERIMENTAL FEATURE -- can be removed/changed
+     * Change the parent input target element.
+     * If Null, then it is being set the to main element.
+     * @type {Null|EventTarget}
+     * @default null
+     */
+    inputTarget: null,
+
+    /**
+     * force an input class
+     * @type {Null|Function}
+     * @default null
+     */
+    inputClass: null,
+
+    /**
+     * Default recognizer setup when calling `Hammer()`
+     * When creating a new Manager these will be skipped.
+     * @type {Array}
+     */
+    preset: [
+        // RecognizerClass, options, [recognizeWith, ...], [requireFailure, ...]
+        [RotateRecognizer, {enable: false}],
+        [PinchRecognizer, {enable: false}, ['rotate']],
+        [SwipeRecognizer, {direction: DIRECTION_HORIZONTAL}],
+        [PanRecognizer, {direction: DIRECTION_HORIZONTAL}, ['swipe']],
+        [TapRecognizer],
+        [TapRecognizer, {event: 'doubletap', taps: 2}, ['tap']],
+        [PressRecognizer]
+    ],
+
+    /**
+     * Some CSS properties can be used to improve the working of Hammer.
+     * Add them to this method and they will be set when creating a new Manager.
+     * @namespace
+     */
+    cssProps: {
+        /**
+         * Disables text selection to improve the dragging gesture. Mainly for desktop browsers.
+         * @type {String}
+         * @default 'none'
+         */
+        userSelect: 'none',
+
+        /**
+         * Disable the Windows Phone grippers when pressing an element.
+         * @type {String}
+         * @default 'none'
+         */
+        touchSelect: 'none',
+
+        /**
+         * Disables the default callout shown when you touch and hold a touch target.
+         * On iOS, when you touch and hold a touch target such as a link, Safari displays
+         * a callout containing information about the link. This property allows you to disable that callout.
+         * @type {String}
+         * @default 'none'
+         */
+        touchCallout: 'none',
+
+        /**
+         * Specifies whether zooming is enabled. Used by IE10>
+         * @type {String}
+         * @default 'none'
+         */
+        contentZooming: 'none',
+
+        /**
+         * Specifies that an entire element should be draggable instead of its contents. Mainly for desktop browsers.
+         * @type {String}
+         * @default 'none'
+         */
+        userDrag: 'none',
+
+        /**
+         * Overrides the highlight color shown when the user taps a link or a JavaScript
+         * clickable element in iOS. This property obeys the alpha value, if specified.
+         * @type {String}
+         * @default 'rgba(0,0,0,0)'
+         */
+        tapHighlightColor: 'rgba(0,0,0,0)'
+    }
+};
+
+var STOP = 1;
+var FORCED_STOP = 2;
+
+/**
+ * Manager
+ * @param {HTMLElement} element
+ * @param {Object} [options]
+ * @constructor
+ */
+function Manager(element, options) {
+    this.options = assign({}, Hammer.defaults, options || {});
+
+    this.options.inputTarget = this.options.inputTarget || element;
+
+    this.handlers = {};
+    this.session = {};
+    this.recognizers = [];
+    this.oldCssProps = {};
+
+    this.element = element;
+    this.input = createInputInstance(this);
+    this.touchAction = new TouchAction(this, this.options.touchAction);
+
+    toggleCssProps(this, true);
+
+    each(this.options.recognizers, function(item) {
+        var recognizer = this.add(new (item[0])(item[1]));
+        item[2] && recognizer.recognizeWith(item[2]);
+        item[3] && recognizer.requireFailure(item[3]);
+    }, this);
+}
+
+Manager.prototype = {
+    /**
+     * set options
+     * @param {Object} options
+     * @returns {Manager}
+     */
+    set: function(options) {
+        assign(this.options, options);
+
+        // Options that need a little more setup
+        if (options.touchAction) {
+            this.touchAction.update();
+        }
+        if (options.inputTarget) {
+            // Clean up existing event listeners and reinitialize
+            this.input.destroy();
+            this.input.target = options.inputTarget;
+            this.input.init();
+        }
+        return this;
+    },
+
+    /**
+     * stop recognizing for this session.
+     * This session will be discarded, when a new [input]start event is fired.
+     * When forced, the recognizer cycle is stopped immediately.
+     * @param {Boolean} [force]
+     */
+    stop: function(force) {
+        this.session.stopped = force ? FORCED_STOP : STOP;
+    },
+
+    /**
+     * run the recognizers!
+     * called by the inputHandler function on every movement of the pointers (touches)
+     * it walks through all the recognizers and tries to detect the gesture that is being made
+     * @param {Object} inputData
+     */
+    recognize: function(inputData) {
+        var session = this.session;
+        if (session.stopped) {
+            return;
+        }
+
+        // run the touch-action polyfill
+        this.touchAction.preventDefaults(inputData);
+
+        var recognizer;
+        var recognizers = this.recognizers;
+
+        // this holds the recognizer that is being recognized.
+        // so the recognizer's state needs to be BEGAN, CHANGED, ENDED or RECOGNIZED
+        // if no recognizer is detecting a thing, it is set to `null`
+        var curRecognizer = session.curRecognizer;
+
+        // reset when the last recognizer is recognized
+        // or when we're in a new session
+        if (!curRecognizer || (curRecognizer && curRecognizer.state & STATE_RECOGNIZED)) {
+            curRecognizer = session.curRecognizer = null;
+        }
+
+        var i = 0;
+        while (i < recognizers.length) {
+            recognizer = recognizers[i];
+
+            // find out if we are allowed try to recognize the input for this one.
+            // 1.   allow if the session is NOT forced stopped (see the .stop() method)
+            // 2.   allow if we still haven't recognized a gesture in this session, or the this recognizer is the one
+            //      that is being recognized.
+            // 3.   allow if the recognizer is allowed to run simultaneous with the current recognized recognizer.
+            //      this can be setup with the `recognizeWith()` method on the recognizer.
+            if (session.stopped !== FORCED_STOP && ( // 1
+                    !curRecognizer || recognizer == curRecognizer || // 2
+                    recognizer.canRecognizeWith(curRecognizer))) { // 3
+                recognizer.recognize(inputData);
+            } else {
+                recognizer.reset();
+            }
+
+            // if the recognizer has been recognizing the input as a valid gesture, we want to store this one as the
+            // current active recognizer. but only if we don't already have an active recognizer
+            if (!curRecognizer && recognizer.state & (STATE_BEGAN | STATE_CHANGED | STATE_ENDED)) {
+                curRecognizer = session.curRecognizer = recognizer;
+            }
+            i++;
+        }
+    },
+
+    /**
+     * get a recognizer by its event name.
+     * @param {Recognizer|String} recognizer
+     * @returns {Recognizer|Null}
+     */
+    get: function(recognizer) {
+        if (recognizer instanceof Recognizer) {
+            return recognizer;
+        }
+
+        var recognizers = this.recognizers;
+        for (var i = 0; i < recognizers.length; i++) {
+            if (recognizers[i].options.event == recognizer) {
+                return recognizers[i];
+            }
+        }
+        return null;
+    },
+
+    /**
+     * add a recognizer to the manager
+     * existing recognizers with the same event name will be removed
+     * @param {Recognizer} recognizer
+     * @returns {Recognizer|Manager}
+     */
+    add: function(recognizer) {
+        if (invokeArrayArg(recognizer, 'add', this)) {
+            return this;
+        }
+
+        // remove existing
+        var existing = this.get(recognizer.options.event);
+        if (existing) {
+            this.remove(existing);
+        }
+
+        this.recognizers.push(recognizer);
+        recognizer.manager = this;
+
+        this.touchAction.update();
+        return recognizer;
+    },
+
+    /**
+     * remove a recognizer by name or instance
+     * @param {Recognizer|String} recognizer
+     * @returns {Manager}
+     */
+    remove: function(recognizer) {
+        if (invokeArrayArg(recognizer, 'remove', this)) {
+            return this;
+        }
+
+        recognizer = this.get(recognizer);
+
+        // let's make sure this recognizer exists
+        if (recognizer) {
+            var recognizers = this.recognizers;
+            var index = inArray(recognizers, recognizer);
+
+            if (index !== -1) {
+                recognizers.splice(index, 1);
+                this.touchAction.update();
+            }
+        }
+
+        return this;
+    },
+
+    /**
+     * bind event
+     * @param {String} events
+     * @param {Function} handler
+     * @returns {EventEmitter} this
+     */
+    on: function(events, handler) {
+        if (events === undefined) {
+            return;
+        }
+        if (handler === undefined) {
+            return;
+        }
+
+        var handlers = this.handlers;
+        each(splitStr(events), function(event) {
+            handlers[event] = handlers[event] || [];
+            handlers[event].push(handler);
+        });
+        return this;
+    },
+
+    /**
+     * unbind event, leave emit blank to remove all handlers
+     * @param {String} events
+     * @param {Function} [handler]
+     * @returns {EventEmitter} this
+     */
+    off: function(events, handler) {
+        if (events === undefined) {
+            return;
+        }
+
+        var handlers = this.handlers;
+        each(splitStr(events), function(event) {
+            if (!handler) {
+                delete handlers[event];
+            } else {
+                handlers[event] && handlers[event].splice(inArray(handlers[event], handler), 1);
+            }
+        });
+        return this;
+    },
+
+    /**
+     * emit event to the listeners
+     * @param {String} event
+     * @param {Object} data
+     */
+    emit: function(event, data) {
+        // we also want to trigger dom events
+        if (this.options.domEvents) {
+            triggerDomEvent(event, data);
+        }
+
+        // no handlers, so skip it all
+        var handlers = this.handlers[event] && this.handlers[event].slice();
+        if (!handlers || !handlers.length) {
+            return;
+        }
+
+        data.type = event;
+        data.preventDefault = function() {
+            data.srcEvent.preventDefault();
+        };
+
+        var i = 0;
+        while (i < handlers.length) {
+            handlers[i](data);
+            i++;
+        }
+    },
+
+    /**
+     * destroy the manager and unbinds all events
+     * it doesn't unbind dom events, that is the user own responsibility
+     */
+    destroy: function() {
+        this.element && toggleCssProps(this, false);
+
+        this.handlers = {};
+        this.session = {};
+        this.input.destroy();
+        this.element = null;
+    }
+};
+
+/**
+ * add/remove the css properties as defined in manager.options.cssProps
+ * @param {Manager} manager
+ * @param {Boolean} add
+ */
+function toggleCssProps(manager, add) {
+    var element = manager.element;
+    if (!element.style) {
+        return;
+    }
+    var prop;
+    each(manager.options.cssProps, function(value, name) {
+        prop = prefixed(element.style, name);
+        if (add) {
+            manager.oldCssProps[prop] = element.style[prop];
+            element.style[prop] = value;
+        } else {
+            element.style[prop] = manager.oldCssProps[prop] || '';
+        }
+    });
+    if (!add) {
+        manager.oldCssProps = {};
+    }
+}
+
+/**
+ * trigger dom event
+ * @param {String} event
+ * @param {Object} data
+ */
+function triggerDomEvent(event, data) {
+    var gestureEvent = document.createEvent('Event');
+    gestureEvent.initEvent(event, true, true);
+    gestureEvent.gesture = data;
+    data.target.dispatchEvent(gestureEvent);
+}
+
+assign(Hammer, {
+    INPUT_START: INPUT_START,
+    INPUT_MOVE: INPUT_MOVE,
+    INPUT_END: INPUT_END,
+    INPUT_CANCEL: INPUT_CANCEL,
+
+    STATE_POSSIBLE: STATE_POSSIBLE,
+    STATE_BEGAN: STATE_BEGAN,
+    STATE_CHANGED: STATE_CHANGED,
+    STATE_ENDED: STATE_ENDED,
+    STATE_RECOGNIZED: STATE_RECOGNIZED,
+    STATE_CANCELLED: STATE_CANCELLED,
+    STATE_FAILED: STATE_FAILED,
+
+    DIRECTION_NONE: DIRECTION_NONE,
+    DIRECTION_LEFT: DIRECTION_LEFT,
+    DIRECTION_RIGHT: DIRECTION_RIGHT,
+    DIRECTION_UP: DIRECTION_UP,
+    DIRECTION_DOWN: DIRECTION_DOWN,
+    DIRECTION_HORIZONTAL: DIRECTION_HORIZONTAL,
+    DIRECTION_VERTICAL: DIRECTION_VERTICAL,
+    DIRECTION_ALL: DIRECTION_ALL,
+
+    Manager: Manager,
+    Input: Input,
+    TouchAction: TouchAction,
+
+    TouchInput: TouchInput,
+    MouseInput: MouseInput,
+    PointerEventInput: PointerEventInput,
+    TouchMouseInput: TouchMouseInput,
+    SingleTouchInput: SingleTouchInput,
+
+    Recognizer: Recognizer,
+    AttrRecognizer: AttrRecognizer,
+    Tap: TapRecognizer,
+    Pan: PanRecognizer,
+    Swipe: SwipeRecognizer,
+    Pinch: PinchRecognizer,
+    Rotate: RotateRecognizer,
+    Press: PressRecognizer,
+
+    on: addEventListeners,
+    off: removeEventListeners,
+    each: each,
+    merge: merge,
+    extend: extend,
+    assign: assign,
+    inherit: inherit,
+    bindFn: bindFn,
+    prefixed: prefixed
+});
+
+// this prevents errors when Hammer is loaded in the presence of an AMD
+//  style loader but by script tag, not by the loader.
+var freeGlobal = (typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : {})); // jshint ignore:line
+freeGlobal.Hammer = Hammer;
+
+if (typeof define === 'function' && define.amd) {
+    define(function() {
+        return Hammer;
+    });
+} else if (typeof module != 'undefined' && module.exports) {
+    module.exports = Hammer;
+} else {
+    window[exportName] = Hammer;
+}
+
+})(window, document, 'Hammer');
+
+},{}]},{},[2]);

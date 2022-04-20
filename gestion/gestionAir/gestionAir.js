@@ -364,6 +364,8 @@ resultats()
     try {
       if (delta >= 1.1) {
         //
+        //! Condition à 40 secondes.
+
         let preconisation = 40000;
         // console.log('preconisation : ' + preconisation);
 
@@ -391,9 +393,13 @@ resultats()
           miseAjourEtatRelay();
           //
         }, preconisation);
+
+        //! -----------------------------------------------
         //
       } else if (delta <= 1 && delta >= 0.6) {
         //
+        //! Condition à 15 secondes.
+
         let preconisation = 15000;
         // console.log('preconisation : ' + preconisation);
 
@@ -417,9 +423,12 @@ resultats()
           //
         }, preconisation);
 
+        //! -----------------------------------------------
         //
       } else if (delta <= 0.5 && delta >= 0.4) {
         //
+        //! Condition à 5 secondes.
+
         let preconisation = 5000;
         // console.log('preconisation : ' + preconisation);
 
@@ -443,6 +452,36 @@ resultats()
           //
         }, preconisation);
 
+        //! -----------------------------------------------
+        //
+      } else if (delta <= 0.5 && delta > 0.3) {
+        //
+        //! Condition à 2 secondes.
+
+        let preconisation = 2000;
+        // console.log('preconisation : ' + preconisation);
+
+        const relay_22_ON = new Gpio(23, 'out');
+
+        if (etatVanneBDD >= 100) {
+          etatRelay = 100;
+        } else {
+          etatRelay = 5;
+        }
+
+        actionRelay = 1;
+        miseAjourEtatRelay();
+
+        setTimeout(() => {
+          //
+          const relay_22_OFF = new Gpio(23, 'in');
+          // console.log('ouverture  du froid');
+          actionRelay = 0;
+          miseAjourEtatRelay();
+          //
+        }, preconisation);
+
+        //! -----------------------------------------------
         //
       } else if (delta <= 0.3 && delta >= -0.3) {
         //***************************************************************
@@ -450,8 +489,39 @@ resultats()
         etatRelay = etatVanneBDD;
         miseAjourEtatRelay();
         //***************************************************************
+      } else if (delta >= -0.5 && delta < -0.3) {
+        //
+        //! Condition à 2 secondes.
+
+        let preconisation = 2000;
+        // console.log('preconisation : ' + preconisation);
+
+        const relay_22_ON = new Gpio(22, 'out');
+
+        if (etatVanneBDD <= 0) {
+          etatRelay = 0;
+        } else {
+          etatRelay = preconisation;
+        }
+
+        etatRelay = 5;
+        actionRelay = 1;
+        miseAjourEtatRelay();
+
+        setTimeout(() => {
+          //
+          const relay_22_OFF = new Gpio(22, 'in');
+
+          actionRelay = 0;
+          miseAjourEtatRelay();
+          //
+        }, preconisation);
+
+        //! -----------------------------------------------
+        //
       } else if (delta <= -0.4 && delta >= -0.5) {
         //
+        //! Condition à 5 secondes.
 
         let preconisation = 5000;
         // console.log('preconisation : ' + preconisation);
@@ -477,9 +547,12 @@ resultats()
           //
         }, preconisation);
 
+        //! -----------------------------------------------
         //
       } else if (delta <= -0.6 && delta >= -1) {
         //
+        //! Condition à 15 secondes.
+
         let preconisation = 15000;
         // console.log('preconisation : ' + preconisation);
 
@@ -503,9 +576,11 @@ resultats()
           //
         }, preconisation);
 
+        //! -----------------------------------------------
         //
       } else if (delta <= -1.1) {
         //
+        //! Condition à 5 secondes.
 
         let preconisation = 40000;
         // console.log('preconisation : ' + preconisation);
@@ -530,6 +605,7 @@ resultats()
           //
         }, preconisation);
 
+        //! -----------------------------------------------
         //
       }
     } catch (error) {

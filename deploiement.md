@@ -131,3 +131,4 @@ CREATE USER 'idric'@'localhost' IDENTIFIED BY 'Kup33uC4W6';
 14. npm install nodemon
 15. npm install sequelize
 16. npm install winston
+17. npm install onoff
