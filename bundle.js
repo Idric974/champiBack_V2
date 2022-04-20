@@ -190,6 +190,7 @@ process.umask = function() { return 0; };
 const axios = require('axios');
 const Chart = require('chart.js');
 const zoomPlugin = require('chartjs-plugin-zoom');
+
 const {
   format,
   time,
@@ -531,6 +532,8 @@ let getDataCourbeAir = () => {
       //!L'instanciation de graphique.
       const myChartAir = new Chart(ctxAir, configAir);
       //! ---------------------------------
+
+      Chart.register(zoomPlugin);
 
       //! --------------------------------------------------------------
     })
