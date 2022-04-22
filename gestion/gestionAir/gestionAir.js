@@ -364,12 +364,11 @@ resultats()
   //! Définition des actions.
   .then(() => {
     try {
-      if (delta >= 1.5) {
+      if (delta > 1.5) {
         //
         //! Condition à 40 secondes.
 
         let preconisation = 40000;
-        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(23, 'out');
 
@@ -389,7 +388,7 @@ resultats()
           //
           const relay_22_OFF = new Gpio(23, 'in');
 
-          // console.log('Fermeture du froid');
+          // console.log('FIN Ouverture du froid');
 
           actionRelay = 0;
           miseAjourEtatRelay();
@@ -398,12 +397,11 @@ resultats()
 
         //! -----------------------------------------------
         //
-      } else if (delta <= 1 && delta >= 0.6) {
+      } else if (delta <= 1.5 && delta > 1) {
         //
         //! Condition à 15 secondes.
 
         let preconisation = 15000;
-        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(23, 'out');
 
@@ -427,12 +425,11 @@ resultats()
 
         //! -----------------------------------------------
         //
-      } else if (delta <= 0.5 && delta >= 0.4) {
+      } else if (delta <= 1 && delta > 0.5) {
         //
         //! Condition à 5 secondes.
 
         let preconisation = 5000;
-        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(23, 'out');
 
@@ -461,7 +458,6 @@ resultats()
         //! Condition à 2 secondes.
 
         let preconisation = 2000;
-        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(23, 'out');
 
@@ -496,7 +492,6 @@ resultats()
         //! Condition à 2 secondes.
 
         let preconisation = 2000;
-        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(22, 'out');
 
@@ -521,12 +516,11 @@ resultats()
 
         //! -----------------------------------------------
         //
-      } else if (delta <= -0.4 && delta >= -0.5) {
+      } else if (delta > -1 && delta < -0.5) {
         //
         //! Condition à 5 secondes.
 
         let preconisation = 5000;
-        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(22, 'out');
 
@@ -551,12 +545,11 @@ resultats()
 
         //! -----------------------------------------------
         //
-      } else if (delta <= -0.6 && delta >= -1) {
+      } else if (delta >= -1.5 && delta < -1) {
         //
         //! Condition à 15 secondes.
 
         let preconisation = 15000;
-        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(22, 'out');
 
@@ -580,12 +573,11 @@ resultats()
 
         //! -----------------------------------------------
         //
-      } else if (delta <= -1.1) {
+      } else if (delta < -1.5) {
         //
         //! Condition à 5 secondes.
 
         let preconisation = 40000;
-        // console.log('preconisation : ' + preconisation);
 
         const relay_22_ON = new Gpio(22, 'out');
 
