@@ -193,3 +193,11 @@ Codename: buster
 
 pi@Clic974:~ $ uname -a
 Linux Clic974 5.10.103-v7l+ #1529 SMP Tue Mar 8 12:24:00 GMT 2022 armv7l GNU/Linux
+
+//!--------------------------------------------------------------
+
+Adresse pour tester une requete POST.
+
+https://httpbin.org/post
+
+//!--------------------------------------------------------------
