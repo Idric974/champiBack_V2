@@ -9,7 +9,7 @@ const con = mysql.createConnection({
 
 //* gestionAir.
 
-// let table = 'gestion_airs';
+let table = 'gestion_airs';
 // let table = 'gestion_airs_datas';
 // let table = 'gestion_airs_etalonnages';
 // let table = 'gestion_airs_etat_relays';
@@ -19,7 +19,7 @@ const con = mysql.createConnection({
 // let table = 'gestion_hums';
 // let table = 'gestion_hums_datas';
 // let table = 'gestion_hums_etalonnage_hums';
-let table = 'gestion_hums_etalonnage_secs';
+// let table = 'gestion_hums_etalonnage_secs';
 
 //* gestion Co2
 
