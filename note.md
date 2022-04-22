@@ -138,4 +138,58 @@ browserify /home/pi/Desktop/champiBack_V2/gestion/gestionCourbes/courbes.js > bu
 
 //!--------------------------------------------------------------
 
-git reset --hard 1a7d28ddecf8791d8cee1316ac2539bb26264068
+Obtenir des informations sur le système d’exploitation exécuté sur un Raspberry : cat /etc/os-release
+
+//!--------------------------------------------------------------
+
+Numéro de sous-version pour Debian : cat /etc/debian_version
+
+//!--------------------------------------------------------------
+
+Installation Vs Code :
+
+sudo apt update
+sudo apt install code
+
+//!--------------------------------------------------------------
+
+Mise à jour :
+
+sudo apt update
+sudo apt upgrade
+
+//!--------------------------------------------------------------
+
+Architecture utilisée sur l'appareil : uname -m
+
+//!--------------------------------------------------------------
+
+La distribution en cours d’exécution : lsb_release -a
+
+//!--------------------------------------------------------------
+
+Kernel version: montre les informations sur le système : uname -a
+
+PRETTY_NAME="Raspbian GNU/Linux 10 (buster)"
+NAME="Raspbian GNU/Linux"
+VERSION_ID="10"
+VERSION="10 (buster)"
+VERSION_CODENAME=buster
+ID=raspbian
+ID_LIKE=debian
+HOME_URL="http://www.raspbian.org/"
+SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
+BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
+
+pi@Clic974:~ $ uname -m
+armv7l
+
+pi@Clic974:~ $ lsb_release -a
+No LSB modules are available.
+Distributor ID: Raspbian
+Description: Raspbian GNU/Linux 10 (buster)
+Release: 10
+Codename: buster
+
+pi@Clic974:~ $ uname -a
+Linux Clic974 5.10.103-v7l+ #1529 SMP Tue Mar 8 12:24:00 GMT 2022 armv7l GNU/Linux
