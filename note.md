@@ -2,11 +2,19 @@
 OK
 
 Pour supprimer la base de données
-DROP DATABASE ma*base
-//* -------------------------\_
+DROP DATABASE ma\*base
 
-Installer Vs Code.
-===> sudo apt install code
+//--------------------------------------------------------------
+
+# Installer Vs Code :
+
+1. sudo apt update
+2. sudo apt install code
+
+# Mises à jour :
+
+3. sudo apt upgrade code
+
 //--------------------------------------------------------------
 
 Installer le module OnOff.
@@ -143,22 +151,6 @@ Obtenir des informations sur le système d’exploitation exécuté sur un Raspb
 //!--------------------------------------------------------------
 
 Numéro de sous-version pour Debian : cat /etc/debian_version
-
-//!--------------------------------------------------------------
-
-Installation Vs Code :
-
-sudo apt update
-sudo apt install code
-
-//!--------------------------------------------------------------
-
-Mise à jour :
-
-sudo apt update
-sudo apt upgrade
-
-//!--------------------------------------------------------------
 
 Architecture utilisée sur l'appareil : uname -m
 
