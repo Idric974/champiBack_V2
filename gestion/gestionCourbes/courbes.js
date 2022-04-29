@@ -4,6 +4,8 @@ const axios = require('axios');
 const Chart = require('chart.js');
 const zoomPlugin = require('chartjs-plugin-zoom');
 
+//Chart.register(zoomPlugin);
+
 const {
   format,
   time,
@@ -323,13 +325,7 @@ let getDataCourbeAir = () => {
           y: {},
         },
         plugins: {
-          zoom: {
-            zoom: {
-              wheel: {
-                enabled: true,
-              },
-            },
-          },
+          zoom: {},
         },
       };
       //! ---------------------------------

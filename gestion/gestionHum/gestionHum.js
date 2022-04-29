@@ -73,7 +73,7 @@ let recuperationConsigneAir = () => {
           // console.log('LastId :   ', lastId);
 
           consigne = result['consigneHum'];
-          // console.log('Consigne : ', consigne);
+          console.log('Consigne : ', consigne);
 
           pas = result['pasHum'];
           // console.log('Pas :      ', pas);
