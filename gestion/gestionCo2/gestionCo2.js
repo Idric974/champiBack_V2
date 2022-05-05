@@ -14,7 +14,7 @@ const axios = require('axios');
 
 //! Les variables.
 
-let data = '';
+let data;
 let consigne;
 let deltaCo2;
 let daysCo2;
@@ -30,44 +30,22 @@ let valeurAxeX;
 
 //! ----------------------------------
 
-const getTauxCo2 = new Promise((resolve, reject) => {
-  //! 2) Demande de mesure à la master.
-  http
-    .get('http://192.168.0.10:6000/getCO2/2', (resp) => {
-      //
-      resp.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      resp.on('end', () => {});
-    })
-
-    .on('response', function (resp) {
-      if (resp.statusCode === 200) {
-        // console.log('OK OK');
-        resolve();
-      } else {
-        reject();
-        // console.log('PAS OK');
-      }
-    })
-
-    .on('error', (err) => {
-      console.log('Error: ' + err.message);
-    });
-});
-
-let actionGetTauxCo2 = async () => {
-  let go = await getTauxCo2;
-  return go;
-};
-
-//!------------------------------------------------------------
-
-actionGetTauxCo2(data)
+axios({
+  method: 'post',
+  url: `http://localhost:5000/api/getCo2Routes/getCo2`,
+  // url: `http://192.168.0.10:5000/api/getCo2Routes/getCo2`,
+  withCredentials: true,
+  data: {
+    numSalle: '1',
+  },
+})
+  .then((res) => {
+    // console.log('resultat :', res.data.co2Room);
+    data = res.data.co2Room;
+    console.log('Le taux de CO2 : ', data);
+  })
   .then(() => {
-    //! Récupération de la consigne
-
+    //! Récupération de la consigne.
     let recuperationConsigneCo2 = () => {
       gestionCo2DataModels
         .findOne({
@@ -76,70 +54,54 @@ actionGetTauxCo2(data)
         })
         .then((id) => {
           // console.log(id.maxid);
-
           gestionCo2DataModels
             .findOne({
               where: { id: id.maxid },
             })
             .then((result) => {
               // console.log('Récupération de la consigne =====> ' + result);
-
               lastId = result['id'];
               // console.log('LastId :   ', lastId);
-
               consigne = result['consigneCo2'];
-
               console.log(
                 cyan,
                 '[ GESTION CO2 CALCULES  ] La consigne est : ' + consigne
               );
-
               pas = result['pasCo2'];
               // console.log('Pas :      ', pas);
-
               pas = result['pasCo2'];
               // console.log('Pas :      ', pas);
-
               objectif = result['objectifCo2'];
               // console.log('Objectif : ', objectif);
             });
         })
         .then(() => {
           //* Calcule du delta.
-
           setTimeout(() => {
             let calcDelta = () => {
               deltaCo2 = data - consigne;
-
               console.log(
                 cyan,
                 '[ GESTION CO2 CALCULES  ] Le taux de Co2 est de :' +
                   data +
                   'ppm'
               );
-
               console.log(
                 cyan,
                 '[ GESTION CO2 CALCULES  ] Le delta de Co2 est de :',
                 deltaCo2 + 'ppm'
               );
             };
-
             calcDelta();
           }, 1000);
-
           //*------------------------------------------------------------
         });
     };
-
     recuperationConsigneCo2();
-
     //!------------------------------------------------------------
   })
-
   .then(() => {
     //! Construction de la valeur de l'axe x.
-
     let getDateDemarrageCycle = () => {
       axios
         .get(
@@ -150,37 +112,30 @@ actionGetTauxCo2(data)
           //     'Date démarrage du cycle :---:',
           //     response.data.dateDemarrageCycle.dateDemarrageCycle
           //   );
-
           //* Date du jour.
           dateDuJour = new Date();
-          console.log('Date du Jour :---------------------:', dateDuJour);
+          // console.log('Date du Jour :---------------------:', dateDuJour);
           //* --------------------------------------------------
-
           //* Date de demarrage du cycle
           dateDemarrageCycle = new Date(
             response.data.dateDemarrageCycle.dateDemarrageCycle
           );
-          console.log(
-            'La date de démarrage du cycle :----:',
-            dateDemarrageCycle
-          );
+          // console.log(
+          //   'La date de démarrage du cycle :----:',
+          //   dateDemarrageCycle
+          // );
           //* --------------------------------------------------
-
           //* Calcul du nombre de jour du cycle.
-
           let nbJourBrut = dateDuJour.getTime() - dateDemarrageCycle.getTime();
           jourDuCycle = Math.round(nbJourBrut / (1000 * 3600 * 24)) + 1;
           // console.log('Le jour du cycle  ', jourDuCycle, ' jours');
-
           //* --------------------------------------------------
-
           //* Affichage de l'heure.
           heureDuCycle = new Date().getHours();
           minuteDuCycle = new Date().getMinutes();
           heureMinute = heureDuCycle + 'h' + minuteDuCycle;
-          console.log("l'heure du cycle :-----------------:", heureMinute);
+          // console.log("l'heure du cycle :-----------------:", heureMinute);
           //* --------------------------------------------------
-
           //* Valeure de l'axe x.
           valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
           console.log("Valeure de l'axe x :---------------:", valeurAxeX);
@@ -191,13 +146,10 @@ actionGetTauxCo2(data)
         });
     };
     getDateDemarrageCycle();
-
     //! -------------------------------------------------- !
   })
-
   .then(() => {
     //! 4) Enregistrement en base de donnes.
-
     setTimeout(() => {
       let enregistrement = () => {
         const newVal = gestionCo2Models
@@ -224,13 +176,13 @@ actionGetTauxCo2(data)
             );
           });
       };
-
       enregistrement();
     }, 2000);
-
     //!----------------------------------------------
   })
 
-  .catch(() => {
-    console.log(cyan, '[ GESTION CO2 CALCULES  ] Erreur Co2');
+  .catch((err) => {
+    console.log(err);
   });
+
+//!------------------------------------------------------------

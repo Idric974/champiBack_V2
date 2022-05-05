@@ -82,7 +82,7 @@ const consigneAirAuto = schedule.scheduleJob(' 0 * * * * ', () => {
 
 //* Calcules.
 
-const gestionHum = schedule.scheduleJob('05 * * * *', () => {
+const gestionHum = schedule.scheduleJob('0 * * * *', () => {
   // const gestionHum = schedule.scheduleJob(' */10 * * * * ', () => {
   var childProcess = require('child_process');
 
@@ -161,7 +161,7 @@ const consigneHumAuto = schedule.scheduleJob(' 0 * * * * ', () => {
 
 //* Calcules.
 
-const gestionCo2 = schedule.scheduleJob(' 0 * * * * ', () => {
+const gestionCo2 = schedule.scheduleJob(' 01 * * * * ', () => {
   // const gestionCo2 = schedule.scheduleJob(' */10 * * * * ', () => {
   var childProcess = require('child_process');
 
@@ -199,7 +199,7 @@ const gestionCo2 = schedule.scheduleJob(' 0 * * * * ', () => {
 
 //* Consigne automatique Co2
 
-const consigneCo2Auto = schedule.scheduleJob(' 0 * * * * ', () => {
+const consigneCo2Auto = schedule.scheduleJob(' 02 * * * * ', () => {
   var childProcess = require('child_process');
 
   function runScript(scriptPath, callback) {
