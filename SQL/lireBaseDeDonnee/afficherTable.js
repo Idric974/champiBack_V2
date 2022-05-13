@@ -23,7 +23,7 @@ const con = mysql.createConnection({
 
 //* gestion Co2
 
-let table = 'gestion_co2s';
+// let table = 'gestion_co2s';
 // let table = 'gestion_co2s_datas';
 
 //* gestion Substrat.
@@ -33,7 +33,7 @@ let table = 'gestion_co2s';
 // let table = 'gestion_logs';
 
 //* Gestion des courbes
-// let table = 'gestion_courbes';
+let table = 'gestion_courbes';
 
 //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 con.connect(function (err) {

@@ -63,3 +63,4 @@
 2022-03-06T16:24:20.188Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  (intermediate value).then is not a function  
 2022-03-06T16:26:15.939Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not a function  
 2022-03-06T16:38:01.004Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  miseAjourEtatRelay is not defined  
+2022-05-10T10:15:14.007Z - [INFO   ] - Fchier source : gestionAir | Module : Définition des actions | Type erreur :  EACCES: permission denied, open '/sys/class/gpio/gpio23/value'  

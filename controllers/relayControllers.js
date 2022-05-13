@@ -161,6 +161,7 @@ exports.relayEau = (req, res, next) => {
     relay16On();
 
     console.log('Le relayEau est ON');
+    res.status(200).json({ message: 'Eau au sol activé ✅' });
   }
   if (relayEau == 0) {
     let relay16Off = () => {
@@ -169,9 +170,9 @@ exports.relayEau = (req, res, next) => {
     relay16Off();
 
     console.log('Le relayEau est OFF');
-  }
 
-  res.status(200).json({ message: 'Requete relayEau : OK' });
+    res.status(200).json({ message: 'Eau au sol déactivé ❌' });
+  }
 };
 
 //*! ➖ ➖ ➖ ➖ ➖ ➖ Gestion relay Ventilateur humidité ➖ ➖ ➖ ➖ ➖ ➖ //

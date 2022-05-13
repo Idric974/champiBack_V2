@@ -165,18 +165,18 @@ const Sequelize = require('sequelize');
 
 //* Etalonnage Hum Sec.
 
-const miseAJourEtalonnageHumSec = db.etalonnageSec;
+// const miseAJourEtalonnageHumSec = db.etalonnageSec;
 
-const newEtalAir = miseAJourEtalonnageHumSec
-  .create({
-    etalonnageSec: 0,
-  })
-  .then((result) => {
-    console.log('Table mise à jour');
-  })
-  .catch((error) => {
-    console.log('Table non mise à jour', error);
-  });
+// const newEtalAir = miseAJourEtalonnageHumSec
+//   .create({
+//     etalonnageSec: 0,
+//   })
+//   .then((result) => {
+//     console.log('Table mise à jour');
+//   })
+//   .catch((error) => {
+//     console.log('Table non mise à jour', error);
+//   });
 
 //! --------------------------------------------------
 
@@ -220,5 +220,31 @@ const newEtalAir = miseAJourEtalonnageHumSec
 
 //       .catch((err) => console.log(err));
 //   });
+
+//! --------------------------------------------------
+
+//* Courbes.
+
+const miseAJourEtatRelay = db.gestionCourbes;
+
+const newMAJ = miseAJourCourbe
+  .findOne({
+    attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+    raw: true,
+  })
+  .then((id) => {
+    // console.log('Le dernier id de gestionAir est : ', id);
+    // console.log(id.maxid);
+    lastId = id.maxid;
+
+    miseAJourCourbe
+      .update({ dateDemarrageCycle: 0 }, { where: { id: lastId } })
+
+      .then(() => {
+        console.log('Data Air enregitrées dans la base gestion_airs');
+      })
+
+      .catch((err) => console.log(err));
+  });
 
 //! --------------------------------------------------

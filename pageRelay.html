@@ -138,54 +138,12 @@
       let toggleRalayEauSol = () => {
         if (boutonToggleEauSol === 0) {
           boutonToggleEauSol = 1;
-          console.log('valeur du bouton' + boutonToggleEauSol);
+
+          console.log('Eau au sol activé');
+          console.log(boutonToggleEauSol);
 
           let element = document.getElementById('btnRelayEauSol');
-
-          element.style.backgroundColor = 'green';
-
-          element.innerHTML = 'Activation';
-
-          axios
-            .post('http://localhost:3003/api/relayRoutes/relayEau/', {
-              relayEau: boutonToggleEauSol,
-            })
-            .then(function (response) {
-              console.log(response);
-            })
-            .catch(function (error) {
-              console.log(error);
-            });
-
-          setTimeout(() => {
-            boutonToggleEauSol = 0;
-            console.log('valeur du bouton' + boutonToggleEauSol);
-
-            let element = document.getElementById('btnRelayEauSol');
-
-            element.style.backgroundColor = 'red';
-
-            element.innerHTML = 'Déactivation';
-
-            axios
-              .post('http://localhost:3003/api/relayRoutes/relayEau/', {
-                relayEau: boutonToggleEauSol,
-              })
-              .then(function (response) {
-                console.log(response);
-              })
-              .catch(function (error) {
-                console.log(error);
-              });
-          }, 120000);
-        } else {
-          boutonToggleEauSol = 0;
-          console.log('valeur du bouton' + boutonToggleEauSol);
-
-          let element = document.getElementById('btnRelayEauSol');
-
           element.style.backgroundColor = 'red';
-
           element.innerHTML = 'Déactivation';
 
           axios
@@ -193,7 +151,48 @@
               relayEau: boutonToggleEauSol,
             })
             .then(function (response) {
-              console.log(response);
+              console.log(response.data);
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+
+          setTimeout(() => {
+            console.log('Déactivation');
+            boutonToggleEauSol = 0;
+
+            axios
+              .post('http://localhost:3003/api/relayRoutes/relayEau/', {
+                relayEau: boutonToggleEauSol,
+              })
+              .then(function (response) {
+                console.log(response.data);
+                let element = document.getElementById('btnRelayEauSol');
+                element.style.backgroundColor = 'green';
+                element.innerHTML = 'Activation';
+
+                console.log(boutonToggleEauSol);
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+          }, 120000);
+        } else {
+          boutonToggleEauSol = 0;
+
+          console.log('Eau au sol déactivé');
+          console.log(boutonToggleEauSol);
+
+          let element = document.getElementById('btnRelayEauSol');
+          element.style.backgroundColor = 'green';
+          element.innerHTML = 'Activation';
+
+          axios
+            .post('http://localhost:3003/api/relayRoutes/relayEau/', {
+              relayEau: boutonToggleEauSol,
+            })
+            .then(function (response) {
+              console.log(response.data);
             })
             .catch(function (error) {
               console.log(error);
@@ -274,7 +273,7 @@
           .get('http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/')
           .then(function (response) {
             etatRelayBrute = response.data.temperatureAir.etatRelay;
-            console.log('etatRelayBrute ===> ' + etatRelayBrute);
+            //console.log('etatRelayBrute ===> ' + etatRelayBrute);
             // console.log('etatRelayBrute ===> ' + typeof etatRelayBrute);
             etatRelayLocalStorage = etatRelayBrute;
           })

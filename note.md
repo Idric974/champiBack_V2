@@ -193,3 +193,22 @@ Adresse pour tester une requete POST.
 https://httpbin.org/post
 
 //!--------------------------------------------------------------
+
+## Demander la version de node.
+
+node -v nodejs
+
+## Installer NodeJs.
+
+apt-get update
+apt-get install nodejs
+
+## Mise à jour de la distribution.
+
+apt-get dist-update
+
+## Installation de npm.
+
+apt-get install npm
+
+//!--------------------------------------------------------------
