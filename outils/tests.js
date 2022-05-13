@@ -1,15 +1,18 @@
-const Gpio = require('onoff').Gpio;
+const mcpadc = require('mcp-spi-adc');
+let mcpBroche = 2; // Broche 2.
 
-let relay = 27;
-let duree = 3000;
+listValAir = [];
 
-let activationRelay = (relay, duree) => {
-  const relay_ON = new Gpio(relay, 'out');
-  console.log('Hello');
+let test = () => {
+  const tempSensor = mcpadc.open(mcpBroche, { speedHz: 20000 }, (err) => {
+    if (err) throw err;
 
-  setTimeout(() => {
-    const relay_OFF = new Gpio(relay, 'in');
-    console.log('ReHello');
-  }, duree);
+    tempSensor.read((err, reading) => {
+      if (err) throw err;
+      listValAir.push(reading.value * 40);
+      console.log('[ GESTION AIR CALCULES  ] listValAir', listValAir);
+    });
+  });
 };
-activationRelay(27, 3000);
+
+test();
