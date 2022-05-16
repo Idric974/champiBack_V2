@@ -1,5 +1,20 @@
 # PROCÉDURE DE DÉPLOIEMENT
 
+## Vérifier si le port SPI est activé.
+
+1) Sur le Raspi :
+Préférence ⇒ Configuration du Raspberry Pi ⇒ Interface ⇒ SPI cocher Activé
+
+2) En ligne de commande : 
+1. sudo raspi-config 
+2. Sélectionnez « Options d’interfaçage »
+3. Mettez en surbrillance l’option « SPI » et activez «  ».
+4. Sélectionnez et activez «  » :
+5. Cliquez sur yes.
+6. Lorsque vous êtes invité à redémarrer, mettez en surbrillance et activez «  ».
+
+
+
 ## 1) Mise à jour du Raspberry.
 
 1. ===> sudo apt update
