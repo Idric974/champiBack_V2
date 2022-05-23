@@ -1,10 +1,11 @@
-const axios = require('axios');
-
 //! Gestion Humidité.
+
+const axios = require('axios');
 
 //? 1 Récupération du taux humidité dans la base.
 
-// Taux humidité.
+//* Taux humidité.
+
 let tauxHum;
 let tauxHumLocalStorage;
 let objectifHum;
@@ -15,13 +16,15 @@ let nbJourHumLocalStorage;
 let nbHeureHum;
 let nbHeureHumLocalStorage;
 
-// Tempèrature Hum
+//* Tempèrature Hum
+
 let temperatureSec;
 let temperatureSecLocalStorage;
 let temperatureHum;
 let temperatureHumLocalStorage;
 
-// Consigne Air.
+//* Consigne Air.
+
 let deltaTauxHum;
 let deltaTauxHumLocalStorage;
 
@@ -101,6 +104,8 @@ let getConsigneHum = () => {
     url: 'http://localhost:3003/api/gestionHumiditeRoutes/getConsigneHumidite/',
     method: 'get',
   })
+    //
+    //* Récupération des données.
     .then((response) => {
       // console.log(response.data);
 
@@ -115,12 +120,16 @@ let getConsigneHum = () => {
       document.getElementById('consigneHumidite').innerHTML =
         'Consigne Hum : ' + consigneHumLocalStorage + '%';
 
-      // -------------------------------------
-
-      // Durée de la descente Hum.
-
       objectifHum = response.data.dataGestionHum.objectifHum;
       pasHum = response.data.dataGestionHum.pasHum;
+    })
+
+    //* -------------------------------------------------
+
+    //* Durée de la descente Air.
+
+    .then(() => {
+      // Durée de la descente Hum.
 
       let CalculeNombreJour = () => {
         if (
@@ -181,6 +190,11 @@ let getConsigneHum = () => {
       }, 120000);
       // -------------------------------------
     })
+
+    //* -------------------------------------------------
+
+    //* Stockage de la valeur deltat.
+
     .then(() => {
       let deltaTauxHum = parseFloat(tauxHum - consigneHum).toFixed(2);
       // console.log('delta Hum Front', deltaHum);
@@ -192,6 +206,10 @@ let getConsigneHum = () => {
       document.getElementById('deltaHumidite').innerHTML =
         'Delta Hum : ' + deltaTauxHumLocalStorage + '%';
     })
+
+    //* -------------------------------------------------
+
+    //* Catch des erreurs.
 
     .catch((error) => {
       console.log(error);
@@ -261,6 +279,8 @@ document
       .catch(function (error) {
         console.log(error);
       });
+
+    window.location.reload();
   });
 
 //? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

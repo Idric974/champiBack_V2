@@ -185,17 +185,19 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
-const axios = require('axios');
-
 //! Gestion Co2.
+
+const axios = require('axios');
 
 //? 1 Récupération du taux de Co2 dans la base.
 
-// Taux de Co2.
+//* Taux de Co2.
+
 let tauxCo2;
 let tauxCo2LocalStorage;
 
-// Consigne Air.
+//* Consigne Air.
+
 let deltaCo2;
 let deltaCo2LocalStorage;
 
@@ -207,7 +209,7 @@ let getTauxCo2 = () => {
     .then((response) => {
       // console.log(response.data);
 
-      // Taux Co2.
+      //* Taux Co2.
 
       tauxCo2 = response.data.tauxCo2.tauxCo2;
 
@@ -252,6 +254,9 @@ let getConsigneCo2 = () => {
     url: 'http://localhost:3003/api/gestionCo2Routes/getDataCo2/',
     method: 'get',
   })
+    //
+    //* Récupération des données.
+
     .then((response) => {
       // console.log(response.data);
 
@@ -266,13 +271,15 @@ let getConsigneCo2 = () => {
       document.getElementById('consigneCo2').innerHTML =
         'Consigne Co2 : ' + consigneCo2LocalStorage + ' ppm';
 
-      // -------------------------------------
-
-      // Durée de la descente Co2.
-
       objectifCo2 = response.data.dataTauxCo2.objectifCo2;
       pasCo2 = response.data.dataTauxCo2.pasCo2;
+    })
 
+    //* -------------------------------------------------
+
+    //* Durée de la descente Air.
+
+    .then(() => {
       let CalculeNombreJour = () => {
         if (
           consigneCo2 == 0 ||
@@ -330,11 +337,14 @@ let getConsigneCo2 = () => {
       setInterval(() => {
         CalculeNombreJour();
       }, 120000);
-      // -------------------------------------
     })
 
+    //* -------------------------------------------------
+
+    //* Stockage de la valeur deltat.
+
     .then(() => {
-      let deltaCo2 = parseFloat(tauxCo2 - consigneCo2).toFixed(2);
+      deltaCo2 = parseFloat(tauxCo2 - consigneCo2).toFixed(2);
       // console.log('delta Air Front', deltaco2);
 
       localStorage.setItem('Valeure delta Co2 : ', deltaCo2);
@@ -413,7 +423,7 @@ document
         console.log(error);
       });
 
-    // history.go(0);
+    window.location.reload();
   });
 
 //? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,11 +1,12 @@
-//* Les constantes.
+//! Les constantes.
 
 const magenta = '\x1b[35m';
 require('dotenv').config();
 const sequelize = require('sequelize');
 const db = require('../../models');
 const gestionHumsDataModels = db.gestionHumData;
-//*-------------------------------------
+
+//!-------------------------------------
 
 //* Les variables.
 

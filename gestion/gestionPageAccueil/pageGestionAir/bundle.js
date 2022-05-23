@@ -185,6 +185,8 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
+//! Gestion Air.
+
 const axios = require('axios');
 
 //! Rafraichissement de la page.
@@ -239,11 +241,13 @@ afficherDate();
 
 //? 1 Récupération de la tempèrature Air dans la base.
 
-// température Air.
+//* Température Air.
+
 let temperatureAir;
 let temperatureAirLocalStorage;
 
-// Consigne Air.
+//* Consigne Air.
+
 let deltaAir;
 let deltaAirLocalStorage;
 
@@ -283,11 +287,11 @@ setInterval(() => {
 
 //? 2 Récupération de la consigne Air dans la base.
 
-// température Air.
+//* température Air.
+
 let consigneAir;
 let consigneAirLocalStorage;
 let objectifAir;
-let heureAir;
 let pasAir;
 let nbJourAir;
 let nbJourAirLocalStorage;
@@ -299,10 +303,13 @@ let getConsigneAir = () => {
     url: 'http://localhost:3003/api/gestionAirRoutes/getDataAir/',
     method: 'get',
   })
+    //
+    //* Récupération des données.
+
     .then((response) => {
       // console.log(response.data);
 
-      // Consigne Air.
+      //* Consigne Air.
 
       consigneAir = response.data.datatemperatureAir.consigneAir;
 
@@ -313,14 +320,16 @@ let getConsigneAir = () => {
       document.getElementById('consigneAir').innerHTML =
         'Consigne Air : ' + consigneAirLocalStorage + '°C';
 
-      // -------------------------------------
-
-      // Durée de la descente Air.
-
       objectifAir = response.data.datatemperatureAir.objectifAir;
 
       pasAir = response.data.datatemperatureAir.pasAir;
+    })
 
+    //* -------------------------------------------------
+
+    //* Durée de la descente Air.
+
+    .then(() => {
       let CalculeNombreJour = () => {
         if (
           consigneAir == 0 ||
@@ -379,11 +388,14 @@ let getConsigneAir = () => {
       setInterval(() => {
         CalculeNombreJour();
       }, 120000);
-
-      // -------------------------------------
     })
+
+    //* -------------------------------------------------
+
+    //* Stockage de la valeur deltat.
+
     .then(() => {
-      let deltaAir = parseFloat(temperatureAir - consigneAir).toFixed(2);
+      deltaAir = parseFloat(temperatureAir - consigneAir).toFixed(2);
       // console.log('delta Air Front', deltaAir);
 
       localStorage.setItem('Valeure delta Air : ', deltaAir);
@@ -392,14 +404,19 @@ let getConsigneAir = () => {
 
       document.getElementById('delatAir').innerHTML =
         'Delta Air : ' + deltaAirLocalStorage + '°C';
-
-      // -------------------------------------
     })
+
+    //* -------------------------------------------------
+
+    //* Catch des erreurs.
+
     .catch((error) => {
       console.log(error);
 
       console.log(JSON.stringify(error));
     });
+
+  //* -------------------------------------------------
 };
 
 getConsigneAir();
@@ -417,7 +434,6 @@ document
   .getElementById('validationConsigneAir')
   .addEventListener('click', function () {
     //
-
     // console.log('Clic sur bouton validation Etal Hum');
 
     let consigneAirForm = document.getElementById('consigneAirForm').value;
@@ -441,7 +457,6 @@ document
   .getElementById('validationdataAir')
   .addEventListener('click', function () {
     //
-
     // console.log('Clic sur bouton validation Etal Hum');
 
     let pasAirForm = document.getElementById('pasAirForm').value;
@@ -460,6 +475,8 @@ document
       .catch(function (error) {
         console.log(error);
       });
+
+    window.location.reload();
   });
 
 //? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
