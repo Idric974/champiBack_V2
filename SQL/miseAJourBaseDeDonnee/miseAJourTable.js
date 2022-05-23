@@ -225,26 +225,43 @@ const Sequelize = require('sequelize');
 
 //* Courbes.
 
-const miseAJourEtatRelay = db.gestionCourbes;
+// const miseAJourEtatRelay = db.gestionCourbes;
 
-const newMAJ = miseAJourCourbe
-  .findOne({
-    attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
-    raw: true,
+// const newMAJ = miseAJourCourbe
+//   .findOne({
+//     attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+//     raw: true,
+//   })
+//   .then((id) => {
+//     // console.log('Le dernier id de gestionAir est : ', id);
+//     // console.log(id.maxid);
+//     lastId = id.maxid;
+
+//     miseAJourCourbe
+//       .update({ dateDemarrageCycle: 0 }, { where: { id: lastId } })
+
+//       .then(() => {
+//         console.log('Data Air enregitrées dans la base gestion_airs');
+//       })
+
+//       .catch((err) => console.log(err));
+//   });
+
+//! --------------------------------------------------
+
+//* etat_Bouton_Eau_Sol .
+
+const miseAJourEtatEauAuSol = db.relayEauAuSol;
+
+const newEtalAir = miseAJourEtatEauAuSol
+  .create({
+    etatRelayEauAuSol: 0,
   })
-  .then((id) => {
-    // console.log('Le dernier id de gestionAir est : ', id);
-    // console.log(id.maxid);
-    lastId = id.maxid;
-
-    miseAJourCourbe
-      .update({ dateDemarrageCycle: 0 }, { where: { id: lastId } })
-
-      .then(() => {
-        console.log('Data Air enregitrées dans la base gestion_airs');
-      })
-
-      .catch((err) => console.log(err));
+  .then((result) => {
+    console.log('Table mise à jour');
+  })
+  .catch((error) => {
+    console.log('Table non mise à jour', error);
   });
 
 //! --------------------------------------------------

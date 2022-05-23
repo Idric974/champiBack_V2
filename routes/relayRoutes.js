@@ -4,9 +4,14 @@ const express = require('express');
 const router = express.Router();
 const relayCtrl = require('../controllers/relayControllers');
 
-router.post('/relay', relayCtrl.relay);
-router.post('/relayEau', relayCtrl.relayEau);
+//! Eau au sol.
+
+//? POST.
+
+router.post('/relayEauAuSol', relayCtrl.relayEauAuSol);
+
 router.post('/relayVentilo', relayCtrl.relayVentilo);
+
 router.post(
   '/relayVanneFroid5SecondesOn',
   relayCtrl.relayVanneFroid5SecondesOn
@@ -18,5 +23,13 @@ router.post(
 );
 
 router.post('/miseAZeroEtatVanne', relayCtrl.miseAZeroEtatVanne);
+
+//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//? GET.
+
+router.get('/getEtatBoutonEauAuSol', relayCtrl.getEtatBoutonEauAuSol);
+
+//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 module.exports = router;

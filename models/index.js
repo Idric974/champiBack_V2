@@ -106,4 +106,9 @@ db.gestionLogsBack = require('./logsModels/gestionLogsModels')(
   Sequelize
 );
 
+//? Gestion eau au sol.
+
+db.gestionEtatBoutonRelayEauAuSol =
+  require('./relayEauAuSol/relayEauAuSolModels')(sequelize, Sequelize);
+
 module.exports = db;

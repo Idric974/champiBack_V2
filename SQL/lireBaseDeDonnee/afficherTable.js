@@ -33,7 +33,10 @@ const con = mysql.createConnection({
 // let table = 'gestion_logs';
 
 //* Gestion des courbes
-let table = 'gestion_courbes';
+// let table = 'gestion_courbes';
+
+//* Gestion eau au sol
+let table = 'relay_eau_au_sols';
 
 //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 con.connect(function (err) {

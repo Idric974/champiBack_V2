@@ -1,4 +1,6 @@
 //! --------------------------------------------------
+
+//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 OK
 
 Pour supprimer la base de données
@@ -210,5 +212,16 @@ apt-get dist-update
 ## Installation de npm.
 
 apt-get install npm
+
+//!--------------------------------------------------------------
+
+## Contenu du fichier configNumSalle
+
+1. Créer le ficheir configNumSalle.js
+
+2. Placer le code ci-dessous
+
+const numSalle = 1;
+module.exports = numSalle;
 
 //!--------------------------------------------------------------

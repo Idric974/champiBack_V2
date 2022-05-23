@@ -16,7 +16,7 @@ let palier;
 let newConsigne;
 //*-------------------------------------
 
-//! 1 ) ➖➖➖➖➖➖ Récupération de la dernière consigne➖➖➖➖➖➖
+//! 1 ) Récupération de la dernière consigne.
 
 let derniereConsigne = () => {
   gestionAirsDataModels
@@ -56,9 +56,12 @@ let derniereConsigne = () => {
         });
     });
 };
+
 derniereConsigne();
 
-//! 2 ) ➖➖➖➖➖➖ Calcule de la nouvelle consigne ➖➖➖➖➖➖
+//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
+//! 2 ) Calcule de la nouvelle consigne.
 
 let gestionConsigne = () => {
   //
@@ -140,7 +143,7 @@ let gestionConsigne = () => {
 };
 //-------------------------------------
 
-//! 3) ➖➖➖➖➖➖ Fonction qui décide de la consigne automatique ou manuelle ➖➖➖➖➖➖
+//! 3) Fonction qui décide de la consigne automatique ou manuelle.
 
 setTimeout(() => {
   palier = pasAir / 12;
@@ -168,4 +171,4 @@ setTimeout(() => {
   }
 }, 1000);
 
-setTimeout(() => {}, 1500);
+//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖

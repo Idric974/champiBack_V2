@@ -9,6 +9,7 @@ const db = require('../../models');
 const gestionCo2Models = db.gestionCo2;
 const gestionCo2DataModels = db.gestionCo2Data;
 const axios = require('axios');
+const numSalle = require('../../configNumSalle');
 
 //! -----------------------------------------------------------
 
@@ -32,11 +33,11 @@ let valeurAxeX;
 
 axios({
   method: 'post',
-  url: `http://localhost:5000/api/getCo2Routes/getCo2`,
-  // url: `http://192.168.0.10:5000/api/getCo2Routes/getCo2`,
+  // url: `http://localhost:5000/api/getCo2Routes/getCo2`,
+  url: `http://192.168.0.10:5000/api/getCo2Routes/getCo2`,
   withCredentials: true,
   data: {
-    numSalle: '1',
+    numSalle: numSalle,
   },
 })
   .then((res) => {

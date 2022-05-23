@@ -1,8 +1,8 @@
 const schedule = require('node-schedule');
 
-//*! 1) ➖ ➖ ➖ ➖ ➖ ➖ GESTION AIR ➖ ➖ ➖ ➖ ➖ ➖ //
+//*! 1) Gestion Air
 
-//* Calcules.
+//? Calcules.
 
 const gestionAir = schedule.scheduleJob(' */5 * * * * ', () => {
   var childProcess = require('child_process');
@@ -39,7 +39,9 @@ const gestionAir = schedule.scheduleJob(' */5 * * * * ', () => {
   });
 });
 
-//* Consigne automatique AIR
+//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//? Consigne automatique AIR
 
 const consigneAirAuto = schedule.scheduleJob(' 0 * * * * ', () => {
   var childProcess = require('child_process');
@@ -76,11 +78,13 @@ const consigneAirAuto = schedule.scheduleJob(' 0 * * * * ', () => {
   });
 });
 
-//*! ➖ ➖ ➖ ➖ ➖ ➖ FIN GESTION AIR ➖ ➖ ➖ ➖ ➖ ➖ //
+//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//*! 2)  ➖ ➖ ➖ ➖ ➖ ➖ GESTION HUMIDITÉ ➖ ➖ ➖ ➖ ➖ ➖ //
+//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-//* Calcules.
+//*! 2) Gestion humidité.
+
+//? Calcules.
 
 const gestionHum = schedule.scheduleJob('0 * * * *', () => {
   // const gestionHum = schedule.scheduleJob(' */10 * * * * ', () => {
@@ -118,7 +122,9 @@ const gestionHum = schedule.scheduleJob('0 * * * *', () => {
   });
 });
 
-//* Consigne automatique Hum
+//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//? Consigne automatique Hum
 
 const consigneHumAuto = schedule.scheduleJob(' 0 * * * * ', () => {
   var childProcess = require('child_process');
@@ -155,11 +161,13 @@ const consigneHumAuto = schedule.scheduleJob(' 0 * * * * ', () => {
   });
 });
 
-//*! ➖ ➖ ➖ ➖ ➖ ➖ FIN GESTION HUMIDITÉ ➖ ➖ ➖ ➖ ➖ ➖ //
+//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//*! 3) ➖ ➖ ➖ ➖ ➖ ➖ GESTION CO2 ➖ ➖ ➖ ➖ ➖ ➖ //
+//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-//* Calcules.
+//*! 3) Gestion Co2
+
+//? Calcules.
 
 const gestionCo2 = schedule.scheduleJob(' 01 * * * * ', () => {
   // const gestionCo2 = schedule.scheduleJob(' */10 * * * * ', () => {
@@ -197,7 +205,9 @@ const gestionCo2 = schedule.scheduleJob(' 01 * * * * ', () => {
   });
 });
 
-//* Consigne automatique Co2
+//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//? Consigne automatique Co2
 
 const consigneCo2Auto = schedule.scheduleJob(' 02 * * * * ', () => {
   var childProcess = require('child_process');
@@ -234,4 +244,6 @@ const consigneCo2Auto = schedule.scheduleJob(' 02 * * * * ', () => {
   });
 });
 
-//*! ➖ ➖ ➖ ➖ ➖ ➖ FIN GESTION CO2 ➖ ➖ ➖ ➖ ➖ ➖ //
+//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
