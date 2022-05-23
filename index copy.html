@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Champi</title>
+    <link rel="icon" type="image/png" href="./images/champignon.ico" />
+    <link rel="stylesheet" type="text/css" href="./styles/globaleStyles.css" />
+    <link rel="stylesheet" type="text/css" href="./styles/style.css" />
+  </head>
+  <body>
+    <!-- NAVIGATION -->
+    <div class="box">
+      <div class="box1">
+        <button class="boutonAccueil"><a href="/">Accueil</a></button>
+        <button class="boutonAccueil">
+          <a href="/pageRelay.html">Gestion Relay</a>
+        </button>
+        <button class="boutonAccueil">
+          <a href="/pageCourbes.html">Courbe</a>
+        </button>
+      </div>
+
+      <!-- FIN NAVIGATION -->
+
+      <!-- BOX 2 -->
+      <div class="box2">
+        <div id="afficheDate" class="laDate"></div>
+
+        <!-- <div class="box2Title">Accueil</div> -->
+        <div class="box2Content">
+          <!-- Température Air -->
+          <div class="boxCard">
+            <!-- BOX AFFICHAGE -->
+
+            <div class="boxCardData1">
+              <div class="boxCardDataTitle">Température Air</div>
+
+              <div id="temperatureAir" class="boxCardDataValue"></div>
+
+              <div class="boxCardDataParams">
+                <div id="consigneAir" class="boxCardDataItem"></div>
+                <div id="delatAir" class="boxCardDataItem"></div>
+              </div>
+            </div>
+            <!-- FIN BOX AFFICHAGE -->
+
+            <!-- BOX SAISIE -->
+
+            <div class="boxCardData2">
+              <div class="boxCardData2Title">Descente Air</div>
+
+              <div class="boxCardData2Form">
+                <form>
+                  <div class="modifBlocForm">
+                    <label for="consigneAir">Consigne</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      id="consigneAirForm"
+                      name="consigneAir"
+                      required
+                    />
+                  </div>
+                </form>
+
+                <button
+                  onclick="validationConsigneAir()"
+                  class="boutonActivation"
+                >
+                  Valider Consigne
+                </button>
+              </div>
+
+              <div class="boxCardData2Form">
+                <form>
+                  <div class="modifBlocForm">
+                    <label for="pasAir">Pas</label>
+                    <input
+                      type="number"
+                      id="pasAirForm"
+                      name="pasAir"
+                      required
+                    />
+                  </div>
+
+                  <div class="modifBlocForm">
+                    <label for="objectiAir">Objectif</label>
+                    <input
+                      type="number"
+                      id="objectiAirForm"
+                      name="objectiAir"
+                      required
+                    />
+                  </div>
+                </form>
+
+                <button onclick="validationdataAir()" class="boutonActivation">
+                  Valider Descente
+                </button>
+              </div>
+
+              <div id="descenteAir" class="boxCardData2DaysHeures"></div>
+            </div>
+
+            <!-- FIN BOX SAISIE -->
+          </div>
+          <!-- --------------------- -->
+
+          <!-- Taux de Humidité -->
+          <div class="boxCard">
+            <!-- BOX AFFICHAGE -->
+
+            <div class="boxCardData1">
+              <div class="boxCardDataTitle">Taux Humidité</div>
+
+              <div id="tauxHumidite" class="boxCardDataValue">30 °C</div>
+
+              <div class="boxCardDataParams">
+                <div id="consigneHumidite" class="boxCardDataItem"></div>
+                <div id="deltaHumidite" class="boxCardDataItem"></div>
+                <div id="temperatureSec" class="boxCardDataItem"></div>
+                <div id="temperatureHum" class="boxCardDataItem"></div>
+              </div>
+            </div>
+
+            <!-- FIN BOX AFFICHAGE -->
+
+            <!-- BOX SAISIE -->
+            <div class="boxCardData2">
+              <div class="boxCardData2Title">Descente Humidité</div>
+
+              <div class="boxCardData2Form">
+                <form>
+                  <div class="modifBlocForm">
+                    <label for="consigneHum">Consigne</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      id="consigneHumForm"
+                      name="consigneHum"
+                      required
+                    />
+                  </div>
+                </form>
+
+                <button
+                  onclick="validationConsigneHum()"
+                  class="boutonActivation"
+                >
+                  Valider Consigne
+                </button>
+              </div>
+
+              <div class="boxCardData2Form">
+                <form>
+                  <div class="modifBlocForm">
+                    <label for="pasHum">Pas</label>
+
+                    <input
+                      type="number"
+                      id="pasHumForm"
+                      name="pasHum"
+                      required
+                    />
+                  </div>
+
+                  <div class="modifBlocForm">
+                    <label for="objectifHum">Objectif</label>
+
+                    <input
+                      type="number"
+                      id="objectifHumForm"
+                      name="objectiHum"
+                      required
+                    />
+                  </div>
+                </form>
+
+                <button onclick="validationdataHum()" class="boutonActivation">
+                  Valider Descente
+                </button>
+              </div>
+
+              <div id="descenteHum" class="boxCardData2DaysHeures"></div>
+            </div>
+
+            <!-- FIN BOX SAISIE -->
+          </div>
+          <!-- --------------------- -->
+
+          <!-- Taux de Co2 -->
+          <div class="boxCard">
+            <!-- BOX AFFICHAGE -->
+            <div class="boxCardData1">
+              <div class="boxCardDataTitle">Taux de Co2</div>
+
+              <div id="tauxCo2" class="boxCardDataValue"></div>
+
+              <div class="boxCardDataParams">
+                <div id="consigneCo2" class="boxCardDataItem"></div>
+                <div id="deltaCo2" class="boxCardDataItem"></div>
+              </div>
+            </div>
+            <!-- FIN BOX AFFICHAGE -->
+
+            <!-- BOX SAISIE -->
+            <div class="boxCardData2">
+              <div class="boxCardData2Title">Descente Co2</div>
+
+              <div class="boxCardData2Form">
+                <form>
+                  <div class="modifBlocForm">
+                    <label for="consigneCo2">Consigne</label>
+                    <input
+                      type="number"
+                      step="100"
+                      id="consigneCo2Form"
+                      name="consigneCo2"
+                      required
+                    />
+                  </div>
+                </form>
+
+                <button
+                  onclick="validationConsigneCo2()"
+                  class="boutonActivation"
+                >
+                  Valider Consigne
+                </button>
+              </div>
+
+              <div class="boxCardData2Form">
+                <form>
+                  <div class="modifBlocForm">
+                    <label for="pasCo2">Pas</label>
+                    <input
+                      type="number"
+                      id="pasCo2Form"
+                      name="pasCo2"
+                      required
+                    />
+                  </div>
+
+                  <div class="modifBlocForm">
+                    <label for="objectiCo2">Objectif</label>
+                    <input
+                      type="number"
+                      id="objectifCo2Form"
+                      name="objectiCo2"
+                      required
+                    />
+                  </div>
+                </form>
+
+                <button onclick="validationdataCo2()" class="boutonActivation">
+                  Valider descente
+                </button>
+              </div>
+
+              <div id="descenteCo2" class="boxCardData2DaysHeures"></div>
+            </div>
+            <!-- FIN BOX SAISIE -->
+          </div>
+          <!-- --------------------- -->
+        </div>
+      </div>
+      <!-- FIN BOX 2 -->
+    </div>
+
+    <script src="/gestion/gestionPageAccueil/bundle.js"></script>
+    <!--  browserify /home/pi/Desktop/champiBack_V2/gestion/gestionPageAccueil/pageAccueil.js > /home/pi/Desktop/champiBack_V2/gestion/gestionPageAccueil/bundle.js   -->
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.25.0/axios.js"
+      integrity="sha512-II/TvxJGs27N3NEu/WWRFtyhBdSByZwS5ovX1vHXVsi2JXj0I5hRvHwgBPKbzZDk0wsKVDoEUEI8rAYGEF394A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script>
+      //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Gestion Air ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
+      // 1 Récupération de la tempèrature Air dans la base.
+
+      // température Air.
+      let temperatureAir;
+      let temperatureAirLocalStorage;
+
+      // Consigne Air.
+      let deltaAir;
+      let deltaAirLocalStorage;
+
+      let getTemperatureAir = () => {
+        axios({
+          url: 'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/',
+          method: 'get',
+        })
+          .then((response) => {
+            // console.log(response.data.temperatureAir.temperatureAir);
+
+            temperatureAir = response.data.temperatureAir.temperatureAir;
+
+            localStorage.setItem('Valeure température Air : ', temperatureAir);
+
+            temperatureAirLocalStorage = localStorage.getItem(
+              'Valeure température Air : '
+            );
+
+            document.getElementById('temperatureAir').innerHTML =
+              temperatureAirLocalStorage + '°C';
+          })
+          .catch((error) => {
+            console.log(error);
+            console.log(JSON.stringify(error));
+          });
+      };
+
+      getTemperatureAir();
+
+      setInterval(() => {
+        getTemperatureAir();
+        // console.log('récup tempAir');
+      }, 10000);
+
+      //*******************************************************
+
+      // 2 Récupération de la consigne Air dans la base.
+
+      // température Air.
+      let consigneAir;
+      let consigneAirLocalStorage;
+      let objectifAir;
+      let heureAir;
+      let pasAir;
+      let nbJourAir;
+      let nbJourAirLocalStorage;
+      let nbHeureAir;
+      let nbHeureAirLocalStorage;
+
+      let getConsigneAir = () => {
+        axios({
+          url: 'http://localhost:3003/api/gestionAirRoutes/getDataAir/',
+          method: 'get',
+        })
+          .then((response) => {
+            // console.log(response.data);
+
+            // Consigne Air.
+
+            consigneAir = response.data.datatemperatureAir.consigneAir;
+
+            localStorage.setItem('Valeure consigne Air : ', consigneAir);
+
+            consigneAirLocalStorage = localStorage.getItem(
+              'Valeure consigne Air : '
+            );
+
+            document.getElementById('consigneAir').innerHTML =
+              'Consigne Air : ' + consigneAirLocalStorage + '°C';
+
+            // -------------------------------------
+
+            // Durée de la descente Air.
+
+            objectifAir = response.data.datatemperatureAir.objectifAir;
+
+            pasAir = response.data.datatemperatureAir.pasAir;
+
+            let CalculeNombreJour = () => {
+              if (
+                consigneAir == 0 ||
+                consigneAir == '' ||
+                consigneAir == null ||
+                objectifAir == 0 ||
+                objectifAir == '' ||
+                objectifAir == null ||
+                pasAir == 0 ||
+                pasAir == '' ||
+                pasAir == null
+              ) {
+                // console.log('Pas de paramètre pas de calcule des jours');
+
+                return;
+              } else {
+                let dureeDescenteAir =
+                  ((consigneAir - objectifAir) / pasAir) * 12;
+
+                // console.log('Durée Descente Air', dureeDescenteAir);
+
+                let totalHeures = dureeDescenteAir;
+
+                nbJourAir = Math.floor(totalHeures / 24);
+
+                totalHeures %= 360;
+
+                nbHeureAir = Math.floor(totalHeures / 36);
+
+                // console.log(
+                //   'La durée de la descente Air est de  : ' +
+                //     nbJourAir +
+                //     ' Jours ' +
+                //     nbHeureAir +
+                //     ' Heures '
+                // );
+              }
+
+              localStorage.setItem('Valeure nbJour Air : ', nbJourAir);
+              nbJourAirLocalStorage = localStorage.getItem(
+                'Valeure nbJour Air : '
+              );
+
+              localStorage.setItem('Valeure nbHeure Air : ', nbHeureAir);
+              nbHeureAirLocalStorage = localStorage.getItem(
+                'Valeure nbHeure Air : '
+              );
+
+              document.getElementById('descenteAir').innerHTML =
+                nbJourAirLocalStorage +
+                ' ' +
+                'Jours et' +
+                ' ' +
+                nbHeureAirLocalStorage +
+                ' ' +
+                'Heures';
+            };
+
+            CalculeNombreJour();
+
+            setInterval(() => {
+              CalculeNombreJour();
+            }, 120000);
+
+            // -------------------------------------
+          })
+          .then(() => {
+            let deltaAir = parseFloat(temperatureAir - consigneAir).toFixed(2);
+            // console.log('delta Air Front', deltaAir);
+
+            localStorage.setItem('Valeure delta Air : ', deltaAir);
+
+            deltaAirLocalStorage = localStorage.getItem('Valeure delta Air : ');
+
+            document.getElementById('delatAir').innerHTML =
+              'Delta Air : ' + deltaAirLocalStorage + '°C';
+
+            // -------------------------------------
+          })
+          .catch((error) => {
+            console.log(error);
+
+            console.log(JSON.stringify(error));
+          });
+      };
+
+      getConsigneAir();
+
+      setInterval(() => {
+        getConsigneAir();
+        // console.log('récup consigneAir');
+      }, 15000);
+
+      // ******************************************************
+
+      // 3 Post consigne air dans la base.
+
+      let validationConsigneAir = () => {
+        // console.log('Clic sur bouton validation Etal Hum');
+
+        let consigneAirForm = document.getElementById('consigneAirForm').value;
+        // console.log('consigneAirForm', consigneAirForm);
+
+        const boutonValiderEtalAir = axios
+          .post('http://localhost:3003/api/gestionAirRoutes/postConsigneAir/', {
+            consigneAir: consigneAirForm,
+          })
+          .then(function (response) {
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+
+      // 4 Post des datas air dans la base.
+
+      let validationdataAir = () => {
+        // console.log('Clic sur bouton validation Etal Hum');
+
+        let pasAirForm = document.getElementById('pasAirForm').value;
+        // console.log('pasAirForm', pasAirForm);
+        let objectiAirForm = document.getElementById('objectiAirForm').value;
+        // console.log('objectiAirForm', objectiAirForm);
+
+        const boutonValiderEtalHum = axios
+          .post('http://localhost:3003/api/gestionAirRoutes/postDataAir/', {
+            pasAir: pasAirForm,
+            objectifAir: objectiAirForm,
+          })
+          .then(function (response) {
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+      // ******************************************************
+
+      //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ FIN Gestion Air ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
+      //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Gestion Hum ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
+      // 1 Récupération du taux humidité dans la base.
+
+      // Taux humidité.
+      let tauxHum;
+      let tauxHumLocalStorage;
+      let objectifHum;
+      let heureHum;
+      let pasHum;
+      let nbJourHum;
+      let nbJourHumLocalStorage;
+      let nbHeureHum;
+      let nbHeureHumLocalStorage;
+
+      // Tempèrature Hum
+      let temperatureSec;
+      let temperatureSecLocalStorage;
+      let temperatureHum;
+      let temperatureHumLocalStorage;
+
+      // Consigne Air.
+      let deltaTauxHum;
+      let deltaTauxHumLocalStorage;
+
+      let getTauxHum = () => {
+        axios({
+          url: 'http://localhost:3003/api/gestionHumiditeRoutes/getTauxHumidite/',
+          method: 'get',
+        })
+          .then((response) => {
+            // console.log(response.data);
+
+            // température Air.
+
+            tauxHum = response.data.gestionTauxHum.tauxHumidite;
+
+            localStorage.setItem('Valeure taux humidité : ', tauxHum);
+
+            tauxHumLocalStorage = localStorage.getItem(
+              'Valeure taux humidité : '
+            );
+
+            document.getElementById('tauxHumidite').innerHTML =
+              tauxHumLocalStorage + '%';
+
+            // -------------------------------------
+
+            // Température Sec.
+
+            temperatureSec = response.data.gestionTauxHum.valeursMesureSec180;
+
+            localStorage.setItem('Valeure tempSec hum : ', temperatureSec);
+
+            temperatureSecLocalStorage = localStorage.getItem(
+              'Valeure tempSec hum : '
+            );
+
+            document.getElementById('temperatureSec').innerHTML =
+              'Température Sec : ' + temperatureSecLocalStorage + '°C';
+
+            // -------------------------------------
+
+            // Température Hum.
+
+            temperatureHum = response.data.gestionTauxHum.valeursMesureHum90;
+
+            localStorage.setItem('Valeure tempHum hum : ', temperatureHum);
+
+            temperatureHumLocalStorage = localStorage.getItem(
+              'Valeure tempHum hum : '
+            );
+
+            document.getElementById('temperatureHum').innerHTML =
+              'Température Hum : ' + temperatureHumLocalStorage + '°C';
+
+            // -------------------------------------
+          })
+          .catch((error) => {
+            console.log(error);
+            console.log(JSON.stringify(error));
+          });
+      };
+
+      getTauxHum();
+
+      setInterval(() => {
+        getTauxHum();
+        // console.log('récup Taux Hum');
+      }, 10000);
+
+      //*******************************************************
+
+      // 2 Récupération de la consigne Hum dans la base.
+
+      let consigneHum;
+      let consigneHumLocalStorage;
+
+      let getConsigneHum = () => {
+        axios({
+          url: 'http://localhost:3003/api/gestionHumiditeRoutes/getConsigneHumidite/',
+          method: 'get',
+        })
+          .then((response) => {
+            // console.log(response.data);
+
+            // Consigne Hum.
+
+            consigneHum = response.data.dataGestionHum.consigneHum;
+
+            localStorage.setItem('Valeure consigne Hum : ', consigneHum);
+
+            consigneHumLocalStorage = localStorage.getItem(
+              'Valeure consigne Hum : '
+            );
+
+            document.getElementById('consigneHumidite').innerHTML =
+              'Consigne Hum : ' + consigneHumLocalStorage + '%';
+
+            // -------------------------------------
+
+            // Durée de la descente Hum.
+
+            objectifHum = response.data.dataGestionHum.objectifHum;
+            pasHum = response.data.dataGestionHum.pasHum;
+
+            let CalculeNombreJour = () => {
+              if (
+                consigneHum == 0 ||
+                consigneHum == '' ||
+                consigneHum == null ||
+                objectifHum == 0 ||
+                objectifHum == '' ||
+                objectifHum == null ||
+                pasHum == 0 ||
+                pasHum == '' ||
+                pasHum == null
+              ) {
+                // console.log('Pas de paramètre pas de calcule des jours');
+                return;
+              } else {
+                let dureeDescenteHum =
+                  ((consigneHum - objectifHum) / pasHum) * 12;
+
+                // console.log('Durée Descente Hum', dureeDescenteHum);
+
+                let totalHeures = dureeDescenteHum;
+
+                nbJourHum = Math.floor(totalHeures / 24);
+
+                totalHeures %= 360;
+
+                nbHeureHum = Math.floor(totalHeures / 36);
+
+                // console.log(
+                //   'La durée de la descente Hum est de  : ' +
+                //     nbJourHum +
+                //     ' Jours ' +
+                //     nbHeureHum +
+                //     ' Heures '
+                // );
+              }
+
+              localStorage.setItem('Valeure nbJour Hum : ', nbJourHum);
+              nbJourHumLocalStorage = localStorage.getItem(
+                'Valeure nbJour Hum : '
+              );
+
+              localStorage.setItem('Valeure nbHeure Hum : ', nbHeureHum);
+              nbHeureHumLocalStorage = localStorage.getItem(
+                'Valeure nbHeure Hum : '
+              );
+
+              document.getElementById('descenteHum').innerHTML =
+                nbJourHumLocalStorage +
+                ' ' +
+                'Jours et' +
+                ' ' +
+                nbHeureHumLocalStorage +
+                ' ' +
+                'Heures';
+            };
+
+            CalculeNombreJour();
+
+            setInterval(() => {
+              CalculeNombreJour();
+            }, 120000);
+            // -------------------------------------
+          })
+          .then(() => {
+            let deltaTauxHum = parseFloat(tauxHum - consigneHum).toFixed(2);
+            // console.log('delta Hum Front', deltaHum);
+
+            localStorage.setItem('Valeure delta hum : ', deltaTauxHum);
+
+            deltaTauxHumLocalStorage = localStorage.getItem(
+              'Valeure delta hum : '
+            );
+
+            document.getElementById('deltaHumidite').innerHTML =
+              'Delta Hum : ' + deltaTauxHumLocalStorage + '%';
+          })
+
+          .catch((error) => {
+            console.log(error);
+            console.log(JSON.stringify(error));
+          });
+      };
+
+      getConsigneHum();
+
+      setInterval(() => {
+        getConsigneHum();
+        // console.log('récup consigneAir');
+      }, 15000);
+      //*******************************************************
+
+      // 3 Post consigne hum dans la base.
+
+      let validationConsigneHum = () => {
+        // console.log('Clic sur bouton validation Etal Hum');
+
+        let consigneHumForm = document.getElementById('consigneHumForm').value;
+        // console.log('consigneHumForm', consigneHumForm);
+
+        const boutonValiderEtatHum = axios
+          .post(
+            'http://localhost:3003/api/gestionHumiditeRoutes/postConsigneHum/',
+            {
+              consigneHum: consigneHumForm,
+            }
+          )
+          .then(function (response) {
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+
+      // 4 Post des datas hum dans la base.
+
+      let validationdataHum = () => {
+        // console.log('Clic sur bouton validation Etal Hum');
+
+        let pasHumForm = document.getElementById('pasHumForm').value;
+        // console.log('pasHumForm', pasHumForm);
+
+        let objectifHumForm = document.getElementById('objectifHumForm').value;
+        // console.log('objectiHumForm', objectiHumForm);
+
+        const boutonValiderEtalHum = axios
+          .post(
+            'http://localhost:3003/api/gestionHumiditeRoutes/postDataHum/',
+            {
+              pasHum: pasHumForm,
+              objectifHum: objectifHumForm,
+            }
+          )
+          .then(function (response) {
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+
+      // ******************************************************
+
+      //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ FIN Gestion Hum ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
+      //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ Gestion Co2 ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
+      // 1 Récupération du taux de Co2 dans la base.
+
+      // Taux de Co2.
+      let tauxCo2;
+      let tauxCo2LocalStorage;
+
+      // Consigne Air.
+      let deltaCo2;
+      let deltaCo2LocalStorage;
+
+      let getTauxCo2 = () => {
+        axios({
+          url: 'http://localhost:3003/api/gestionCo2Routes/getTauxC2o/',
+          method: 'get',
+        })
+          .then((response) => {
+            // console.log(response.data);
+
+            // Taux Co2.
+
+            tauxCo2 = response.data.tauxCo2.tauxCo2;
+
+            localStorage.setItem('Valeure taux Co2 : ', tauxCo2);
+
+            tauxCo2LocalStorage = localStorage.getItem('Valeure taux Co2 : ');
+
+            document.getElementById('tauxCo2').innerHTML =
+              tauxCo2LocalStorage + ' ppm';
+
+            // -------------------------------------
+          })
+          .catch((error) => {
+            console.log(error);
+            console.log(JSON.stringify(error));
+          });
+      };
+
+      getTauxCo2();
+
+      setInterval(() => {
+        getTauxCo2();
+        // console.log('récup tempAir');
+      }, 10000);
+
+      //*******************************************************
+
+      // 2 Récupération de la consigne Co2 dans la base.
+
+      let consigneCo2;
+      let consigneCo2LocalStorage;
+      let objectifCo2;
+      let heureCo2;
+      let pasCo2;
+      let nbJourCo2;
+      let nbJourCo2LocalStorage;
+      let nbHeureCo2;
+      let nbHeureCo2LocalStorage;
+
+      let getConsigneCo2 = () => {
+        axios({
+          url: 'http://localhost:3003/api/gestionCo2Routes/getDataCo2/',
+          method: 'get',
+        })
+          .then((response) => {
+            // console.log(response.data);
+
+            // Consigne Co2.
+
+            consigneCo2 = response.data.dataTauxCo2.consigneCo2;
+
+            localStorage.setItem('Valeure consigne Co2 : ', consigneCo2);
+
+            consigneCo2LocalStorage = localStorage.getItem(
+              'Valeure consigne Co2 : '
+            );
+
+            document.getElementById('consigneCo2').innerHTML =
+              'Consigne Co2 : ' + consigneCo2LocalStorage + ' ppm';
+
+            // -------------------------------------
+
+            // Durée de la descente Co2.
+
+            objectifCo2 = response.data.dataTauxCo2.objectifCo2;
+            pasCo2 = response.data.dataTauxCo2.pasCo2;
+
+            let CalculeNombreJour = () => {
+              if (
+                consigneCo2 == 0 ||
+                consigneCo2 == '' ||
+                consigneCo2 == null ||
+                objectifCo2 == 0 ||
+                objectifCo2 == '' ||
+                objectifCo2 == null ||
+                pasCo2 == 0 ||
+                pasCo2 == '' ||
+                pasCo2 == null
+              ) {
+                // console.log('Pas de paramètre pas de calcule des jours');
+                return;
+              } else {
+                let dureeDescenteCo2 =
+                  ((consigneCo2 - objectifCo2) / pasCo2) * 12;
+
+                // console.log('Durée Descente Co2', dureeDescenteCo2);
+
+                let totalHeures = dureeDescenteCo2;
+
+                nbJourCo2 = Math.floor(totalHeures / 24);
+
+                totalHeures %= 360;
+
+                nbHeureCo2 = Math.floor(totalHeures / 36);
+
+                // console.log(
+                //   'La durée de la descente Co2 est de  : ' +
+                //     nbJourCo2 +
+                //     ' Jours ' +
+                //     nbHeureCo2 +
+                //     ' Heures '
+                // );
+              }
+
+              localStorage.setItem('Valeure nbJour Co2 : ', nbJourCo2);
+              nbJourCo2LocalStorage = localStorage.getItem(
+                'Valeure nbJour Co2 : '
+              );
+
+              localStorage.setItem('Valeure nbHeure Co2 : ', nbHeureCo2);
+              nbHeureCo2LocalStorage = localStorage.getItem(
+                'Valeure nbHeure Co2 : '
+              );
+
+              document.getElementById('descenteCo2').innerHTML =
+                nbJourCo2LocalStorage +
+                ' ' +
+                'Jours et' +
+                ' ' +
+                nbHeureCo2LocalStorage +
+                ' ' +
+                'Heures';
+            };
+
+            CalculeNombreJour();
+
+            setInterval(() => {
+              CalculeNombreJour();
+            }, 120000);
+            // -------------------------------------
+          })
+
+          .then(() => {
+            let deltaCo2 = parseFloat(tauxCo2 - consigneCo2).toFixed(2);
+            // console.log('delta Air Front', deltaco2);
+
+            localStorage.setItem('Valeure delta Co2 : ', deltaCo2);
+
+            deltaCo2LocalStorage = localStorage.getItem('Valeure delta Co2 : ');
+
+            document.getElementById('deltaCo2').innerHTML =
+              'Delta Co2 : ' + deltaCo2LocalStorage + ' ppm';
+          })
+
+          .catch((error) => {
+            console.log(error);
+            console.log(JSON.stringify(error));
+          });
+      };
+
+      getConsigneCo2();
+
+      setInterval(() => {
+        getConsigneCo2();
+        // console.log('récup consigneAir');
+      }, 15000);
+
+      // ******************************************************
+
+      // 3 Post consigne Co2 dans la base.
+
+      let validationConsigneCo2 = () => {
+        // console.log('Clic sur bouton validation Etal Co2');
+
+        let consigneCo2Form = document.getElementById('consigneCo2Form').value;
+        console.log('consigneCo2Form', consigneCo2Form);
+
+        const boutonValiderEtatco2 = axios
+          .post('http://localhost:3003/api/gestionCo2Routes/postConsigneCo2/', {
+            consigneCo2: consigneCo2Form,
+          })
+          .then(function (response) {
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+
+      // 4 Post des datas Co2 dans la base.
+
+      let validationdataCo2 = () => {
+        // console.log('Clic sur bouton validation Etal Co2');
+
+        let pasCo2Form = document.getElementById('pasCo2Form').value;
+        // console.log('pasCo2Form', pasCo2Form);
+
+        let objectifCo2Form = document.getElementById('objectifCo2Form').value;
+        // console.log('objectiCo2Form', objectiCo2Form);
+
+        const boutonValiderEtalCo2 = axios
+          .post('http://localhost:3003/api/gestionCo2Routes/postDataCo2/', {
+            pasCo2: pasCo2Form,
+            objectifCo2: objectifCo2Form,
+          })
+          .then(function (response) {
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+
+        // history.go(0);
+      };
+      // ******************************************************
+
+      //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖ FIN Gestion Air ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    </script>
+  </body>
+</html>

@@ -512,19 +512,7 @@ let getDataCourbeAir = () => {
           y: {},
         },
         plugins: {
-          zoom: {
-            // pan: {
-            //   enable: true,
-            //   mode: x,
-            //   threshold,
-            // },
-
-            zoom: {
-              drag: {
-                enable: true,
-              },
-            },
-          },
+          zoom: {},
         },
       };
       //! ---------------------------------
