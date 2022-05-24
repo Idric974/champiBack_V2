@@ -255,7 +255,7 @@ const miseAJourEtatEauAuSol = db.gestionEtatBoutonRelayEauAuSol;
 
 const newEtalAir = miseAJourEtatEauAuSol
   .create({
-    etatRelayEauAuSol: 1,
+    etatRelayEauAuSol: 0,
   })
   .then((result) => {
     console.log('Table mise à jour');

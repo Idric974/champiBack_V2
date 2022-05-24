@@ -267,7 +267,7 @@ exports.relayEauAuSol = (req, res) => {
 
         setTimeout(() => {
           // const relayOn = new Gpio(27, 'in');
-          const relayOn = new Gpio(eauAuSol, 'out');
+          const relayOn = new Gpio(eauAuSol, 'in');
           console.log('Relay au sol = Off');
 
           //* Mise à jour de la basede donnée.
@@ -287,7 +287,7 @@ exports.relayEauAuSol = (req, res) => {
 
                 .then(function (result) {
                   console.log(
-                    'Déactivation relay après seTimeout  ===> ',
+                    'Déactivation relay après setTimeout  ===> ',
                     result
                   );
                 })
