@@ -154,13 +154,13 @@ db.connect(function (err) {
 
   //! Gestion relay eau au sol.
 
-  let tableLog =
-    'CREATE TABLE  relay_eau_au_sol (id int auto_increment,  etatRelayEauAuSol INTEGER, createdAt DATE, updatedAt DATE, primary key(id))';
+  // let tableLog =
+  //   'CREATE TABLE  relay_eau_au_sol (id int auto_increment,  etatRelayEauAuSol INTEGER, createdAt DATE, updatedAt DATE, primary key(id))';
 
-  db.query(tableLog, function (err, result) {
-    if (err) throw err;
-    console.log('Table elay_eau_au_sol créé', result);
-  });
+  // db.query(tableLog, function (err, result) {
+  //   if (err) throw err;
+  //   console.log('Table elay_eau_au_sol créé', result);
+  // });
 
   //* -----------------------
 });

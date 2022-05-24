@@ -251,11 +251,11 @@ const Sequelize = require('sequelize');
 
 //* etat_Bouton_Eau_Sol .
 
-const miseAJourEtatEauAuSol = db.relayEauAuSol;
+const miseAJourEtatEauAuSol = db.gestionEtatBoutonRelayEauAuSol;
 
 const newEtalAir = miseAJourEtatEauAuSol
   .create({
-    etatRelayEauAuSol: 0,
+    etatRelayEauAuSol: 1,
   })
   .then((result) => {
     console.log('Table mise à jour');
