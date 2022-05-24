@@ -105,7 +105,9 @@ setInterval(() => {
 let consigneAir;
 let consigneAirLocalStorage;
 let objectifAir;
+let objectifAirLocalStorage;
 let pasAir;
+let pasAirLocalStorage;
 let nbJourAir;
 let nbJourAirLocalStorage;
 let nbHeureAir;
@@ -133,9 +135,33 @@ let getConsigneAir = () => {
       document.getElementById('consigneAir').innerHTML =
         'Consigne Air : ' + consigneAirLocalStorage + '°C';
 
-      objectifAir = response.data.datatemperatureAir.objectifAir;
+      //* -------------------------------------------------
+
+      //* Pas Air.
 
       pasAir = response.data.datatemperatureAir.pasAir;
+
+      localStorage.setItem('Valeure Pas air : ', pasAir);
+
+      pasAirLocalStorage = localStorage.getItem('Valeure Pas air : ');
+
+      document.getElementById('pasAirId').innerHTML =
+        'Pas : ' + pasAirLocalStorage;
+
+      //* -------------------------------------------------
+
+      //* Objectif Air.
+
+      objectifAir = response.data.datatemperatureAir.objectifAir;
+
+      localStorage.setItem('Valeure objectif air : ', objectifAir);
+
+      objectifAirLocalStorage = localStorage.getItem('Valeure objectif air : ');
+
+      document.getElementById('objectiAirId').innerHTML =
+        'Objectif : ' + objectifAirLocalStorage;
+
+      //* -------------------------------------------------
     })
 
     //* -------------------------------------------------

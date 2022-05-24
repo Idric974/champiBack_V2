@@ -195,9 +195,11 @@ const axios = require('axios');
 
 let tauxHum;
 let tauxHumLocalStorage;
-let objectifHum;
-let heureHum;
 let pasHum;
+let pasHumLocalStorage;
+let objectifHum;
+let objectifHumLocalStorage;
+let heureHum;
 let nbJourHum;
 let nbJourHumLocalStorage;
 let nbHeureHum;
@@ -223,7 +225,7 @@ let getTauxHum = () => {
     .then((response) => {
       // console.log(response.data);
 
-      // température Air.
+      //* température Air.
 
       tauxHum = response.data.gestionTauxHum.tauxHumidite;
 
@@ -234,9 +236,9 @@ let getTauxHum = () => {
       document.getElementById('tauxHumidite').innerHTML =
         tauxHumLocalStorage + '%';
 
-      // -------------------------------------
+      //* -------------------------------------------------
 
-      // Température Sec.
+      //* Température Sec.
 
       temperatureSec = response.data.gestionTauxHum.valeursMesureSec180;
 
@@ -249,9 +251,9 @@ let getTauxHum = () => {
       document.getElementById('temperatureSec').innerHTML =
         'Température Sec : ' + temperatureSecLocalStorage + '°C';
 
-      // -------------------------------------
+      //* -------------------------------------------------
 
-      // Température Hum.
+      //* Température Hum.
 
       temperatureHum = response.data.gestionTauxHum.valeursMesureHum90;
 
@@ -264,7 +266,7 @@ let getTauxHum = () => {
       document.getElementById('temperatureHum').innerHTML =
         'Température Hum : ' + temperatureHumLocalStorage + '°C';
 
-      // -------------------------------------
+      //* -------------------------------------------------
     })
     .catch((error) => {
       console.log(error);
@@ -294,9 +296,9 @@ let getConsigneHum = () => {
     //
     //* Récupération des données.
     .then((response) => {
-      // console.log(response.data);
+      console.log(response.data);
 
-      // Consigne Hum.
+      //* Consigne Hum.
 
       consigneHum = response.data.dataGestionHum.consigneHum;
 
@@ -307,8 +309,33 @@ let getConsigneHum = () => {
       document.getElementById('consigneHumidite').innerHTML =
         'Consigne Hum : ' + consigneHumLocalStorage + '%';
 
-      objectifHum = response.data.dataGestionHum.objectifHum;
+      //* Pas Humidité.
+
       pasHum = response.data.dataGestionHum.pasHum;
+
+      localStorage.setItem('Valeure Pas hum : ', pasHum);
+
+      pasHumLocalStorage = localStorage.getItem('Valeure Pas hum : ');
+
+      document.getElementById('pasHumId').innerHTML =
+        'Pas : ' + pasHumLocalStorage;
+
+      //* -------------------------------------------------
+
+      //* Objectif Humidité.
+
+      objectifHum = response.data.dataGestionHum.objectifHum;
+
+      localStorage.setItem('Valeure objectif hum : ', objectifHum);
+
+      objectifHumLocalStorage = localStorage.getItem('Valeure objectif hum : ');
+
+      console.log('=======> ', objectifHumLocalStorage);
+
+      document.getElementById('objectifHums').innerHTML =
+        'Pas : ' + objectifHumLocalStorage;
+
+      //* -------------------------------------------------
     })
 
     //* -------------------------------------------------

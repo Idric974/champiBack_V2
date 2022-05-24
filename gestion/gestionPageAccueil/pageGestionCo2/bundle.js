@@ -241,9 +241,11 @@ setInterval(() => {
 
 let consigneCo2;
 let consigneCo2LocalStorage;
-let objectifCo2;
-let heureCo2;
 let pasCo2;
+let pasCo2LocalStorage;
+let objectifCo2;
+let objectifCo2LocalStorage;
+let heureCo2;
 let nbJourCo2;
 let nbJourCo2LocalStorage;
 let nbHeureCo2;
@@ -260,7 +262,7 @@ let getConsigneCo2 = () => {
     .then((response) => {
       // console.log(response.data);
 
-      // Consigne Co2.
+      //* Consigne Co2.
 
       consigneCo2 = response.data.dataTauxCo2.consigneCo2;
 
@@ -271,8 +273,33 @@ let getConsigneCo2 = () => {
       document.getElementById('consigneCo2').innerHTML =
         'Consigne Co2 : ' + consigneCo2LocalStorage + ' ppm';
 
-      objectifCo2 = response.data.dataTauxCo2.objectifCo2;
+      //* -------------------------------------------------
+
+      //* Pas Co2.
+
       pasCo2 = response.data.dataTauxCo2.pasCo2;
+
+      localStorage.setItem('Valeure Pas Co2 : ', pasCo2);
+
+      pasCo2LocalStorage = localStorage.getItem('Valeure Pas Co2 : ');
+
+      document.getElementById('pasCo2Id').innerHTML =
+        'Pas : ' + pasCo2LocalStorage;
+
+      //* -------------------------------------------------
+
+      //* Objectif Co2.
+
+      objectifCo2 = response.data.dataTauxCo2.objectifCo2;
+
+      localStorage.setItem('Valeure objectif Co2 : ', objectifCo2);
+
+      objectifCo2LocalStorage = localStorage.getItem('Valeure objectif Co2 : ');
+
+      document.getElementById('objectiCo2Id').innerHTML =
+        'Objectif : ' + objectifCo2LocalStorage;
+
+      //* -------------------------------------------------
     })
 
     //* -------------------------------------------------

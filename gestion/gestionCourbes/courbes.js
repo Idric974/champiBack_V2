@@ -50,6 +50,8 @@ let getJourDuCycle = () => {
 
       jourDuCycleLocalStorage = localStorage.getItem('Jour du cycle : ');
 
+      console.log('Jour du cycle : ', jourDuCycleLocalStorage);
+
       document.getElementById('jourDuCycle').innerHTML =
         'Jour ' + jourDuCycleLocalStorage;
     })
@@ -72,6 +74,10 @@ let getJourDuCycle = () => {
 };
 
 getJourDuCycle();
+
+setInterval(() => {
+  getJourDuCycle();
+}, 3600000);
 
 //! --------------------------------------------------
 
@@ -241,10 +247,10 @@ let getDataCourbeAir = () => {
         })
       );
 
-      console.log(
-        'Tableau des valeurs temperature air à afficher : ',
-        valeurTemperatureAir
-      );
+      // console.table(
+      //   'Tableau des valeurs temperature air à afficher : ',
+      //   valeurTemperatureAir
+      // );
 
       //*---------------------------------------------
 
@@ -264,10 +270,10 @@ let getDataCourbeAir = () => {
         })
       );
 
-      console.log(
-        'Tableau des valeurs consigne air à afficher : ',
-        valeurConsigneAir
-      );
+      // console.table(
+      //   'Tableau des valeurs consigne air à afficher : ',
+      //   valeurConsigneAir
+      // );
 
       //*---------------------------------------------
     })
