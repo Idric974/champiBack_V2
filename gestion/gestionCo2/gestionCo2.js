@@ -31,16 +31,18 @@ let valeurAxeX;
 
 //! ----------------------------------
 
-axios({
-  method: 'post',
-  //url: `http://localhost:5000/api/getCo2Routes/getCo2`,
-  url: `http://192.168.0.10:5000/api/getCo2Routes/getCo2`,
-  withCredentials: true,
-  timeout: 300000,
-  data: {
-    numSalle: numSalle,
-  },
-})
+// let url = `http://localhost:5000/api/getCo2Routes/getCo2`;
+let url = `http://192.168.0.10:5000/api/getCo2Routes/getCo2`;
+
+axios
+  .post(
+    url,
+    {
+      numSalle: numSalle,
+    },
+    { timeout: 300000 },
+    { withCredentials: true }
+  )
   .then((res) => {
     // console.log('resultat :', res.data.co2Room);
     data = res.data.co2Room;

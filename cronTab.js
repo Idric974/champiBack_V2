@@ -167,10 +167,9 @@ const consigneHumAuto = schedule.scheduleJob(' 0 * * * * ', () => {
 
 //*! 3) Gestion Co2
 
-//? Calcules.
+//? Calculs.
 
 const gestionCo2 = schedule.scheduleJob(' 01 * * * * ', () => {
-  // const gestionCo2 = schedule.scheduleJob(' */10 * * * * ', () => {
   var childProcess = require('child_process');
 
   function runScript(scriptPath, callback) {
