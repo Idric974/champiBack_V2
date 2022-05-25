@@ -43,7 +43,7 @@
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
     "node-schedule": "^2.1.0",
-    "nodemon": "^2.0.15",
+    "nodemon": "^2.0.16",
     "sequelize": "^6.16.1",
     "socket.io": "^4.4.1",
     "socket.io-client": "^4.4.1",
