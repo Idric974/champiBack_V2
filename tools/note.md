@@ -144,3 +144,5 @@ Calculs = 25
 Consigne automatique Co2 = 26
 
 # --------------------------------------------------------------
+
+intaller le logiciel printsaver

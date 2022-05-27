@@ -31,8 +31,8 @@ let valeurAxeX;
 
 //! ----------------------------------
 
-// let url = `http://localhost:5000/api/getCo2Routes/getCo2`;
-let url = `http://192.168.0.10:5000/api/getCo2Routes/getCo2`;
+let url = `http://localhost:5000/api/getCo2Routes/getCo2`;
+// let url = `http://192.168.0.10:5000/api/getCo2Routes/getCo2`;
 
 axios
   .post(
