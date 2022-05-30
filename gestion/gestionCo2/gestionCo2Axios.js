@@ -29,60 +29,29 @@ let minuteDuCycle;
 let heureMinute;
 let valeurAxeX;
 
-//! -----------------------------------------------------------
+//! ----------------------------------
 
-//! Demande de mesure à la master.
+let url = `http://localhost:5000/api/getCo2Routes/getCo2`;
+// let url = `http://192.168.0.10:5000/api/getCo2Routes/getCo2`;
 
-const url = 'http://localhost:5000/api/getCo2Routes/getCo2/' + numSalle;
-// const url = 'http://192.168.0.10:6000/getCO2/' + numSalle;
 console.log('url : ', url);
 
-const getTauxCo2 = new Promise((resolve, reject) => {
-  //
-
-  http
-    .get(url, (resp) => {
-      //
-      resp.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      resp.on('end', () => {});
-    })
-
-    .on('response', function (resp) {
-      if (resp.statusCode === 200) {
-        console.log('Status Code : ', resp.statusCode);
-        resolve();
-      } else {
-        reject();
-        console.log('PAS OK');
-      }
-    })
-
-    .on('error', (err) => {
-      console.log('Error: ' + err.message);
-    });
-});
-
-//! -----------------------------------------------------------
-
-//! Validation de la suite.
-
-let actionGetTauxCo2 = async () => {
-  let go = await getTauxCo2;
-  return go;
-};
-
-//! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//! Action saprès validation.
-
-actionGetTauxCo2(data)
-  //
-  //? Récupération de la consigne.
-
+axios
+  .post(
+    url,
+    {
+      numSalle: numSalle,
+    },
+    { timeout: 300000 },
+    { withCredentials: true }
+  )
+  .then((res) => {
+    // console.log('resultat :', res.data.co2Room);
+    data = res.data.co2Room;
+    console.log('Le taux de CO2 : ', data);
+  })
   .then(() => {
+    //! Récupération de la consigne.
     let recuperationConsigneCo2 = () => {
       gestionCo2DataModels
         .findOne({
@@ -135,12 +104,10 @@ actionGetTauxCo2(data)
         });
     };
     recuperationConsigneCo2();
+    //!------------------------------------------------------------
   })
-
-  //? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  //? Construction de la valeur de l'axe x.
   .then(() => {
+    //! Construction de la valeur de l'axe x.
     let getDateDemarrageCycle = () => {
       axios
         .get(
@@ -185,13 +152,10 @@ actionGetTauxCo2(data)
         });
     };
     getDateDemarrageCycle();
+    //! -------------------------------------------------- !
   })
-
-  //? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  //? Enregistrement en base de donnes.
-
   .then(() => {
+    //! 4) Enregistrement en base de donnes.
     setTimeout(() => {
       let enregistrement = () => {
         const newVal = gestionCo2Models
@@ -220,14 +184,11 @@ actionGetTauxCo2(data)
       };
       enregistrement();
     }, 2000);
+    //!----------------------------------------------
   })
 
-  //? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  //? Catch des erreurs.
-
-  .catch((error) => {
-    console.log(cyan, '[ GESTION CO2 CALCULES  ] Erreur Co2', error);
+  .catch((err) => {
+    console.log(err);
   });
 
-//! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//!------------------------------------------------------------
