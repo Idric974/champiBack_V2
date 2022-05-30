@@ -1,7 +1,8 @@
 const http = require('http');
 const numSalle = require('../../configNumSalle');
 
-let url = 'http://localhost:5000/api/getCo2Routes/getCo2/' + numSalle;
+let url = 'http://192.168.0.10:6000/api/getCo2Routes/getCo2/' + numSalle;
+// let url = 'http://localhost:5000/api/getCo2Routes/getCo2/' + numSalle;
 console.log('url :', url);
 
 let data = '';
