@@ -3,8 +3,8 @@ const numSalle = require('../../configNumSalle');
 
 let tauxCO2;
 
-// let url = 'http://192.168.0.10:5000/api/getCo2Routes/getCo2/' + numSalle;
-let url = 'http://localhost:5000/api/getCo2Routes/getCo2/' + numSalle;
+let url = 'http://192.168.0.10:5000/api/getCo2Routes/getCo2/' + numSalle;
+//let url = 'http://localhost:5000/api/getCo2Routes/getCo2/' + numSalle;
 // console.log('url :', url);
 
 function co2() {
