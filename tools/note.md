@@ -146,3 +146,5 @@ Consigne automatique Co2 = 26
 # --------------------------------------------------------------
 
 intaller le logiciel printsaver
+
+OK
