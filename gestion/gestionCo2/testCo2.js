@@ -1,40 +1,23 @@
 const http = require('http');
 const numSalle = require('../../configNumSalle');
 
-const data = JSON.stringify({
-  numSalle: numSalle,
-});
+let url = 'http://localhost:5000/api/getCo2Routes/getCo2/' + numSalle;
+console.log('url :', url);
 
-let str = '';
+let data = '';
 let tauxCo2;
 
-const options = {
-  hostname: 'localhost',
-  port: 5000,
-  path: '/api/getCo2Routes/getCo2',
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Content-Length': data.length,
-  },
-};
-
-const req = http.request(options, (res) => {
-  console.log(`statusCode: ${res.statusCode}`);
-
-  res
-    .on('data', (d) => {
-      str += d;
-    })
-    .on('end', () => {
-      tauxCo2 = JSON.parse(str)['co2Room'];
-      console.log('Le taux de Co2 reçut de la master: ', tauxCo2);
+http
+  .get(url, (resp) => {
+    resp.on('data', (chunk) => {
+      data += chunk;
     });
-});
 
-req.on('error', (error) => {
-  console.error(error);
-});
-
-req.write(data);
-req.end();
+    resp.on('end', () => {
+      tauxCo2 = JSON.parse(data)['co2Room'];
+      console.log('Le taux de Co2 de la master : ', tauxCo2);
+    });
+  })
+  .on('error', (err) => {
+    console.log('Error: ' + err.message);
+  });
