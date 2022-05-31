@@ -1,36 +1,25 @@
-const http = require('http');
+var http = require('http');
+
 const numSalle = require('../../configNumSalle');
 
-let tauxCO2;
+var options = {
+  // host: 'localhost',
+  host: '192.168.0.10',
+  path: '/api/getCo2Routes/getCo2/' + numSalle,
+  port: '5000',
+  headers: { 'Content-Type': 'application/json' },
+};
 
-let url = 'http://192.168.0.10:5000/api/getCo2Routes/getCo2/' + numSalle;
-//let url = 'http://localhost:5000/api/getCo2Routes/getCo2/' + numSalle;
-// console.log('url :', url);
-
-function co2() {
-  new Promise((resolve, reject) => {
-    http
-      .get(url, (resp) => {
-        data = '';
-
-        resp.on('data', (chunk) => {
-          data += chunk;
-          console.log('Valeur CO2 de la master', data);
-
-          // Taux de Co2.
-          tauxCO2 = parseFloat(data).toFixed(2);
-          // console.log(tauxCO2);
-        });
-      })
-
-      .on('error', (err) => {
-        console.log(err);
-
-        reject();
-      });
-  }).catch((err) => {
-    console.log(err);
+callback = function (response) {
+  var str = '';
+  response.on('data', function (chunk) {
+    str += chunk;
   });
-}
 
-co2();
+  response.on('end', function () {
+    console.log('Le taux de Co2 : ', JSON.parse(str)['co2Room']);
+  });
+};
+
+var req = http.request(options, callback);
+req.end();
