@@ -3,15 +3,15 @@ var http = require('http');
 const numSalle = require('../../configNumSalle');
 
 var options = {
-  // host: 'localhost',
-  host: '192.168.0.10',
+  host: 'localhost',
+  // host: '192.168.0.10',
   path: '/api/getCo2Routes/getCo2/' + numSalle,
   port: '5000',
   headers: { 'Content-Type': 'application/json' },
 };
 
 callback = function (response) {
-  var str = '';
+  let str = '';
   response.on('data', function (chunk) {
     str += chunk;
   });
@@ -21,5 +21,7 @@ callback = function (response) {
   });
 };
 
-var req = http.request(options, callback);
+let req = http.request(options, callback);
+// console.log('req :', req);
+
 req.end();

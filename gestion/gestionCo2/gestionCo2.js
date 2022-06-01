@@ -16,6 +16,7 @@ const numSalle = require('../../configNumSalle');
 //! Les variables.
 
 let data;
+let tauxCo2;
 let consigne;
 let deltaCo2;
 let daysCo2;
@@ -33,9 +34,9 @@ let valeurAxeX;
 
 //! Demande de mesure à la master.
 
-const url = 'http://localhost:5000/api/getCo2Routes/getCo2/1';
-// const url = 'http://192.168.0.10:6000/getCO2/' + numSalle;
-console.log('url : ', url);
+//const url = 'http://localhost:5000/getCo2/' + numSalle;
+const url = 'http://192.168.0.10:5000/getCO2/' + numSalle;
+// console.log('url : ', url);
 
 const getTauxCo2 = new Promise((resolve, reject) => {
   //
@@ -45,14 +46,22 @@ const getTauxCo2 = new Promise((resolve, reject) => {
       //
       resp.on('data', (chunk) => {
         data += chunk;
+        // console.log('data ============>', data);
       });
 
-      resp.on('end', () => {});
+      resp.on('end', () => {
+        // console.log(
+        //   'data 2 ============>',
+        //   parseFloat(data.split('undefined')[1])
+        // );
+
+        tauxCo2 = parseFloat(data.split('undefined')[1]);
+      });
     })
 
     .on('response', function (resp) {
       if (resp.statusCode === 200) {
-        console.log('Status Code : ', resp.statusCode);
+        // console.log('Status Code : ', resp.statusCode);
         resolve();
       } else {
         reject();
@@ -78,7 +87,7 @@ let actionGetTauxCo2 = async () => {
 
 //! Action saprès validation.
 
-actionGetTauxCo2(data)
+actionGetTauxCo2(tauxCo2)
   //
   //? Récupération de la consigne.
 
@@ -116,17 +125,17 @@ actionGetTauxCo2(data)
           //* Calcule du delta.
           setTimeout(() => {
             let calcDelta = () => {
-              deltaCo2 = data - consigne;
+              deltaCo2 = tauxCo2 - consigne;
               console.log(
                 cyan,
                 '[ GESTION CO2 CALCULES  ] Le taux de Co2 est de :' +
-                  data +
-                  'ppm'
+                  tauxCo2 +
+                  ' ppm'
               );
               console.log(
                 cyan,
                 '[ GESTION CO2 CALCULES  ] Le delta de Co2 est de :',
-                deltaCo2 + 'ppm'
+                deltaCo2 + ' ppm'
               );
             };
             calcDelta();
@@ -177,7 +186,11 @@ actionGetTauxCo2(data)
           //* --------------------------------------------------
           //* Valeure de l'axe x.
           valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
-          console.log("Valeure de l'axe x :---------------:", valeurAxeX);
+          console.log(
+            cyan,
+            "[ GESTION CO2 CALCULES  ] Valeure de l'axe x : ",
+            valeurAxeX
+          );
           //* --------------------------------------------------
         })
         .catch((error) => {
@@ -196,7 +209,7 @@ actionGetTauxCo2(data)
       let enregistrement = () => {
         const newVal = gestionCo2Models
           .create({
-            tauxCo2: data,
+            tauxCo2: tauxCo2,
             deltaCo2: deltaCo2,
             daysCo2: daysCo2,
             heuresCo2: heuresCo2,
