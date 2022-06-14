@@ -147,4 +147,21 @@ Consigne automatique Co2 = 26
 
 intaller le logiciel printsaver
 
-OK
+## Le mode veille.
+
+sudo apt-get install xscreensaver
+
+## Infos :
+
+Adresse IP du routeur r480t+
+192.168.0.1
+User name. admin
+MDP champyresi
+
+## Pour modifier la adresse mac.
+
+Il faut aller dans
+Network>lan>adresse revervation
+
+Pour trouver l adresse mac du raspi c est
+Ifconfig
