@@ -34,8 +34,8 @@ let valeurAxeX;
 
 //! Demande de mesure à la master.
 
-const url = 'http://localhost:5000/getCo2/' + numSalle;
-// const url = 'http://192.168.0.10:5000/getCO2/' + numSalle;
+// const url = 'http://localhost:5000/getCo2/' + numSalle;
+const url = 'http://192.168.0.10:5000/getCO2/' + numSalle;
 // console.log('url : ', url);
 
 const getTauxCo2 = new Promise((resolve, reject) => {
