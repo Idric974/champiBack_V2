@@ -16,7 +16,7 @@ const con = mysql.createConnection({
 
 //* gestion Hummidité.
 
-// let table = 'gestion_hums';
+let table = 'gestion_hums';
 // let table = 'gestion_hums_datas';
 // let table = 'gestion_hums_etalonnage_hums';
 // let table = 'gestion_hums_etalonnage_secs';
@@ -36,7 +36,7 @@ const con = mysql.createConnection({
 // let table = 'gestion_courbes';
 
 //* Gestion eau au sol
-let table = 'relay_eau_au_sols';
+// let table = 'relay_eau_au_sols';
 
 //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 con.connect(function (err) {

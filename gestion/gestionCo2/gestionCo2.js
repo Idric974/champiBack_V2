@@ -34,8 +34,8 @@ let valeurAxeX;
 
 //! Demande de mesure à la master.
 
-//const url = 'http://localhost:5000/getCo2/' + numSalle;
-const url = 'http://192.168.0.10:5000/getCO2/' + numSalle;
+const url = 'http://localhost:5000/getCo2/' + numSalle;
+// const url = 'http://192.168.0.10:5000/getCO2/' + numSalle;
 // console.log('url : ', url);
 
 const getTauxCo2 = new Promise((resolve, reject) => {
@@ -109,10 +109,10 @@ actionGetTauxCo2(tauxCo2)
               lastId = result['id'];
               // console.log('LastId :   ', lastId);
               consigne = result['consigneCo2'];
-              console.log(
-                cyan,
-                '[ GESTION CO2 CALCULES  ] La consigne est : ' + consigne
-              );
+              // console.log(
+              //   cyan,
+              //   '[ GESTION CO2 CALCULES  ] La consigne est : ' + consigne
+              // );
               pas = result['pasCo2'];
               // console.log('Pas :      ', pas);
               pas = result['pasCo2'];
@@ -132,11 +132,11 @@ actionGetTauxCo2(tauxCo2)
                   tauxCo2 +
                   ' ppm'
               );
-              console.log(
-                cyan,
-                '[ GESTION CO2 CALCULES  ] Le delta de Co2 est de :',
-                deltaCo2 + ' ppm'
-              );
+              // console.log(
+              //   cyan,
+              //   '[ GESTION CO2 CALCULES  ] Le delta de Co2 est de :',
+              //   deltaCo2 + ' ppm'
+              // );
             };
             calcDelta();
           }, 1000);
@@ -186,11 +186,11 @@ actionGetTauxCo2(tauxCo2)
           //* --------------------------------------------------
           //* Valeure de l'axe x.
           valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
-          console.log(
-            cyan,
-            "[ GESTION CO2 CALCULES  ] Valeure de l'axe x : ",
-            valeurAxeX
-          );
+          // console.log(
+          //   cyan,
+          //   "[ GESTION CO2 CALCULES  ] Valeure de l'axe x : ",
+          //   valeurAxeX
+          // );
           //* --------------------------------------------------
         })
         .catch((error) => {
@@ -218,10 +218,10 @@ actionGetTauxCo2(tauxCo2)
             jourDuCycle: jourDuCycle,
           })
           .then(() => {
-            console.log(
-              cyan,
-              '[ GESTION CO2 CALCULES  ] Données transférées à la base de données gestion_co2s.'
-            );
+            // console.log(
+            //   cyan,
+            //   '[ GESTION CO2 CALCULES  ] Données transférées à la base de données gestion_co2s.'
+            // );
           })
           .catch((error) => {
             console.log(

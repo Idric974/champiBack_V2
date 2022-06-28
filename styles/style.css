@@ -15,14 +15,34 @@
 
 /* Setting CSS page accueil. */
 
+.dateBox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
 .laDate {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  width: 50%;
   height: 50px;
   font-size: 3rem;
+  margin: 10px 0px 10px 0px;
+  color: white;
+}
+
+.version {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  height: 50px;
+  font-size: 2.5rem;
   margin: 10px 0px 10px 0px;
   color: white;
 }

@@ -3964,7 +3964,7 @@ resultatsHum()
         // );
         //! ----------------------------------------
         //
-      } else if (delta <= 2 && delta >= -2) {
+      } else if (deltaHum <= 2 && deltaHum >= -2) {
         //*
         //* Pas d'action car interval entre 2% et -2%"
         //*

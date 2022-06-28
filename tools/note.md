@@ -167,18 +167,3 @@ Pour trouver l adresse mac du raspi c est
 Ifconfig
 
 ## ---------------------------------------------------
-
-//\* etat_Bouton_Eau_Sol .
-
-const miseAJourEtatEauAuSol = db.gestionEtatBoutonRelayEauAuSol;
-
-const newEtalAir = miseAJourEtatEauAuSol
-.create({
-etatRelayEauAuSol: 0,
-})
-.then((result) => {
-console.log('Table mise à jour');
-})
-.catch((error) => {
-console.log('Table non mise à jour', error);
-});
