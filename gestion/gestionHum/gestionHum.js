@@ -3970,7 +3970,7 @@ resultatsHum()
         //*
         //! ----------------------------------------
         //
-      } else if (deltaHum >= -5 && deltaMum < -2) {
+      } else if (deltaHum >= -5 && deltaHum < -2) {
         //
 
         let eau = () => {
@@ -3996,7 +3996,7 @@ resultatsHum()
         }, 10000);
         //! ----------------------------------------
         //
-      } else if (deltaHum >= 10 && deltaMum < -5) {
+      } else if (deltaHum >= 10 && deltaHum < -5) {
         //
 
         let eau = () => {
@@ -4022,7 +4022,7 @@ resultatsHum()
         }, 30000);
         //! ----------------------------------------
         //
-      } else if (deltaMum < -10) {
+      } else if (deltaHum < -10) {
         //
 
         let eau = () => {
