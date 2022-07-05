@@ -56,7 +56,7 @@ const getTauxCo2 = new Promise((resolve, reject) => {
         // );
 
         // tauxCo2 = parseFloat(data.split('undefined')[1]);
-        tauxCo2 = data.split('"')[1].split("\n")[0];
+        tauxCo2 = data.split('"')[1].split('\\')[0];
       });
     })
 
