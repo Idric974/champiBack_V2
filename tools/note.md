@@ -168,4 +168,5 @@ Ifconfig
 
 ## ---------------------------------------------------
 
-Mise à jour de gitignore 1.6
+Mise à jour de gitignore 1.8
+
