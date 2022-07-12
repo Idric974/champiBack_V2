@@ -167,3 +167,5 @@ Pour trouver l adresse mac du raspi c est
 Ifconfig
 
 ## ---------------------------------------------------
+
+Mise à jour de gitignore 1.6
