@@ -15,6 +15,9 @@ const gestionLogs = require('./routes/logsBackRoutes');
 const relayRoutes = require('./routes/relayRoutes');
 const brocheRoutes = require('./routes/broche');
 
+// SMS
+const orderSmsRoutes = require('./routes/gestionSmsOrders');
+
 //! Utilisation de cors pour les connexions
 
 const cors = require('cors');
@@ -102,6 +105,9 @@ app.use('/api/logsBackRoutes', gestionLogs);
 // Outils
 app.use('/api/relayRoutes', relayRoutes);
 app.use('/api/broche', brocheRoutes);
+
+// SMS.
+app.use('/api/postSmsOrderRoute', orderSmsRoutes);
 
 //! --------------------------------------------------
 

@@ -1,8 +1,8 @@
 const axios = require('axios');
 
-const url = 'http://192.168.1.11:3000/api/postSms/postSms';
+const url = 'http://192.168.1.9:4000/api/postSms/postSms';
 
-let message = "Non pas d'ince ???";
+let message = "Message test du 05/08/2022 ==> 9h42";
 
 axios
   .post(url, {
@@ -14,3 +14,4 @@ axios
   .catch(function (error) {
     console.log(error);
   });
+
