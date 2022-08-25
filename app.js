@@ -7,6 +7,7 @@ const gestionAirRoutes = require('./routes/gestionAirRoutes');
 const gestionHumidite = require('./routes/gestionHumiditeRoutes');
 const gestionCo2 = require('./routes/gestionCo2Routes');
 const gestionCourbe = require('./routes/gestionCourbeRoutes');
+const substratRoutes = require('./routes/gestionSubstratRoutes');
 
 // Logs
 const gestionLogs = require('./routes/logsBackRoutes');
@@ -17,6 +18,9 @@ const brocheRoutes = require('./routes/broche');
 
 // SMS
 const orderSmsRoutes = require('./routes/gestionSmsOrders');
+
+
+
 
 //! Utilisation de cors pour les connexions
 
@@ -98,6 +102,7 @@ app.use('/api/gestionAirRoutes', gestionAirRoutes);
 app.use('/api/gestionHumiditeRoutes', gestionHumidite);
 app.use('/api/gestionCo2Routes', gestionCo2);
 app.use('/api/gestionCourbeRoutes', gestionCourbe);
+app.use('/api/gestionSubstratRoutes', substratRoutes);
 
 // Logs
 app.use('/api/logsBackRoutes', gestionLogs);
@@ -108,6 +113,8 @@ app.use('/api/broche', brocheRoutes);
 
 // SMS.
 app.use('/api/postSmsOrderRoute', orderSmsRoutes);
+
+
 
 //! --------------------------------------------------
 

@@ -111,4 +111,14 @@ db.gestionLogsBack = require('./logsModels/gestionLogsModels')(
 db.gestionEtatBoutonRelayEauAuSol =
   require('./relayEauAuSol/relayEauAuSolModels')(sequelize, Sequelize);
 
+
+//? Gestion substrat.
+
+db.gestionSubstrat =
+  require('./gestionSubstrat/gestionSubstratModels')(sequelize, Sequelize);
+
+db.gestionSubstratData =
+  require('./gestionSubstrat/gestionSubstratDataModels')(sequelize, Sequelize);
+
+
 module.exports = db;

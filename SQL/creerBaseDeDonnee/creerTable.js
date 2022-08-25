@@ -20,7 +20,7 @@ db.connect(function (err) {
   //   'CREATE TABLE gestion_airs (id int auto_increment, temperatureAir FLOAT, deltaAir FLOAT, days FLOAT, heures FLOAT, etatRelay FLOAT, actionRelay FLOAT,  consigne varchar(255), valeurAxeX varchar(255), jourDuCycle varchar(255), createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_airs créé', result);
+  //   console.log('Table gestion_airs créé : ', result);
   // });
 
   //* -----------------------
@@ -31,7 +31,7 @@ db.connect(function (err) {
   //   'CREATE TABLE gestion_airs_datas (id int auto_increment, consigneAir FLOAT, pasAir FLOAT, objectifAir FLOAT, deltaAir FLOAT, days INTEGER, heures INTEGER, createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_airs_datas créé', result);
+  //   console.log('Table gestion_airs_datas créé : ', result);
   // });
 
   //* -----------------------
@@ -42,7 +42,7 @@ db.connect(function (err) {
   //   'CREATE TABLE gestion_airs_etalonnages (id int auto_increment, etalonnageAir FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_airs_etalonnages créé', result);
+  //   console.log('Table gestion_airs_etalonnages créé : ', result);
   // });
 
   //* -----------------------
@@ -53,7 +53,7 @@ db.connect(function (err) {
   //   'CREATE TABLE gestion_airs_etat_relays (id int auto_increment, etatRelay FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_airs_etat_relays créé', result);
+  //   console.log('Table gestion_airs_etat_relays créé : ', result);
   // });
 
   //* -----------------------
@@ -66,7 +66,7 @@ db.connect(function (err) {
   //   'CREATE TABLE gestion_hums (id int auto_increment, tauxHumidite FLOAT, deltaHum FLOAT, valeursMesureSec180 FLOAT, valeursMesureHum90 FLOAT, daysHum INTEGER, heuresHum INTEGER, createdAt DATE, consigne varchar(255), valeurAxeX varchar(255), jourDuCycle varchar(255), updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_hums créé', result);
+  //   console.log('Table gestion_hums créé : ', result);
   // });
 
   //* -----------------------
@@ -77,7 +77,7 @@ db.connect(function (err) {
   //   'CREATE TABLE gestion_hums_datas (id int auto_increment, consigneHum FLOAT, pasHum FLOAT, objectifHum FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_hums_datas créé', result);
+  //   console.log('Table gestion_hums_datas créé : ', result);
   // });
 
   //* -----------------------
@@ -88,7 +88,7 @@ db.connect(function (err) {
   //   'CREATE TABLE gestion_hums_etalonnage_secs (id int auto_increment,  etalonnageSec FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_airs_etalonnage créé', result);
+  //   console.log('Table gestion_airs_etalonnage créé : ', result);
   // });
 
   //* -----------------------
@@ -99,7 +99,7 @@ db.connect(function (err) {
   //   'CREATE TABLE gestion_hums_etalonnage_hums (id int auto_increment, etalonnageHum FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_airs_etalonnage créé', result);
+  //   console.log('Table gestion_airs_etalonnage créé : ', result);
   // });
 
   //* -----------------------
@@ -112,7 +112,7 @@ db.connect(function (err) {
   //   'CREATE TABLE  gestion_co2s (id int auto_increment, tauxCo2 FLOAT, deltaCo2 FLOAT, daysCo2 FLOAT,  heuresCo2 FLOAT, consigne varchar(255), valeurAxeX varchar(255), jourDuCycle varchar(255), createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_co2s créé', result);
+  //   console.log('Table gestion_co2s créé : ', result);
   // });
 
   //* gestion_co2s_datas.
@@ -121,7 +121,7 @@ db.connect(function (err) {
   //   'CREATE TABLE  gestion_co2s_datas (id int auto_increment, consigneCo2 FLOAT, pasCo2 FLOAT, objectifCo2 FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
   // db.query(sql, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_co2s_datas créé', result);
+  //   console.log('Table gestion_co2s_datas créé : ', result);
   // });
 
   //* -----------------------
@@ -133,7 +133,7 @@ db.connect(function (err) {
 
   // db.query(tableLog, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_logs créé', result);
+  //   console.log('Table gestion_logs créé : ', result);
   // });
 
   //* -----------------------
@@ -147,7 +147,7 @@ db.connect(function (err) {
 
   // db.query(tableLog, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table gestion_courbes créé', result);
+  //   console.log('Table gestion_courbes créé : ', result);
   // });
 
   //* -----------------------
@@ -159,8 +159,32 @@ db.connect(function (err) {
 
   // db.query(tableLog, function (err, result) {
   //   if (err) throw err;
-  //   console.log('Table elay_eau_au_sol créé', result);
+  //   console.log('Table elay_eau_au_sol créé : ', result);
   // });
+
+  //* -----------------------
+
+  //! Gestion de la température substrat.
+
+  // let tableLog =
+  //   'CREATE TABLE  gestion_substrats (id int auto_increment,  temperatureSubstrat FLOAT,  days FLOAT, heures FLOAT, etatRelay FLOAT, actionRelay FLOAT, valeurAxeX varchar(255), jourDuCycle varchar(255), createdAt DATE, updatedAt DATE, primary key(id))';
+
+  // db.query(tableLog, function (err, result) {
+  //   if (err) throw err;
+  //   console.log('Table gestion_substrats créé : ', result);
+  // });
+
+  //* -----------------------
+
+  //! Gestion de la température substrat.
+
+  let tableLog =
+    'CREATE TABLE  gestion_substrats_datas (id int auto_increment, consigneMaxDataSubstrat FLOAT, consigneMinDataSubstrat FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
+
+  db.query(tableLog, function (err, result) {
+    if (err) throw err;
+    console.log('Table gestion_substrats_datas créé : ', result);
+  });
 
   //* -----------------------
 });
