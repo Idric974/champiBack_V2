@@ -75,11 +75,11 @@ let recuperationEtatRelay = () => {
                             // console.log(result);
 
                             etatVanneBDD = result['etatRelay'];
-                            console.log(
-                                jaune,
-                                '[ GESTION AIR CALCULES  ] Dernier état vanne de la BDD : ',
-                                etatVanneBDD
-                            );
+                            // console.log(
+                            //     jaune,
+                            //     '[ GESTION AIR CALCULES  ] Dernier état vanne de la BDD : ',
+                            //     etatVanneBDD
+                            // );
 
                             resolve();
                         });
@@ -156,11 +156,11 @@ let getDateDemarrageCycle = () => {
                 //* Valeure de l'axe X.
 
                 valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
-                console.log(
-                    jaune,
-                    "[ GESTION AIR CALCULES  ] Valeure de l'axe X : ",
-                    valeurAxeX
-                );
+                // console.log(
+                //     jaune,
+                //     "[ GESTION AIR CALCULES  ] Valeure de l'axe X : ",
+                //     valeurAxeX
+                // );
 
                 //* --------------------------------------------------
             })
@@ -192,7 +192,7 @@ let getTemperatures = () => {
 
             //console.log(temps++);
 
-            if (temps++ === 1) {
+            if (temps++ === 9) {
                 clearInterval(conteur);
 
                 setTimeout(() => {
@@ -240,7 +240,7 @@ let calculeDeLaTemperatureMoyenne = () => {
 
             temperatureSubstratMoyenne = Math.round((sumlistValAir / arrayLength) * 100) / 100;
 
-            console.log('Temperature substrat moyenne : ', temperatureSubstratMoyenne);
+            // console.log('Temperature substrat moyenne : ', temperatureSubstratMoyenne);
 
             resolve();
 

@@ -3929,8 +3929,8 @@ resultatsHum()
     tauxHumidite = (
       ((correspondancePressionsHum -
         1013 *
-          0.000662 *
-          (valeursMesureSec180Corrigee - valeursMesureHum90Corrigee)) /
+        0.000662 *
+        (valeursMesureSec180Corrigee - valeursMesureHum90Corrigee)) /
         correspondancePressions) *
       100
     ).toFixed(2);
@@ -3952,7 +3952,7 @@ resultatsHum()
     // );
   })
 
-  //! Action après le calcule du delta
+  //! Action après le calcule du delta.
   .then(() => {
     let actionDelta = () => {
       //

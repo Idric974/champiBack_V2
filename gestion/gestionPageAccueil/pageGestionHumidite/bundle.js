@@ -296,7 +296,7 @@ let getConsigneHum = () => {
     //
     //* Récupération des données.
     .then((response) => {
-      console.log(response.data);
+      // console.log(response.data);
 
       //* Consigne Hum.
 
@@ -330,7 +330,7 @@ let getConsigneHum = () => {
 
       objectifHumLocalStorage = localStorage.getItem('Valeure objectif hum : ');
 
-      console.log('=======> ', objectifHumLocalStorage);
+      // console.log('=======> ', objectifHumLocalStorage);
 
       document.getElementById('objectifHums').innerHTML =
         'Pas : ' + objectifHumLocalStorage;
@@ -488,7 +488,7 @@ document
         objectifHum: objectifHumForm,
       })
       .then(function (response) {
-        console.log(response.data);
+        // console.log(response.data);
       })
       .catch(function (error) {
         console.log(error);

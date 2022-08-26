@@ -17,7 +17,7 @@ console.log('Page actualisée le : ' + date);
 
 //? 1 Récupération de la tempèrature substrat dans la base.
 
-//* Température Air.
+//* Température Substrat.
 
 let temperatureSubstrat;
 let temperatureSubstratLocalStorage;
@@ -133,14 +133,14 @@ if (typeof document !== 'undefined') {
     .getElementById('validationConsigneSubstrat')
     .addEventListener('click', function () {
       //
-      console.log('Clic sur bouton validation consigne substrat');
+      // console.log('Clic sur bouton validation consigne substrat');
 
 
       let consigneMaxDataSubstrat = document.getElementById('inputConsigneMaxDataSubstrat').value;
-      console.log('consigneMaxDataSubstrat', consigneMaxDataSubstrat);
+      // console.log('consigneMaxDataSubstrat', consigneMaxDataSubstrat);
 
       let consigneMinDataSubstrat = document.getElementById('inputConsigneMinDataSubstrat').value;
-      console.log('consigneMinDataSubstrat', consigneMinDataSubstrat);
+      // console.log('consigneMinDataSubstrat', consigneMinDataSubstrat);
 
       axios
         .post('http://localhost:3003/api/gestionSubstratRoutes/postConsigneSubstrat/', {
@@ -148,7 +148,7 @@ if (typeof document !== 'undefined') {
           consigneMinDataSubstrat
         })
         .then(function (response) {
-          console.log(response.data);
+          // console.log(response.data);
         })
         .then(() => {
           window.location.reload();
