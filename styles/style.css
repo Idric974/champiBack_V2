@@ -16,7 +16,7 @@
 /* Setting CSS page accueil. */
 
 .dateBox {
-    border: solid 1px red;
+  /* border: solid 1px red; */
   display: flex;
   flex-direction: row;
   align-items: center;

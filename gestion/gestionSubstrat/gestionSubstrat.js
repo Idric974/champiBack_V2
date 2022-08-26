@@ -7,6 +7,7 @@ const sequelize = require('sequelize');
 const Sequelize = require('sequelize');
 const db = require('../../models');
 const gestionSubstratModels = db.gestionSubstrat;
+const gestionSubstratDataModels = db.gestionSubstratData;
 const gestionAirModels = db.gestionAir;
 const logger = require('../../src/logger');
 const axios = require('axios');
@@ -50,6 +51,54 @@ let miseAjourEtatRelay = () => {
 //! --------------------------------------------------
 
 //! Les fonctions synchrone. 
+
+
+//? Récupération des consignes substrat. 
+
+let consigneMaxDataSubstrat;
+let consigneMinDataSubstrat;
+
+let getConsignesSubstrat = () => {
+    return new Promise((resolve, reject) => {
+
+        try {
+            gestionSubstratDataModels
+                .findOne({
+                    attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
+                    raw: true,
+                })
+                .then((id) => {
+                    // console.log(id.maxid);
+
+                    gestionSubstratDataModels
+                        .findOne({
+                            where: { id: id.maxid },
+                        })
+                        .then((result) => {
+                            // console.log('gestConsignesSubstrat :', result);
+
+                            consigneMaxDataSubstrat = result['consigneMaxDataSubstrat']
+
+                            // console.log('consigneMaxDataSubstrat :', consigneMaxDataSubstrat);
+
+                            consigneMinDataSubstrat = result['consigneMinDataSubstrat']
+
+                            // console.log('consigneMinDataSubstrat :', consigneMinDataSubstrat);
+
+
+                        }).then(() => {
+                            resolve()
+                        });
+                });
+        } catch (error) {
+            console.log('ERREUR : ', error);
+            reject();
+        }
+
+    });
+}
+
+//? -------------------------------------------------- !
 
 //? Récupération de l'état de la vanne froid.
 
@@ -180,7 +229,7 @@ let getDateDemarrageCycle = () => {
 
 //? Mesure de la température du substrat.
 
-let mcpBroche = 0;
+let mcpBroche = 2;
 
 let getTemperatures = () => {
     return new Promise((resolve) => {
@@ -262,7 +311,7 @@ let definitionAction = () => {
 
         try {
 
-            if (temperatureSubstratMoyenne >= 25) {
+            if (temperatureSubstratMoyenne >= consigneMaxDataSubstrat) {
 
                 //! Condition à 40 secondes.
 
@@ -298,7 +347,9 @@ let definitionAction = () => {
 
                 //! -----------------------------------------------
 
-            } else {
+            }
+
+            if (temperatureSubstratMoyenne >= consigneMinDataSubstrat) {
 
                 //! Condition à 40 secondes.
 
@@ -395,6 +446,8 @@ let enregistrementTemperature = () => {
 let handleMyPromise = async () => {
 
     try {
+
+        await getConsignesSubstrat();
 
         await recuperationEtatRelay();
 

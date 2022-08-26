@@ -18,7 +18,7 @@ const axios = require('axios');
 
 //! Les variables.
 
-let mcpBroche = 2; // Broche 2.
+let mcpBroche = 0; // Broche 2.
 let temperatureCorrigée;
 let ValTemp;
 let etalonnage;

@@ -16,7 +16,7 @@ const gestionSecEtallonnageModels = db.etalonnageSec;
 
 //! Les variables.
 
-let mcpBrocheSec = 0;
+let mcpBrocheSec = 0; // Broche 0.
 let mcpBrocheHum = 1;
 let tauxHumidite;
 let consigne;
