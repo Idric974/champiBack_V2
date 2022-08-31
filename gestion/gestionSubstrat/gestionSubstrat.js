@@ -416,9 +416,9 @@ let enregistrementTemperature = () => {
 
             .then(function (result) {
 
-                // console.log(
-                //     'Enregistrement des datas dans la base =======> ' + result
-                // );
+                console.log(
+                    'Enregistrement des datas dans la base =======> ' + result
+                );
 
                 resolve();
             })

@@ -39,6 +39,7 @@ let table = 'gestion_co2s';
 // let table = 'relay_eau_au_sols';
 
 //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+
 con.connect(function (err) {
   if (err) throw err;
   console.log('Connecté à la base de données MySQL!');
@@ -54,4 +55,5 @@ con.connect(function (err) {
     }
   );
 });
+
 //* ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
