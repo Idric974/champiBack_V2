@@ -349,7 +349,7 @@ let definitionAction = () => {
 
             }
 
-            if (temperatureSubstratMoyenne >= consigneMinDataSubstrat) {
+            if (temperatureSubstratMoyenne <= consigneMinDataSubstrat) {
 
                 //! Condition à 40 secondes.
 
