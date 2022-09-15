@@ -1,27 +1,58 @@
-.boutonAccueil {
-  width: 90%;
-  font-size: 1.5rem;
-  cursor: pointer;
-  border-radius: 10px;
-  border: none;
-  background-color: rgb(212, 212, 212);
-  margin-top: 20px;
-  padding: 10px;
+.box{
+    width: 100%;
+  /* border: solid red 1px; */
 }
 
-.boutonAccueil:hover {
-  box-shadow: 0px 0px 5px 5px #373964;
+.boxMenuTitle{
+  width: 100%;
+  height: 9vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  text-align: center;
+  /* padding: 10px 0px 10px 0px ; */
+  background-color: #146ec2;
+  border-bottom: solid black 1px;
+  color: white;
 }
+
+.boutonAccueil {
+  width: 90%;
+  border-radius: 10px;
+  padding: 10px 10px 10px 10px;
+  margin: 10px 0px 10px 0px;
+  color: #ececec;
+  background-color: #e59500;
+  box-shadow: 0px 0px 10px 1px black;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px rgb(122, 122, 122);
+}
+
+.boutonAccueil:active {
+  box-shadow: 0 0px black;
+  top: 6px;
+  color: white;
+}
+
+
 
 /* Setting CSS page accueil. */
 
 .dateBox {
   /* border: solid 1px red; */
+   width: 100%;
+   height: 9vh;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  width: 100%;
+ background-color: #146ec2;
+ border-bottom: solid black 1px;
 }
 
 .laDate {
@@ -30,7 +61,6 @@
   align-items: center;
   justify-content: center;
   width: 50%;
-  height: 50px;
   font-size: 3rem;
   margin: 10px 0px 10px 0px;
   color: white;
@@ -42,7 +72,6 @@
   align-items: center;
   justify-content: center;
   width: 50%;
-  height: 50px;
   font-size: 2.5rem;
   margin: 10px 0px 10px 0px;
   color: white;
@@ -64,14 +93,15 @@
 
 .boxAffichage {
   width: 100%;
-  background-color: #373964;
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* justify-content: center; */
+  border: solid black 1px;
+
 }
 
 .boxAffichageTitle {
+  /* border: solid green 1px; */
   width: 100%;
   height: 7vh;
   display: flex;
@@ -84,14 +114,12 @@
 
 .boxAffichageContent {
   /* border: solid 1px green; */
-  width: 85%;
-  height: 100vh;
+  width: 100%;
+  height: 90vh;
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: center;
-  justify-content: space-around;
-  /* border: solid red 1px; */
+
 }
 
 .boxCard {
@@ -101,45 +129,131 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  justify-content: space-around;
+  justify-content: space-between;
   border-radius: 10px;
+    margin: 10px 0px 5px 0px ;
 }
 
-.boxCardData1,
-.boxCardData2 {
-  /* border: solid 1px green; */
+.boxCardData1{
+  /* border: solid 1px red; */
   width: 95%;
+  height: 33vh;
   box-shadow: 0px 0px 10px 1px black;
   border-radius: 10px;
   background-color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 10px 0px 10px 0px;
 }
 
-
-
-.boxCardData1 {
-  height: 33vh;
-  padding-top: 10px;
-}
-
-.boxCardDataTitle,
-.boxCardDataValue,
-.boxCardDataParams,
-.boxCardData2Title,
-.boxCardData2Form,
-.boxCardData2DaysHeures {
-  /* border: solid 1px green; */
+.boxCardData2 {
+  border: solid 1px green;
   width: 95%;
+   height: 55vh;
+  box-shadow: 0px 0px 10px 1px black;
+  border-radius: 10px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+
+
+
+}
+
+
+
+.boxCardDataTitle
+ {
+  /* border: solid 1px green; */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  border-radius: 10px 10px 0px 0px;
+  padding: 20px 0px 20px 0px ;
+  background-color: #146ec2;
+  color: white;
+  margin-bottom: 10px;
+  font-size: 2.5rem;
+
+}
+
+.boxCardDataValue
+ {
+  /* border: solid 1px red; */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 5.5rem;
+
+}
+
+
+.boxCardDataParams
+ {
+  /* border: solid 1px green; */
+   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.boxCardDataItem {
+  margin: 10px;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+
+.boxCardData2Title
+ {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  border-radius: 10px 10px 0px 0px;
+  padding: 20px 0px 20px 0px ;
+  background-color: #146ec2;
+  color: white;
+  margin-bottom: 10px;
+  font-size: 2.5rem;
+}
+
+
+.boxCardData2Form
+{
+  border: solid 1px green;
+  width: 100%;
   display: flex;
   flex-direction: column;
   /* align-items: center; */
   text-align: center;
 }
 
-.boutonActivation,
+
+.boxCardData2DaysHeures {
+  border: solid 1px green;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  text-align: center;
+  
+}
+
+.boutonActivation {
+  width: 95%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px;
+}
+
+
 .boutonDeactivation {
   width: 95%;
   display: flex;
@@ -148,44 +262,27 @@
   margin: 10px;
 }
 
-.boxCardDataTitle {
-  margin: 10px 0px 10px 0px;
-}
 
-.boxCardDataTitle,
-.boxCardData2Title,
+
+
+
+
+
 .boxCardData2DaysHeures {
   font-size: 2rem;
 }
 
-.boxCardData2Title {
-  margin-bottom: 10px;
-}
 
-.boxCardDataValue {
-  font-size: 3.5rem;
-  color: #373964;
-}
 
-.boxCardDataParams {
-  font-size: 1.5rem;
-}
 
-.boxCardDataItem {
-  margin: 10px;
-  text-align: center;
-}
 
-.boxCardData2 {
-  /* border: solid green 1px; */
-  width: 95%;
-  height: 55vh;
-  padding-top: 20px;
-}
 
-.boxCardData2Title {
-  height: 5vh;
-}
+
+
+
+
+
+
 
 .boxCardData2Form {
   /* border: solid red 1px; */
@@ -514,9 +611,7 @@
 
 /*! ********* Container à onglet ******** */
 
-/* .boxAffichage {
-  border: solid red 1px;
-} */
+
 
 .container {
   /* border: solid green 1px; */
@@ -599,3 +694,6 @@
     opacity: 1;
   }
 }
+
+
+/* Nouvelle page index html */
