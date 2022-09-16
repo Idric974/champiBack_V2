@@ -229,9 +229,9 @@ let getTauxHum = () => {
 
       tauxHum = response.data.gestionTauxHum.tauxHumidite;
 
-      localStorage.setItem('Valeure taux humidité : ', tauxHum);
+      localStorage.setItem('gestionHum ==> Taux humidité :', tauxHum);
 
-      tauxHumLocalStorage = localStorage.getItem('Valeure taux humidité : ');
+      tauxHumLocalStorage = localStorage.getItem('gestionHum ==> Taux humidité :');
 
       document.getElementById('tauxHumidite').innerHTML =
         tauxHumLocalStorage + '%';
@@ -242,14 +242,14 @@ let getTauxHum = () => {
 
       temperatureSec = response.data.gestionTauxHum.valeursMesureSec180;
 
-      localStorage.setItem('Valeure tempSec hum : ', temperatureSec);
+      localStorage.setItem('gestionHum ==> Tempèrature Sec :', temperatureSec);
 
       temperatureSecLocalStorage = localStorage.getItem(
-        'Valeure tempSec hum : '
+        'gestionHum ==> Tempèrature Sec :'
       );
 
       document.getElementById('temperatureSec').innerHTML =
-        'Température Sec : ' + temperatureSecLocalStorage + '°C';
+        temperatureSecLocalStorage + '°C';
 
       //* -------------------------------------------------
 
@@ -257,14 +257,14 @@ let getTauxHum = () => {
 
       temperatureHum = response.data.gestionTauxHum.valeursMesureHum90;
 
-      localStorage.setItem('Valeure tempHum hum : ', temperatureHum);
+      localStorage.setItem('gestionHum ==> Tempèrature Humide :', temperatureHum);
 
       temperatureHumLocalStorage = localStorage.getItem(
-        'Valeure tempHum hum : '
+        'gestionHum ==> Tempèrature Humide :'
       );
 
       document.getElementById('temperatureHum').innerHTML =
-        'Température Hum : ' + temperatureHumLocalStorage + '°C';
+        temperatureHumLocalStorage + '°C';
 
       //* -------------------------------------------------
     })
@@ -302,23 +302,39 @@ let getConsigneHum = () => {
 
       consigneHum = response.data.dataGestionHum.consigneHum;
 
-      localStorage.setItem('Valeure consigne Hum : ', consigneHum);
+      localStorage.setItem('gestionHum ==> Consigne:', consigneHum);
 
-      consigneHumLocalStorage = localStorage.getItem('Valeure consigne Hum : ');
+      consigneHumLocalStorage = localStorage.getItem('gestionHum ==> Consigne:');
 
       document.getElementById('consigneHumidite').innerHTML =
-        'Consigne Hum : ' + consigneHumLocalStorage + '%';
+        consigneHumLocalStorage + '%';
+
+      //* Dernièr consigne Hum entrée.
+
+      let dernierConsigneHumEntree = localStorage.getItem('gestionHum ==> Dernier consigne:');
+
+      document.getElementById('dernierConsigneHumEntree').innerHTML =
+        dernierConsigneHumEntree;
+
+      //* -------------------------------------------------
 
       //* Pas Humidité.
 
       pasHum = response.data.dataGestionHum.pasHum;
 
-      localStorage.setItem('Valeure Pas hum : ', pasHum);
+      localStorage.setItem('gestionHum ==> Pas :', pasHum);
 
-      pasHumLocalStorage = localStorage.getItem('Valeure Pas hum : ');
+      pasHumLocalStorage = localStorage.getItem('gestionHum ==> Pas :');
 
       document.getElementById('pasHumId').innerHTML =
-        'Pas : ' + pasHumLocalStorage;
+        pasHumLocalStorage;
+
+      if (pasHumLocalStorage !== null && pasHumLocalStorage !== ' ') {
+        document.getElementById('pasHumId').innerHTML = "-";
+      } else {
+        document.getElementById('pasHumId').innerHTML =
+          pasHumLocalStorage;
+      }
 
       //* -------------------------------------------------
 
@@ -326,14 +342,21 @@ let getConsigneHum = () => {
 
       objectifHum = response.data.dataGestionHum.objectifHum;
 
-      localStorage.setItem('Valeure objectif hum : ', objectifHum);
+      localStorage.setItem('gestionHum ==> Objectif :', objectifHum);
 
-      objectifHumLocalStorage = localStorage.getItem('Valeure objectif hum : ');
+      objectifHumLocalStorage = localStorage.getItem('gestionHum ==> Objectif :');
 
       // console.log('=======> ', objectifHumLocalStorage);
 
-      document.getElementById('objectifHums').innerHTML =
-        'Pas : ' + objectifHumLocalStorage;
+      if (objectifHumLocalStorage !== null && objectifHumLocalStorage !== ' ') {
+
+        document.getElementById('objectifHums').innerHTML = "-";
+        console.log('pasAirLocalStorage === undefined');
+      } else {
+
+        document.getElementById('objectifHums').innerHTML =
+          objectifHumLocalStorage;
+      }
 
       //* -------------------------------------------------
     })
@@ -381,11 +404,11 @@ let getConsigneHum = () => {
           // );
         }
 
-        localStorage.setItem('Valeure nbJour Hum : ', nbJourHum);
-        nbJourHumLocalStorage = localStorage.getItem('Valeure nbJour Hum : ');
+        localStorage.setItem('gestionHum ==> Nombre de jour :', nbJourHum);
+        nbJourHumLocalStorage = localStorage.getItem('gestionHum ==> Nombre de jour :');
 
-        localStorage.setItem('Valeure nbHeure Hum : ', nbHeureHum);
-        nbHeureHumLocalStorage = localStorage.getItem('Valeure nbHeure Hum : ');
+        localStorage.setItem("gestionHum ==> Nombre d'heures :", nbHeureHum);
+        nbHeureHumLocalStorage = localStorage.getItem("gestionHum ==> Nombre d'heures :");
 
         document.getElementById('descenteHum').innerHTML =
           nbJourHumLocalStorage +
@@ -397,11 +420,11 @@ let getConsigneHum = () => {
           'Heures';
       };
 
-      CalculeNombreJour();
+      // CalculeNombreJour();
 
-      setInterval(() => {
-        CalculeNombreJour();
-      }, 120000);
+      // setInterval(() => {
+      //   CalculeNombreJour();
+      // }, 120000);
       // -------------------------------------
     })
 
@@ -413,12 +436,12 @@ let getConsigneHum = () => {
       let deltaTauxHum = parseFloat(tauxHum - consigneHum).toFixed(2);
       // console.log('delta Hum Front', deltaHum);
 
-      localStorage.setItem('Valeure delta hum : ', deltaTauxHum);
+      localStorage.setItem('gestionHum ==> Delta :', deltaTauxHum);
 
-      deltaTauxHumLocalStorage = localStorage.getItem('Valeure delta hum : ');
+      deltaTauxHumLocalStorage = localStorage.getItem('gestionHum ==> Delta :');
 
       document.getElementById('deltaHumidite').innerHTML =
-        'Delta Hum : ' + deltaTauxHumLocalStorage + '%';
+        deltaTauxHumLocalStorage + '%';
     })
 
     //* -------------------------------------------------
@@ -451,6 +474,8 @@ document
 
     let consigneHumForm = document.getElementById('consigneHumForm').value;
     // console.log('consigneHumForm', consigneHumForm);
+
+    localStorage.setItem('gestionHum ==> Dernier consigne:', consigneHumForm);
 
     const boutonValiderEtatHum = axios
       .post(

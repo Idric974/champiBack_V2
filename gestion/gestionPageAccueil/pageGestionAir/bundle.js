@@ -309,18 +309,30 @@ let getConsigneAir = () => {
     //* Récupération des données.
 
     .then((response) => {
-      // console.log(response.data);
 
       //* Consigne Air.
 
+      // console.log(response.data);
+
       consigneAir = response.data.datatemperatureAir.consigneAir;
 
-      localStorage.setItem('Valeure consigne Air : ', consigneAir);
+      localStorage.setItem('gestionAir ==> Consigne :', consigneAir);
 
-      consigneAirLocalStorage = localStorage.getItem('Valeure consigne Air : ');
+      consigneAirLocalStorage = localStorage.getItem('gestionAir ==> Consigne :');
 
       document.getElementById('consigneAir').innerHTML =
-        'Consigne Air : ' + consigneAirLocalStorage + '°C';
+        consigneAirLocalStorage + '°C';
+
+      //* -------------------------------------------------
+
+      //* Dernièr consigne air entrée.
+
+      let dernierConsigneAirEntree = localStorage.getItem('gestionAir ==> Dernier cons air :');
+
+      // console.log('dernierConsigneAirEntree :', dernierConsigneAirEntree);
+
+      document.getElementById('dernierConsigneAirEntree').innerHTML =
+        dernierConsigneAirEntree;
 
       //* -------------------------------------------------
 
@@ -328,12 +340,21 @@ let getConsigneAir = () => {
 
       pasAir = response.data.datatemperatureAir.pasAir;
 
-      localStorage.setItem('Valeure Pas air : ', pasAir);
+      // console.log('pasAir :', pasAir);
 
-      pasAirLocalStorage = localStorage.getItem('Valeure Pas air : ');
+      localStorage.setItem('gestionAir ==> Pas :', pasAir);
 
-      document.getElementById('pasAirId').innerHTML =
-        'Pas : ' + pasAirLocalStorage;
+      pasAirLocalStorage = localStorage.getItem('gestionAir ==> Pas :');
+
+      if (pasAirLocalStorage !== null && pasAirLocalStorage !== ' ') {
+        document.getElementById('pasAirId').innerHTML = "-";
+        console.log('pasAirLocalStorage === undefined');
+      } else {
+        document.getElementById('pasAirId').innerHTML =
+          pasAirLocalStorage;
+
+        console.log('pasAirLocalStorage === OK');
+      }
 
       //* -------------------------------------------------
 
@@ -341,12 +362,20 @@ let getConsigneAir = () => {
 
       objectifAir = response.data.datatemperatureAir.objectifAir;
 
-      localStorage.setItem('Valeure objectif air : ', objectifAir);
+      // console.log('objectifAir :', objectifAir);
 
-      objectifAirLocalStorage = localStorage.getItem('Valeure objectif air : ');
+      localStorage.setItem('gestionAir ==> Objectif :', objectifAir);
 
-      document.getElementById('objectiAirId').innerHTML =
-        'Objectif : ' + objectifAirLocalStorage;
+      objectifAirLocalStorage = localStorage.getItem('gestionAir ==> Objectif :');
+
+      if (objectifAirLocalStorage !== null && objectifAirLocalStorage !== ' ') {
+        document.getElementById('objectiAirId').innerHTML = "-";
+
+      } else {
+        document.getElementById('objectiAirId').innerHTML =
+          objectifAirLocalStorage;
+
+      }
 
       //* -------------------------------------------------
     })
@@ -418,7 +447,7 @@ let getConsigneAir = () => {
 
     //* -------------------------------------------------
 
-    //* Stockage de la valeur deltat.
+    //* Stockage de la valeur delta.
 
     .then(() => {
       deltaAir = parseFloat(temperatureAir - consigneAir).toFixed(2);
@@ -428,8 +457,8 @@ let getConsigneAir = () => {
 
       deltaAirLocalStorage = localStorage.getItem('Valeure delta Air : ');
 
-      document.getElementById('delatAir').innerHTML =
-        'Delta Air : ' + deltaAirLocalStorage + '°C';
+      document.getElementById('deltaAir').innerHTML =
+        deltaAirLocalStorage + '°C';
     })
 
     //* -------------------------------------------------
@@ -460,10 +489,12 @@ document
   .getElementById('validationConsigneAir')
   .addEventListener('click', function () {
     //
-    // console.log('Clic sur bouton validation Etal Hum');
+    console.log('Clic sur bouton validation consigne air ');
 
     let consigneAirForm = document.getElementById('consigneAirForm').value;
     // console.log('consigneAirForm', consigneAirForm);
+
+    localStorage.setItem('gestionAir ==> Dernier cons air :', consigneAirForm);
 
     const boutonValiderEtalAir = axios
       .post('http://localhost:3003/api/gestionAirRoutes/postConsigneAir/', {

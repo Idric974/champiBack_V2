@@ -84,7 +84,16 @@ let getConsigneCo2 = () => {
       consigneCo2LocalStorage = localStorage.getItem('Valeure consigne Co2 : ');
 
       document.getElementById('consigneCo2').innerHTML =
-        'Consigne Co2 : ' + consigneCo2LocalStorage + ' ppm';
+        consigneCo2LocalStorage + ' ppm';
+
+      //* -------------------------------------------------
+
+      //* Dernier consigne Co2.
+
+      let dernierConsigneCo2Entree = localStorage.getItem('gestionCo2 ==> Dernier consigne :');
+
+      document.getElementById('dernierConsigneCo2Entree').innerHTML =
+        dernierConsigneCo2Entree;
 
       //* -------------------------------------------------
 
@@ -96,8 +105,16 @@ let getConsigneCo2 = () => {
 
       pasCo2LocalStorage = localStorage.getItem('Valeure Pas Co2 : ');
 
-      document.getElementById('pasCo2Id').innerHTML =
-        'Pas : ' + pasCo2LocalStorage;
+      if (pasCo2LocalStorage !== null && pasCo2LocalStorage !== ' ') {
+        document.getElementById('pasCo2Id').innerHTML = "-";
+
+        console.log('pasAirLocalStorage === undefined');
+      } else {
+
+        document.getElementById('pasCo2Id').innerHTML =
+          pasCo2LocalStorage;
+
+      }
 
       //* -------------------------------------------------
 
@@ -109,8 +126,15 @@ let getConsigneCo2 = () => {
 
       objectifCo2LocalStorage = localStorage.getItem('Valeure objectif Co2 : ');
 
-      document.getElementById('objectiCo2Id').innerHTML =
-        'Objectif : ' + objectifCo2LocalStorage;
+      if (objectifCo2LocalStorage !== null && objectifCo2LocalStorage !== ' ') {
+
+        document.getElementById('objectiCo2Id').innerHTML = "-";
+
+      } else {
+
+        document.getElementById('objectiCo2Id').innerHTML =
+          objectifCo2LocalStorage;
+      }
 
       //* -------------------------------------------------
     })
@@ -192,7 +216,7 @@ let getConsigneCo2 = () => {
       deltaCo2LocalStorage = localStorage.getItem('Valeure delta Co2 : ');
 
       document.getElementById('deltaCo2').innerHTML =
-        'Delta Co2 : ' + deltaCo2LocalStorage + ' ppm';
+        deltaCo2LocalStorage + ' ppm';
     })
 
     .catch((error) => {
@@ -222,6 +246,8 @@ document
     let consigneCo2Form = document.getElementById('consigneCo2Form').value;
     console.log('consigneCo2Form', consigneCo2Form);
 
+    localStorage.setItem('gestionCo2 ==> Dernier consigne :', consigneCo2Form);
+
     const boutonValiderEtatco2 = axios
       .post('http://localhost:3003/api/gestionCo2Routes/postConsigneCo2/', {
         consigneCo2: consigneCo2Form,
@@ -250,6 +276,7 @@ document
 
     let objectifCo2Form = document.getElementById('objectifCo2Form').value;
     // console.log('objectiCo2Form', objectiCo2Form);
+
 
     const boutonValiderEtalCo2 = axios
       .post('http://localhost:3003/api/gestionCo2Routes/postDataCo2/', {

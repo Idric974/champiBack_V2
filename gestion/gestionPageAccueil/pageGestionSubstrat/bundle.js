@@ -221,10 +221,10 @@ let getTemperatureSubstrat = () => {
       temperatureSubstrat = response.data.temperatureSubsrat.temperatureSubstrat;
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem('Valeure température Substrat : ', temperatureSubstrat);
+        localStorage.setItem('gestionSubstrat ==> Tempèrature :', temperatureSubstrat);
 
         temperatureSubstratLocalStorage = localStorage.getItem(
-          'Valeure température Substrat : '
+          'gestionSubstrat ==> Tempèrature :'
         );
 
         document.getElementById('temperatureSubstrat').innerHTML =
@@ -263,19 +263,19 @@ let getConsigneSubstrat = () => {
 
       //! consigne Max Data Substrat.
 
-
       if (typeof window !== 'undefined') {
+
         consigneMaxDataSubstrat = response.data.dataSubstrat.consigneMaxDataSubstrat
         //console.log('consigneMaxDataSubstrat :', consigneMaxDataSubstrat);
 
-        localStorage.setItem('consigneMaxDataSubstrat : ', consigneMaxDataSubstrat);
+        localStorage.setItem('gestionSubstrat ==> Consigne Max :', consigneMaxDataSubstrat);
 
         consigneMaxDataSubstratLocalStorage = localStorage.getItem(
-          'consigneMaxDataSubstrat : '
+          'gestionSubstrat ==> Consigne Max :'
         );
 
-        document.getElementById('consigneMaxDataSubstrat').innerHTML = 'Consigne Max : ' +
-          consigneMaxDataSubstratLocalStorage + '°C';
+        document.getElementById('consigneMaxDataSubstrat').innerHTML =
+          consigneMaxDataSubstratLocalStorage;
 
       }
 
@@ -288,15 +288,14 @@ let getConsigneSubstrat = () => {
         consigneMinDataSubstrat = response.data.dataSubstrat.consigneMinDataSubstrat
         // console.log('consigneMinDataSubstrat :', consigneMinDataSubstrat);
 
-        localStorage.setItem('consigneMinDataSubstrat : ', consigneMinDataSubstrat);
+        localStorage.setItem('gestionSubstrat ==> Consigne Min :', consigneMinDataSubstrat);
 
         consigneMinDataSubstratLocalStorage = localStorage.getItem(
-          'consigneMinDataSubstrat : '
+          'gestionSubstrat ==> Consigne Min :'
         );
 
-        document.getElementById('consigneMinDataSubstrat').innerHTML = 'Consigne Min : ' +
-          consigneMinDataSubstratLocalStorage + '°C';
-
+        document.getElementById('consigneMinDataSubstrat').innerHTML =
+          consigneMinDataSubstratLocalStorage;
       }
 
     })
@@ -312,7 +311,6 @@ setInterval(() => {
   // console.log('récup consigneAir');
 }, 15000);
 
-
 //? 3 Post des consignes substrat dans la base.
 
 if (typeof document !== 'undefined') {
@@ -322,12 +320,37 @@ if (typeof document !== 'undefined') {
       //
       // console.log('Clic sur bouton validation consigne substrat');
 
+      //* Consigne Max Substrat.
 
       let consigneMaxDataSubstrat = document.getElementById('inputConsigneMaxDataSubstrat').value;
       // console.log('consigneMaxDataSubstrat', consigneMaxDataSubstrat);
 
+      localStorage.setItem('gestionSubstrat ==> Dernier Consigne Max:', consigneMaxDataSubstrat);
+
+      consigneMaxDataSubstratLocalStorage = localStorage.getItem(
+        'gestionSubstrat ==> Dernier Consigne Max:'
+      );
+
+      document.getElementById('dernierConsigneSubstratMaxEntree').innerHTML =
+        consigneMaxDataSubstratLocalStorage + '°C';
+
+      //* -----------------------------------------
+
+      //* Consigne Min Substrat.
+
       let consigneMinDataSubstrat = document.getElementById('inputConsigneMinDataSubstrat').value;
       // console.log('consigneMinDataSubstrat', consigneMinDataSubstrat);
+      localStorage.setItem('gestionSubstrat ==> Dernier Consigne Min:', consigneMinDataSubstrat);
+
+      localStorage.setItem('gestionSubstrat ==> Dernier Consigne Max:', consigneMaxDataSubstrat);
+      consigneMaxDataSubstratLocalStorage = localStorage.getItem(
+        'gestionSubstrat ==> Consigne Max :'
+      );
+
+      document.getElementById('dernierConsigneSubstratMinEntree').innerHTML =
+        consigneMaxDataSubstratLocalStorage + '°C';
+
+      //* -----------------------------------------
 
       axios
         .post('http://localhost:3003/api/gestionSubstratRoutes/postConsigneSubstrat/', {
