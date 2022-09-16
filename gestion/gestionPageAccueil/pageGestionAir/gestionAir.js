@@ -74,10 +74,10 @@ let getTemperatureAir = () => {
 
       temperatureAir = response.data.temperatureAir.temperatureAir;
 
-      localStorage.setItem('Valeure température Air : ', temperatureAir);
+      localStorage.setItem('gestionAir ==> Tempèrature Air:', temperatureAir);
 
       temperatureAirLocalStorage = localStorage.getItem(
-        'Valeure température Air : '
+        'gestionAir ==> Tempèrature Air:'
       );
 
       document.getElementById('temperatureAir').innerHTML =
@@ -105,13 +105,12 @@ setInterval(() => {
 let consigneAir;
 let consigneAirLocalStorage;
 let objectifAir;
-let objectifAirLocalStorage;
 let pasAir;
-let pasAirLocalStorage;
 let nbJourAir;
-let nbJourAirLocalStorage;
 let nbHeureAir;
-let nbHeureAirLocalStorage;
+let getDernierConsigneAirEntree;
+let getdernierPasAirEntree;
+let getDernierObjectifAirEntree;
 
 let getConsigneAir = () => {
   axios({
@@ -138,59 +137,33 @@ let getConsigneAir = () => {
 
       //* -------------------------------------------------
 
-      //* Dernièr consigne air entrée.
+      //* Affichage historique Consigne.
 
-      let dernierConsigneAirEntree = localStorage.getItem('gestionAir ==> Dernier cons air :');
-
-      // console.log('dernierConsigneAirEntree :', dernierConsigneAirEntree);
+      getDernierConsigneAirEntree = localStorage.getItem('gestionAir ==> Dernier consigne:');
 
       document.getElementById('dernierConsigneAirEntree').innerHTML =
-        dernierConsigneAirEntree;
+        getDernierConsigneAirEntree;
 
       //* -------------------------------------------------
 
-      //* Pas Air.
+      //* Affichage historique Pas.
 
-      pasAir = response.data.datatemperatureAir.pasAir;
+      getdernierPasAirEntree = localStorage.getItem('gestionAir ==> Dernier Pas:');
 
-      // console.log('pasAir :', pasAir);
-
-      localStorage.setItem('gestionAir ==> Pas :', pasAir);
-
-      pasAirLocalStorage = localStorage.getItem('gestionAir ==> Pas :');
-
-      if (pasAirLocalStorage !== null && pasAirLocalStorage !== ' ') {
-        document.getElementById('pasAirId').innerHTML = "-";
-        console.log('pasAirLocalStorage === undefined');
-      } else {
-        document.getElementById('pasAirId').innerHTML =
-          pasAirLocalStorage;
-
-        console.log('pasAirLocalStorage === OK');
-      }
+      document.getElementById('dernierPasAirEntree').innerHTML =
+        getdernierPasAirEntree;
 
       //* -------------------------------------------------
 
-      //* Objectif Air.
+      //* Affichage historique Objecif.
 
-      objectifAir = response.data.datatemperatureAir.objectifAir;
+      getDernierObjectifAirEntree = localStorage.getItem('gestionAir ==> Dernier Objectif:');
 
-      // console.log('objectifAir :', objectifAir);
-
-      localStorage.setItem('gestionAir ==> Objectif :', objectifAir);
-
-      objectifAirLocalStorage = localStorage.getItem('gestionAir ==> Objectif :');
-
-      if (objectifAirLocalStorage !== null && objectifAirLocalStorage !== ' ') {
-        document.getElementById('objectiAirId').innerHTML = "-";
-
-      } else {
-        document.getElementById('objectiAirId').innerHTML =
-          objectifAirLocalStorage;
-
-      }
+      document.getElementById('dernierObjectifAirEntree').innerHTML =
+        getDernierObjectifAirEntree;
 
       //* -------------------------------------------------
+
     })
 
     //* -------------------------------------------------
@@ -200,21 +173,21 @@ let getConsigneAir = () => {
     .then(() => {
       let CalculeNombreJour = () => {
         if (
-          consigneAir == 0 ||
-          consigneAir == '' ||
-          consigneAir == null ||
-          objectifAir == 0 ||
-          objectifAir == '' ||
-          objectifAir == null ||
-          pasAir == 0 ||
-          pasAir == '' ||
-          pasAir == null
+          getDernierConsigneAirEntree == 0 ||
+          getDernierConsigneAirEntree == '' ||
+          getDernierConsigneAirEntree == null ||
+          getDernierObjectifAirEntree == 0 ||
+          getDernierObjectifAirEntree == '' ||
+          getDernierObjectifAirEntree == null ||
+          getdernierPasAirEntree == 0 ||
+          getdernierPasAirEntree == '' ||
+          getdernierPasAirEntree == null
         ) {
-          // console.log('Pas de paramètre pas de calcule des jours');
+          //  console.log('Pas de paramètre pas de calcule des jours');
 
           return;
         } else {
-          let dureeDescenteAir = ((consigneAir - objectifAir) / pasAir) * 12;
+          let dureeDescenteAir = ((getDernierConsigneAirEntree - getDernierObjectifAirEntree) / getdernierPasAirEntree) * 12;
 
           // console.log('Durée Descente Air', dureeDescenteAir);
 
@@ -228,25 +201,30 @@ let getConsigneAir = () => {
 
           // console.log(
           //   'La durée de la descente Air est de  : ' +
-          //     nbJourAir +
-          //     ' Jours ' +
-          //     nbHeureAir +
-          //     ' Heures '
+          //   nbJourAir +
+          //   ' Jours ' +
+          //   nbHeureAir +
+          //   ' Heures '
           // );
         }
 
-        localStorage.setItem('Valeure nbJour Air : ', nbJourAir);
+        localStorage.setItem('gestionAir ==> Nombre de jour:', nbJourAir);
         nbJourAirLocalStorage = localStorage.getItem('Valeure nbJour Air : ');
 
-        localStorage.setItem('Valeure nbHeure Air : ', nbHeureAir);
-        nbHeureAirLocalStorage = localStorage.getItem('Valeure nbHeure Air : ');
+        let nombreDeJour = localStorage.getItem('gestionAir ==> Nombre de jour:');
+
+
+        localStorage.setItem('gestionAir ==> Nombre de heure:', nbHeureAir);
+
+
+        let nombreDeHeure = localStorage.getItem('gestionAir ==> Nombre de heure:');
 
         document.getElementById('descenteAir').innerHTML =
-          nbJourAirLocalStorage +
+          nombreDeJour +
           ' ' +
           'Jours et' +
           ' ' +
-          nbHeureAirLocalStorage +
+          nombreDeHeure +
           ' ' +
           'Heures';
       };
@@ -307,7 +285,7 @@ document
     let consigneAirForm = document.getElementById('consigneAirForm').value;
     // console.log('consigneAirForm', consigneAirForm);
 
-    localStorage.setItem('gestionAir ==> Dernier cons air :', consigneAirForm);
+    localStorage.setItem('gestionAir ==> Dernier consigne:', consigneAirForm);
 
     const boutonValiderEtalAir = axios
       .post('http://localhost:3003/api/gestionAirRoutes/postConsigneAir/', {
@@ -329,10 +307,22 @@ document
     //
     // console.log('Clic sur bouton validation Etal Hum');
 
+    //* Pas Air.
+
     let pasAirForm = document.getElementById('pasAirForm').value;
     // console.log('pasAirForm', pasAirForm);
+
+    localStorage.setItem('gestionAir ==> Dernier Pas:', pasAirForm);
+
+    //* -------------------------------------------------
+
+    //* Objectif Air.
+
     let objectiAirForm = document.getElementById('objectiAirForm').value;
-    // console.log('objectiAirForm', objectiAirForm);
+
+    localStorage.setItem('gestionAir ==> Dernier Objectif:', objectiAirForm);
+
+    //* -------------------------------------------------
 
     const boutonValiderEtalHum = axios
       .post('http://localhost:3003/api/gestionAirRoutes/postDataAir/', {

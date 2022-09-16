@@ -225,7 +225,7 @@ let getTauxHum = () => {
     .then((response) => {
       // console.log(response.data);
 
-      //* température Air.
+      //* Taux humidité.
 
       tauxHum = response.data.gestionTauxHum.tauxHumidite;
 
@@ -287,6 +287,9 @@ setInterval(() => {
 
 let consigneHum;
 let consigneHumLocalStorage;
+let getDernierConsigneHumEntree;
+let getDernierPasHumEntree;
+let getDernierObjectifHumEntree
 
 let getConsigneHum = () => {
   axios({
@@ -309,56 +312,35 @@ let getConsigneHum = () => {
       document.getElementById('consigneHumidite').innerHTML =
         consigneHumLocalStorage + '%';
 
-      //* Dernièr consigne Hum entrée.
+      //* -------------------------------------------------
 
-      let dernierConsigneHumEntree = localStorage.getItem('gestionHum ==> Dernier consigne:');
+      //* Affichage historique Consigne.
+
+      getDernierConsigneHumEntree = localStorage.getItem('gestionHum ==> Dernier consigne:');
 
       document.getElementById('dernierConsigneHumEntree').innerHTML =
-        dernierConsigneHumEntree;
+        getDernierConsigneHumEntree;
 
       //* -------------------------------------------------
 
-      //* Pas Humidité.
+      //* Affichage historique Pas.
 
-      pasHum = response.data.dataGestionHum.pasHum;
+      getDernierPasHumEntree = localStorage.getItem('gestionHum ==> Dernier Pas:');
 
-      localStorage.setItem('gestionHum ==> Pas :', pasHum);
-
-      pasHumLocalStorage = localStorage.getItem('gestionHum ==> Pas :');
-
-      document.getElementById('pasHumId').innerHTML =
-        pasHumLocalStorage;
-
-      if (pasHumLocalStorage !== null && pasHumLocalStorage !== ' ') {
-        document.getElementById('pasHumId').innerHTML = "-";
-      } else {
-        document.getElementById('pasHumId').innerHTML =
-          pasHumLocalStorage;
-      }
+      document.getElementById('dernierConsignePasEntree').innerHTML =
+        getDernierPasHumEntree;
 
       //* -------------------------------------------------
 
-      //* Objectif Humidité.
+      //* Affichage historique Objectif.
 
-      objectifHum = response.data.dataGestionHum.objectifHum;
+      getDernierObjectifHumEntree = localStorage.getItem('gestionHum ==> Dernier Objectif:');
 
-      localStorage.setItem('gestionHum ==> Objectif :', objectifHum);
-
-      objectifHumLocalStorage = localStorage.getItem('gestionHum ==> Objectif :');
-
-      // console.log('=======> ', objectifHumLocalStorage);
-
-      if (objectifHumLocalStorage !== null && objectifHumLocalStorage !== ' ') {
-
-        document.getElementById('objectifHums').innerHTML = "-";
-        console.log('pasAirLocalStorage === undefined');
-      } else {
-
-        document.getElementById('objectifHums').innerHTML =
-          objectifHumLocalStorage;
-      }
+      document.getElementById('dernierConsigneObjectifEntree').innerHTML =
+        getDernierObjectifHumEntree;
 
       //* -------------------------------------------------
+
     })
 
     //* -------------------------------------------------
@@ -367,27 +349,27 @@ let getConsigneHum = () => {
 
     .then(() => {
       // Durée de la descente Hum.
-
       let CalculeNombreJour = () => {
         if (
-          consigneHum == 0 ||
-          consigneHum == '' ||
-          consigneHum == null ||
-          objectifHum == 0 ||
-          objectifHum == '' ||
-          objectifHum == null ||
-          pasHum == 0 ||
-          pasHum == '' ||
-          pasHum == null
+          getDernierConsigneHumEntree == 0 ||
+          getDernierConsigneHumEntree == '' ||
+          getDernierConsigneHumEntree == null ||
+          getDernierObjectifHumEntree == 0 ||
+          getDernierObjectifHumEntree == '' ||
+          getDernierObjectifHumEntree == null ||
+          getDernierPasHumEntree == 0 ||
+          getDernierPasHumEntree == '' ||
+          getDernierPasHumEntree == null
         ) {
-          // console.log('Pas de paramètre pas de calcule des jours');
+          //console.log('Pas de paramètre pas de calcule des jours');
+
           return;
         } else {
-          let dureeDescenteHum = ((consigneHum - objectifHum) / pasHum) * 12;
+          let dureeDescenteAir = ((getDernierConsigneHumEntree - getDernierObjectifHumEntree) / getDernierPasHumEntree) * 12;
 
-          // console.log('Durée Descente Hum', dureeDescenteHum);
+          //  console.log('Durée Descente Air', dureeDescenteAir);
 
-          let totalHeures = dureeDescenteHum;
+          let totalHeures = dureeDescenteAir;
 
           nbJourHum = Math.floor(totalHeures / 24);
 
@@ -396,35 +378,40 @@ let getConsigneHum = () => {
           nbHeureHum = Math.floor(totalHeures / 36);
 
           // console.log(
-          //   'La durée de la descente Hum est de  : ' +
-          //     nbJourHum +
-          //     ' Jours ' +
-          //     nbHeureHum +
-          //     ' Heures '
+          //   'La durée de la descente Air est de  : ' +
+          //   nbJourAir +
+          //   ' Jours ' +
+          //   nbHeureAir +
+          //   ' Heures '
           // );
         }
 
-        localStorage.setItem('gestionHum ==> Nombre de jour :', nbJourHum);
-        nbJourHumLocalStorage = localStorage.getItem('gestionHum ==> Nombre de jour :');
+        localStorage.setItem('gestionHum ==> Nombre de jour:', nbJourHum);
+        nbJourHum = localStorage.getItem('Valeure nbJour Air : ');
 
-        localStorage.setItem("gestionHum ==> Nombre d'heures :", nbHeureHum);
-        nbHeureHumLocalStorage = localStorage.getItem("gestionHum ==> Nombre d'heures :");
+        let nombreDeJour = localStorage.getItem('gestionHum ==> Nombre de jour:');
+
+
+        localStorage.setItem('gestionHum ==> Nombre de heure:', nbHeureHum);
+
+
+        let nombreDeHeure = localStorage.getItem('gestionHum ==> Nombre de heure:');
 
         document.getElementById('descenteHum').innerHTML =
-          nbJourHumLocalStorage +
+          nombreDeJour +
           ' ' +
           'Jours et' +
           ' ' +
-          nbHeureHumLocalStorage +
+          nombreDeHeure +
           ' ' +
           'Heures';
       };
 
-      // CalculeNombreJour();
+      CalculeNombreJour();
 
-      // setInterval(() => {
-      //   CalculeNombreJour();
-      // }, 120000);
+      setInterval(() => {
+        CalculeNombreJour();
+      }, 120000);
       // -------------------------------------
     })
 
@@ -504,8 +491,12 @@ document
     let pasHumForm = document.getElementById('pasHumForm').value;
     // console.log('pasHumForm', pasHumForm);
 
+    localStorage.setItem('gestionHum ==> Dernier Pas:', pasHumForm);
+
     let objectifHumForm = document.getElementById('objectifHumForm').value;
     // console.log('objectiHumForm', objectiHumForm);
+
+    localStorage.setItem('gestionHum ==> Dernier Objectif:', objectifHumForm);
 
     const boutonValiderEtalHum = axios
       .post('http://localhost:3003/api/gestionHumiditeRoutes/postDataHum/', {

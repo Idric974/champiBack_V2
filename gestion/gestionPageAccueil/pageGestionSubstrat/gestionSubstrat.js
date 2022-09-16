@@ -44,6 +44,20 @@ let getTemperatureSubstrat = () => {
           temperatureSubstratLocalStorage + '°C';
       }
 
+      let consigneMaxDataSubstratLocalStorage = localStorage.getItem(
+        'gestionSubstrat ==> Dernier Consigne Max:'
+      );
+
+      document.getElementById('dernierConsigneSubstratMaxEntree').innerHTML =
+        consigneMaxDataSubstratLocalStorage;
+
+      let consigneMinDataSubstratLocalStorage = localStorage.getItem(
+        'gestionSubstrat ==> Consigne Min :'
+      );
+
+      document.getElementById('dernierConsigneSubstratMinEntree').innerHTML =
+        consigneMinDataSubstratLocalStorage;
+
     })
     .catch((error) => {
       console.log(error);
@@ -140,12 +154,7 @@ if (typeof document !== 'undefined') {
 
       localStorage.setItem('gestionSubstrat ==> Dernier Consigne Max:', consigneMaxDataSubstrat);
 
-      consigneMaxDataSubstratLocalStorage = localStorage.getItem(
-        'gestionSubstrat ==> Dernier Consigne Max:'
-      );
 
-      document.getElementById('dernierConsigneSubstratMaxEntree').innerHTML =
-        consigneMaxDataSubstratLocalStorage + '°C';
 
       //* -----------------------------------------
 
@@ -156,12 +165,10 @@ if (typeof document !== 'undefined') {
       localStorage.setItem('gestionSubstrat ==> Dernier Consigne Min:', consigneMinDataSubstrat);
 
       localStorage.setItem('gestionSubstrat ==> Dernier Consigne Max:', consigneMaxDataSubstrat);
-      consigneMaxDataSubstratLocalStorage = localStorage.getItem(
-        'gestionSubstrat ==> Consigne Max :'
-      );
 
-      document.getElementById('dernierConsigneSubstratMinEntree').innerHTML =
-        consigneMaxDataSubstratLocalStorage + '°C';
+
+
+
 
       //* -----------------------------------------
 

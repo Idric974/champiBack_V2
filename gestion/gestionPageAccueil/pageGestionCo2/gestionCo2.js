@@ -63,6 +63,9 @@ let nbJourCo2;
 let nbJourCo2LocalStorage;
 let nbHeureCo2;
 let nbHeureCo2LocalStorage;
+let getDernierConsigneCo2Entree;
+let getDernierPasCo2Entree;
+let getDernierObjectifCo2Entree
 
 let getConsigneCo2 = () => {
   axios({
@@ -88,55 +91,33 @@ let getConsigneCo2 = () => {
 
       //* -------------------------------------------------
 
-      //* Dernier consigne Co2.
+      //* Affichage historique Consigne.
 
-      let dernierConsigneCo2Entree = localStorage.getItem('gestionCo2 ==> Dernier consigne :');
+      getDernierConsigneCo2Entree = localStorage.getItem('gestionCo2 ==> Dernier consigne:');
 
       document.getElementById('dernierConsigneCo2Entree').innerHTML =
-        dernierConsigneCo2Entree;
+        getDernierConsigneCo2Entree;
 
       //* -------------------------------------------------
 
-      //* Pas Co2.
+      //* Affichage historique Pas.
 
-      pasCo2 = response.data.dataTauxCo2.pasCo2;
+      getDernierPasCo2Entree = localStorage.getItem('gestionCo2 ==> Dernier Pas:');
 
-      localStorage.setItem('Valeure Pas Co2 : ', pasCo2);
-
-      pasCo2LocalStorage = localStorage.getItem('Valeure Pas Co2 : ');
-
-      if (pasCo2LocalStorage !== null && pasCo2LocalStorage !== ' ') {
-        document.getElementById('pasCo2Id').innerHTML = "-";
-
-        console.log('pasAirLocalStorage === undefined');
-      } else {
-
-        document.getElementById('pasCo2Id').innerHTML =
-          pasCo2LocalStorage;
-
-      }
+      document.getElementById('dernierPasCo2Entree').innerHTML =
+        getDernierPasCo2Entree;
 
       //* -------------------------------------------------
 
-      //* Objectif Co2.
+      //* Affichage historique Objectif.
 
-      objectifCo2 = response.data.dataTauxCo2.objectifCo2;
+      getDernierObjectifCo2Entree = localStorage.getItem('gestionCo2 ==> Dernier Objectif:');
 
-      localStorage.setItem('Valeure objectif Co2 : ', objectifCo2);
-
-      objectifCo2LocalStorage = localStorage.getItem('Valeure objectif Co2 : ');
-
-      if (objectifCo2LocalStorage !== null && objectifCo2LocalStorage !== ' ') {
-
-        document.getElementById('objectiCo2Id').innerHTML = "-";
-
-      } else {
-
-        document.getElementById('objectiCo2Id').innerHTML =
-          objectifCo2LocalStorage;
-      }
+      document.getElementById('dernierObjectifCo2Entree').innerHTML =
+        getDernierObjectifCo2Entree;
 
       //* -------------------------------------------------
+
     })
 
     //* -------------------------------------------------
@@ -146,22 +127,23 @@ let getConsigneCo2 = () => {
     .then(() => {
       let CalculeNombreJour = () => {
         if (
-          consigneCo2 == 0 ||
-          consigneCo2 == '' ||
-          consigneCo2 == null ||
-          objectifCo2 == 0 ||
-          objectifCo2 == '' ||
-          objectifCo2 == null ||
-          pasCo2 == 0 ||
-          pasCo2 == '' ||
-          pasCo2 == null
+          getDernierConsigneCo2Entree == 0 ||
+          getDernierConsigneCo2Entree == '' ||
+          getDernierConsigneCo2Entree == null ||
+          getDernierObjectifCo2Entree == 0 ||
+          getDernierObjectifCo2Entree == '' ||
+          getDernierObjectifCo2Entree == null ||
+          getDernierPasCo2Entree == 0 ||
+          getDernierPasCo2Entree == '' ||
+          getDernierPasCo2Entree == null
         ) {
-          // console.log('Pas de paramètre pas de calcule des jours');
+          console.log('Pas de paramètre pas de calcule des jours Hum');
+
           return;
         } else {
-          let dureeDescenteCo2 = ((consigneCo2 - objectifCo2) / pasCo2) * 12;
+          let dureeDescenteCo2 = ((getDernierConsigneCo2Entree - getDernierObjectifCo2Entree) / getDernierPasCo2Entree) * 12;
 
-          // console.log('Durée Descente Co2', dureeDescenteCo2);
+          console.log('Durée Descente Co2', dureeDescenteCo2);
 
           let totalHeures = dureeDescenteCo2;
 
@@ -172,26 +154,30 @@ let getConsigneCo2 = () => {
           nbHeureCo2 = Math.floor(totalHeures / 36);
 
           // console.log(
-          //   'La durée de la descente Co2 est de  : ' +
-          //     nbJourCo2 +
-          //     ' Jours ' +
-          //     nbHeureCo2 +
-          //     ' Heures '
+          //   'La durée de la descente Air est de  : ' +
+          //   nbJourAir +
+          //   ' Jours ' +
+          //   nbHeureAir +
+          //   ' Heures '
           // );
         }
 
-        localStorage.setItem('Valeure nbJour Co2 : ', nbJourCo2);
-        nbJourCo2LocalStorage = localStorage.getItem('Valeure nbJour Co2 : ');
+        localStorage.setItem('gestionCo2 ==> Nombre de jour:', nbJourCo2);
+        nbJourCo2 = localStorage.getItem('gestionCo2 ==> Nombre de jour:');
 
-        localStorage.setItem('Valeure nbHeure Co2 : ', nbHeureCo2);
-        nbHeureCo2LocalStorage = localStorage.getItem('Valeure nbHeure Co2 : ');
+        let nombreDeJour = localStorage.getItem('gestionCo2 ==> Nombre de jour:');
+
+
+        localStorage.setItem('gestionCo2 ==> Nombre de heure:', nbHeureCo2);
+
+        let nombreDeHeure = localStorage.getItem('gestionCo2 ==> Nombre de heure:');
 
         document.getElementById('descenteCo2').innerHTML =
-          nbJourCo2LocalStorage +
+          nombreDeJour +
           ' ' +
           'Jours et' +
           ' ' +
-          nbHeureCo2LocalStorage +
+          nombreDeHeure +
           ' ' +
           'Heures';
       };
@@ -246,7 +232,7 @@ document
     let consigneCo2Form = document.getElementById('consigneCo2Form').value;
     console.log('consigneCo2Form', consigneCo2Form);
 
-    localStorage.setItem('gestionCo2 ==> Dernier consigne :', consigneCo2Form);
+    localStorage.setItem('gestionCo2 ==> Dernier consigne:', consigneCo2Form);
 
     const boutonValiderEtatco2 = axios
       .post('http://localhost:3003/api/gestionCo2Routes/postConsigneCo2/', {
@@ -273,9 +259,11 @@ document
 
     let pasCo2Form = document.getElementById('pasCo2Form').value;
     // console.log('pasCo2Form', pasCo2Form);
+    localStorage.setItem('gestionCo2 ==> Dernier Pas:', pasCo2Form);
 
     let objectifCo2Form = document.getElementById('objectifCo2Form').value;
     // console.log('objectiCo2Form', objectiCo2Form);
+    localStorage.setItem('gestionCo2 ==> Dernier Objectif:', objectifCo2Form);
 
 
     const boutonValiderEtalCo2 = axios
