@@ -1,0 +1,137 @@
+.boxCardRelay_1,
+.boxCardRelay_2,
+.boxCardRelay_3 {
+    /* border: solid green 1px; */
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.boxCardRelay_1,
+.boxCardRelay_2 {
+    width: 24%;
+}
+
+.boxCardRelay_3 {
+    width: 50%;
+}
+
+.boxCardRelayData {
+    /* border: solid red 1px; */
+    width: 95%;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+    box-shadow: 0px 0px 10px 1px black;
+    border-radius: 10px;
+    background-color: white;
+    /* border: solid green 1px; */
+}
+
+.boxCardRelayTitle {
+    /* border: solid blue 1px; */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    text-align: center;
+    padding: 20px 0px 20px 0px;
+    border-radius: 10px 10px 0px 0px;
+    background-color: #146ec2;
+    color: white;
+    font-weight: bolder;
+    font-size: 2rem;
+}
+
+.boutonActivation,
+.boutonDeactivation,
+.demarrerCycleButton {
+    width: 60%;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    font-size: 1.5rem;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: green;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    box-shadow: 0 6px black;
+    margin: 10px;
+}
+
+.boutonDeactivation {
+    background-color: red;
+}
+
+.boutonActivation:hover,
+.boutonDeactivation:hover,
+.demarrerCycleButton:hover {
+    box-shadow: 0 4px black;
+    top: 2px;
+    color: white;
+}
+
+.boutonActivation:active,
+.boutonDeactivation:active,
+.demarrerCycleButton:active {
+    box-shadow: 0 0px black;
+    top: 6px;
+    color: white;
+}
+
+.boxRelayContent {
+    width: 85%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    justify-content: space-around;
+    /* border: solid yellow 1px; */
+}
+
+.boxCardRelay {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    /* border: solid green 1px; */
+}
+
+.boxCardRelay_3Box {
+    /* border: solid red 1px; */
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    justify-content: space-evenly;
+}
+
+.buttonBox {
+    width: 47%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10px;
+    padding: 10px 0px 10px 0px;
+    box-shadow: var(--shadow);
+    margin-top: 15px;
+}
+
+.buttonBoxTitle {
+    font-size: 1.5rem;
+    text-align: center;
+}

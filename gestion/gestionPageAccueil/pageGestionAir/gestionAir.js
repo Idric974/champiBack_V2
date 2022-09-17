@@ -121,7 +121,6 @@ let getConsigneAir = () => {
     //* Récupération des données.
 
     .then((response) => {
-
       //* Consigne Air.
 
       // console.log(response.data);
@@ -130,7 +129,9 @@ let getConsigneAir = () => {
 
       localStorage.setItem('gestionAir ==> Consigne :', consigneAir);
 
-      consigneAirLocalStorage = localStorage.getItem('gestionAir ==> Consigne :');
+      consigneAirLocalStorage = localStorage.getItem(
+        'gestionAir ==> Consigne :'
+      );
 
       document.getElementById('consigneAir').innerHTML =
         consigneAirLocalStorage + '°C';
@@ -139,7 +140,9 @@ let getConsigneAir = () => {
 
       //* Affichage historique Consigne.
 
-      getDernierConsigneAirEntree = localStorage.getItem('gestionAir ==> Dernier consigne:');
+      getDernierConsigneAirEntree = localStorage.getItem(
+        'gestionAir ==> Dernier consigne:'
+      );
 
       document.getElementById('dernierConsigneAirEntree').innerHTML =
         getDernierConsigneAirEntree;
@@ -148,7 +151,9 @@ let getConsigneAir = () => {
 
       //* Affichage historique Pas.
 
-      getdernierPasAirEntree = localStorage.getItem('gestionAir ==> Dernier Pas:');
+      getdernierPasAirEntree = localStorage.getItem(
+        'gestionAir ==> Dernier Pas:'
+      );
 
       document.getElementById('dernierPasAirEntree').innerHTML =
         getdernierPasAirEntree;
@@ -157,13 +162,14 @@ let getConsigneAir = () => {
 
       //* Affichage historique Objecif.
 
-      getDernierObjectifAirEntree = localStorage.getItem('gestionAir ==> Dernier Objectif:');
+      getDernierObjectifAirEntree = localStorage.getItem(
+        'gestionAir ==> Dernier Objectif:'
+      );
 
       document.getElementById('dernierObjectifAirEntree').innerHTML =
         getDernierObjectifAirEntree;
 
       //* -------------------------------------------------
-
     })
 
     //* -------------------------------------------------
@@ -173,9 +179,9 @@ let getConsigneAir = () => {
     .then(() => {
       let CalculeNombreJour = () => {
         if (
-          getDernierConsigneAirEntree == 0 ||
-          getDernierConsigneAirEntree == '' ||
-          getDernierConsigneAirEntree == null ||
+          consigneAir == 0 ||
+          consigneAir == '' ||
+          consigneAir == null ||
           getDernierObjectifAirEntree == 0 ||
           getDernierObjectifAirEntree == '' ||
           getDernierObjectifAirEntree == null ||
@@ -187,7 +193,10 @@ let getConsigneAir = () => {
 
           return;
         } else {
-          let dureeDescenteAir = ((getDernierConsigneAirEntree - getDernierObjectifAirEntree) / getdernierPasAirEntree) * 12;
+          let dureeDescenteAir =
+            ((consigneAir - getDernierObjectifAirEntree) /
+              getdernierPasAirEntree) *
+            12;
 
           // console.log('Durée Descente Air', dureeDescenteAir);
 
@@ -211,13 +220,15 @@ let getConsigneAir = () => {
         localStorage.setItem('gestionAir ==> Nombre de jour:', nbJourAir);
         nbJourAirLocalStorage = localStorage.getItem('Valeure nbJour Air : ');
 
-        let nombreDeJour = localStorage.getItem('gestionAir ==> Nombre de jour:');
-
+        let nombreDeJour = localStorage.getItem(
+          'gestionAir ==> Nombre de jour:'
+        );
 
         localStorage.setItem('gestionAir ==> Nombre de heure:', nbHeureAir);
 
-
-        let nombreDeHeure = localStorage.getItem('gestionAir ==> Nombre de heure:');
+        let nombreDeHeure = localStorage.getItem(
+          'gestionAir ==> Nombre de heure:'
+        );
 
         document.getElementById('descenteAir').innerHTML =
           nombreDeJour +

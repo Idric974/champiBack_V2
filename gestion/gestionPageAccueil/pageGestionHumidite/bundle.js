@@ -351,9 +351,9 @@ let getConsigneHum = () => {
       // Durée de la descente Hum.
       let CalculeNombreJour = () => {
         if (
-          getDernierConsigneHumEntree == 0 ||
-          getDernierConsigneHumEntree == '' ||
-          getDernierConsigneHumEntree == null ||
+          consigneHum == 0 ||
+          consigneHum == '' ||
+          consigneHum == null ||
           getDernierObjectifHumEntree == 0 ||
           getDernierObjectifHumEntree == '' ||
           getDernierObjectifHumEntree == null ||
@@ -365,7 +365,7 @@ let getConsigneHum = () => {
 
           return;
         } else {
-          let dureeDescenteAir = ((getDernierConsigneHumEntree - getDernierObjectifHumEntree) / getDernierPasHumEntree) * 12;
+          let dureeDescenteAir = ((consigneHum - getDernierObjectifHumEntree) / getDernierPasHumEntree) * 12;
 
           //  console.log('Durée Descente Air', dureeDescenteAir);
 

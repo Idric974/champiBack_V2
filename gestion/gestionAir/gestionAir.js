@@ -96,24 +96,24 @@ let recupérationDeLaConsigne = () => {
 
                             consigne = result['consigneAir'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de la Consigne Air ==> ",
-                                'color: green', consigne
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération de la Consigne Air ==> ",
+                            //     'color: green', consigne
+                            // );
 
-                            pas = result['pasAir'];
+                            // pas = result['pasAir'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération du Pas Air ==========> ",
-                                'color: green', pas
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération du Pas Air ==========> ",
+                            //     'color: green', pas
+                            // );
 
                             objectif = result['objectifAir'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'Objectif Air ===> ",
-                                'color: green', objectif
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'Objectif Air ===> ",
+                            //     'color: green', objectif
+                            // );
                         })
                         .then(() => {
 
@@ -159,10 +159,10 @@ let recuperationDeEtalonage = () => {
 
                             etalonnage = result['etalonnageAir'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage",
-                                'color: green', etalonnage
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage",
+                            //     'color: green', etalonnage
+                            // );
                         })
                         .then(() => {
 
@@ -211,17 +211,17 @@ let recuperationEtatVanneFroid = () => {
 
                             etatVanneBDD = result['etatRelay'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'état de la vanne froid",
-                                'color: green', etatVanneBDD
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'état de la vanne froid",
+                            //     'color: green', etatVanneBDD
+                            // );
 
                             deltaAirPrecedent = result['deltaAir'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération du delta air",
-                                'color: green', deltaAirPrecedent
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération du delta air",
+                            //     'color: green', deltaAirPrecedent
+                            // );
 
                         }).then(() => {
 
@@ -279,10 +279,10 @@ let constructionAxeX = () => {
 
                             dateDemarrageCycle = result['dateDemarrageCycle'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X",
-                                'color: green', dateDemarrageCycle
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X",
+                            //     'color: green', dateDemarrageCycle
+                            // );
 
                             //* --------------------------------------------------
 
@@ -299,10 +299,10 @@ let constructionAxeX = () => {
 
                                     dateDemarrageCycle = new Date(result['dateDemarrageCycle']);
 
-                                    console.log(
-                                        "✅ %c SUCCÈS ==> gestions Air ==> Date de démarrage du cycle ===>",
-                                        'color: green', dateDemarrageCycle
-                                    );
+                                    // console.log(
+                                    //     "✅ %c SUCCÈS ==> gestions Air ==> Date de démarrage du cycle ===>",
+                                    //     'color: green', dateDemarrageCycle
+                                    // );
 
                                     //* --------------------------------------------------
 
@@ -310,10 +310,10 @@ let constructionAxeX = () => {
 
                                     dateDuJour = new Date();
 
-                                    console.log(
-                                        "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Date du jour",
-                                        'color: green', dateDuJour
-                                    );
+                                    // console.log(
+                                    //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Date du jour",
+                                    //     'color: green', dateDuJour
+                                    // );
 
                                     //* --------------------------------------------------
 
@@ -322,10 +322,10 @@ let constructionAxeX = () => {
                                     let nbJourBrut = dateDuJour.getTime() - dateDemarrageCycle.getTime();
                                     jourDuCycle = Math.round(nbJourBrut / (1000 * 3600 * 24)) + 1;
 
-                                    console.log(
-                                        "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Calcul du nombre de jour du cycle",
-                                        'color: green', jourDuCycle
-                                    );
+                                    // console.log(
+                                    //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Calcul du nombre de jour du cycle",
+                                    //     'color: green', jourDuCycle
+                                    // );
 
                                     //* --------------------------------------------------
 
@@ -334,20 +334,20 @@ let constructionAxeX = () => {
                                     minuteDuCycle = new Date().getMinutes();
                                     heureMinute = heureDuCycle + 'h' + minuteDuCycle;
 
-                                    console.log(
-                                        "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Affichage de l'heure",
-                                        'color: green', heureMinute
-                                    );
+                                    // console.log(
+                                    //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Affichage de l'heure",
+                                    //     'color: green', heureMinute
+                                    // );
 
                                     //* --------------------------------------------------
 
                                     //* Valeure de l'axe x.
                                     valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
 
-                                    console.log(
-                                        "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Valeure de l'axe X",
-                                        'color: green', valeurAxeX
-                                    );
+                                    // console.log(
+                                    //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Valeure de l'axe X",
+                                    //     'color: green', valeurAxeX
+                                    // );
 
                                     //* --------------------------------------------------
 
@@ -457,10 +457,10 @@ let calculeDeLaTemperatureMoyenne = () => {
 
             temperatureMoyenneAir = Math.round((sumlistValAir / arrayLength) * 100) / 100;
 
-            console.log(
-                "✅ %c SUCCÈS ==> gestions Air ==> Temperature air moyenne",
-                'color: green ', temperatureMoyenneAir
-            );
+            // console.log(
+            //     "✅ %c SUCCÈS ==> gestions Air ==> Temperature air moyenne",
+            //     'color: green ', temperatureMoyenneAir
+            // );
 
             resolve();
 
@@ -490,10 +490,10 @@ let definitionTemperatureAirCorrigee = () => {
             temperatureCorrigee =
                 parseFloat(temperatureMoyenneAir.toFixed(1)) + etalonnage;
 
-            console.log(
-                "✅ %c SUCCÈS ==> gestions Air ==> Définition de la température air corrigée ===> ",
-                'color: green', temperatureCorrigee
-            );
+            // console.log(
+            //     "✅ %c SUCCÈS ==> gestions Air ==> Définition de la température air corrigée ===> ",
+            //     'color: green', temperatureCorrigee
+            // );
 
             resolve();
 
@@ -522,10 +522,10 @@ let definitionDuDelta = () => {
 
             delta = parseFloat((temperatureCorrigee - consigne).toFixed(1));
 
-            console.log(
-                "✅ %c SUCCÈS ==> gestions Air ==> Définition du delta ===> ",
-                'color: green', delta
-            );
+            // console.log(
+            //     "✅ %c SUCCÈS ==> gestions Air ==> Définition du delta ===> ",
+            //     'color: green', delta
+            // );
 
             resolve();
 
@@ -554,7 +554,7 @@ let definitionDesActions = () => {
 
             if (delta >= 1.5) {
 
-                console.log('🔺 Action sélectionnée ==> gestions Air ==> delta >= 1.5');
+                //   console.log('🔺 Action sélectionnée ==> gestions Air ==> delta >= 1.5');
 
                 //* Actions.
 
@@ -564,10 +564,10 @@ let definitionDesActions = () => {
 
                             new Gpio(23, 'out');
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta >= 1.5 | Début ouverture du froid",
-                                'color: green'
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta >= 1.5 | Début ouverture du froid",
+                            //     'color: green'
+                            // );
 
                             actionRelay = 1;
                             etatRelay = etatRelay;
@@ -595,10 +595,11 @@ let definitionDesActions = () => {
                             setTimeout(() => {
                                 //
                                 const relay_23_OFF = new Gpio(23, 'in');
-                                console.log(
-                                    "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta >= 1.5 | Fin ouverture du froid",
-                                    'color: green'
-                                );
+
+                                // console.log(
+                                //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta >= 1.5 | Fin ouverture du froid",
+                                //     'color: green'
+                                // );
 
                                 actionRelay = 0;
                                 etatRelay = 100;
@@ -620,10 +621,10 @@ let definitionDesActions = () => {
 
                 let resolveAction = async () => {
 
-                    console.log(
-                        "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta >= 1.5 | Fin des actions ",
-                        'color: green'
-                    );
+                    // console.log(
+                    //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta >= 1.5 | Fin des actions ",
+                    //     'color: green'
+                    // );
 
                     resolve();
 
@@ -655,7 +656,7 @@ let definitionDesActions = () => {
 
                 //! Delta = 0.
 
-                console.log('🔺 Action sélectionnée ==> gestions Air ==> delta === 0');
+                // console.log('🔺 Action sélectionnée ==> gestions Air ==> delta === 0');
 
                 //* Actions.
                 let fermetureTotalVanne40 = () => {
@@ -664,10 +665,10 @@ let definitionDesActions = () => {
                             //
                             const relay_23_OFF = new Gpio(23, 'in');
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta === 0 | Lancement fermeture total de la vanne pour 40 secondes.",
-                                'color: green'
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta === 0 | Lancement fermeture total de la vanne pour 40 secondes.",
+                            //     'color: green'
+                            // );
 
                             actionRelay = 1;
                             etatRelay = etatRelay;
@@ -693,10 +694,10 @@ let definitionDesActions = () => {
                             setTimeout(() => {
                                 new Gpio(23, 'out');
 
-                                console.log(
-                                    "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta === 0 | Arrêt fermeture total de la vanne  pour 40 secondes.",
-                                    'color: green'
-                                );
+                                // console.log(
+                                //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta === 0 | Arrêt fermeture total de la vanne  pour 40 secondes.",
+                                //     'color: green'
+                                // );
 
                                 actionRelay = 0;
                                 etatRelay = 0;
@@ -722,10 +723,10 @@ let definitionDesActions = () => {
 
                             new Gpio(23, 'out');
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta === 0 | Lancement ouverture de la vanne pour 15 secondes.",
-                                'color: green'
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta === 0 | Lancement ouverture de la vanne pour 15 secondes.",
+                            //     'color: green'
+                            // );
 
                             actionRelay = 1;
                             etatRelay = etatRelay;
@@ -750,10 +751,10 @@ let definitionDesActions = () => {
                             setTimeout(() => {
                                 new Gpio(23, 'out');
 
-                                console.log(
-                                    "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta === 0 | Arrêt ouverture de la vanne pour 15 secondes.",
-                                    'color: green'
-                                );
+                                // console.log(
+                                //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta === 0 | Arrêt ouverture de la vanne pour 15 secondes.",
+                                //     'color: green'
+                                // );
 
                                 actionRelay = 0;
                                 etatRelay = 37.5;
@@ -774,10 +775,10 @@ let definitionDesActions = () => {
 
                 let resolveAction = async () => {
 
-                    console.log(
-                        "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta === 0 | Fin des actions.",
-                        'color: green'
-                    );
+                    // console.log(
+                    //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta === 0 | Fin des actions.",
+                    //     'color: green'
+                    // );
 
                     resolve();
 
@@ -810,7 +811,7 @@ let definitionDesActions = () => {
 
                 //! Delta <= -0.3
 
-                console.log('🔺 Action sélectionnée ==> gestions Air ==> delta <= -0.3');
+                //  console.log('🔺 Action sélectionnée ==> gestions Air ==> delta <= -0.3');
 
 
                 //* Actions.
@@ -821,10 +822,10 @@ let definitionDesActions = () => {
 
                             new Gpio(23, 'in');
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= -0.3 | Début fermeture du froid pour 40 secondes.",
-                                'color: green'
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= -0.3 | Début fermeture du froid pour 40 secondes.",
+                            //     'color: green'
+                            // );
 
                             actionRelay = 1;
                             etatRelay = etatRelay;
@@ -852,10 +853,11 @@ let definitionDesActions = () => {
                             setTimeout(() => {
                                 //
                                 const relay_23_OFF = new Gpio(23, 'out');
-                                console.log(
-                                    "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= -0.3 | Fin fermeture du froid pour 40 secondes.",
-                                    'color: green'
-                                );
+
+                                // console.log(
+                                //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= -0.3 | Fin fermeture du froid pour 40 secondes.",
+                                //     'color: green'
+                                // );
 
                                 actionRelay = 0;
                                 etatRelay = 0;
@@ -877,10 +879,10 @@ let definitionDesActions = () => {
 
                 let resolveAction = async () => {
 
-                    console.log(
-                        "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= -0.3 | Fin des actions",
-                        'color: green'
-                    );
+                    // console.log(
+                    //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= -0.3 | Fin des actions",
+                    //     'color: green'
+                    // );
 
                     resolve();
 
@@ -912,7 +914,7 @@ let definitionDesActions = () => {
 
                 //! Delta delta > -0.3 && delta < 1.5.
 
-                console.log('🔺 Action sélectionnée ==> gestions Air ==> delta > -0.3 && delta < 1.5');
+                //  console.log('🔺 Action sélectionnée ==> gestions Air ==> delta > -0.3 && delta < 1.5');
 
                 //* Action.
 
@@ -921,7 +923,7 @@ let definitionDesActions = () => {
 
                         let difDelta = deltaAirPrecedent - delta;
 
-                        console.log('⭐ gestions Air ==> Calcule du difDelta : ', difDelta);
+                        //  console.log('⭐ gestions Air ==> Calcule du difDelta : ', difDelta);
 
                         try {
                             if (difDelta > 0) {
@@ -934,10 +936,10 @@ let definitionDesActions = () => {
 
                                             new Gpio(23, 'in');
 
-                                            console.log(
-                                                "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= delta > -0.3 && delta < 1.5 | Début fermeture du froid",
-                                                'color: green'
-                                            );
+                                            // console.log(
+                                            //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= delta > -0.3 && delta < 1.5 | Début fermeture du froid",
+                                            //     'color: green'
+                                            // );
 
                                             actionRelay = 1;
                                             etatRelay = etatRelay;
@@ -961,17 +963,17 @@ let definitionDesActions = () => {
                                             //
                                             let preconisation;
                                             let preconisationBrut = difDelta / 0.05 * 1000;
-                                            console.log('preconisationBrut :', preconisationBrut);
+                                            // console.log('preconisationBrut :', preconisationBrut);
 
                                             if (preconisationBrut >= 0) {
 
                                                 preconisation = preconisationBrut;
-                                                console.log('⭐ gestions Air ==> preconisation : ', preconisation);
+                                                // console.log('⭐ gestions Air ==> preconisation : ', preconisation);
 
                                             } else {
 
                                                 preconisation = preconisationBrut * -1;
-                                                console.log('⭐ gestions Air ==> preconisation : ', preconisation);
+                                                //   console.log('⭐ gestions Air ==> preconisation : ', preconisation);
 
                                             }
 
@@ -979,10 +981,11 @@ let definitionDesActions = () => {
                                             setTimeout(() => {
                                                 //
                                                 const relay_23_OFF = new Gpio(23, 'out');
-                                                console.log(
-                                                    "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= delta > -0.3 && delta < 1.5 | Fin fermeture du froid",
-                                                    'color: green'
-                                                );
+
+                                                // console.log(
+                                                //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= delta > -0.3 && delta < 1.5 | Fin fermeture du froid",
+                                                //     'color: green'
+                                                // );
 
                                                 actionRelay = 0;
                                                 etatRelay = preconisation / 40000 * 100;
@@ -1004,10 +1007,10 @@ let definitionDesActions = () => {
 
                                 let resolveAction = async () => {
 
-                                    console.log(
-                                        "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta >= -0.3 | Fin Action sélectionnée",
-                                        'color: green'
-                                    );
+                                    // console.log(
+                                    //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta >= -0.3 | Fin Action sélectionnée",
+                                    //     'color: green'
+                                    // );
 
                                     resolve();
 
@@ -1023,7 +1026,7 @@ let definitionDesActions = () => {
 
                                     }
                                     catch (err) {
-                                        console.log('🔺 Erreur :', err);
+                                        //  console.log('🔺 Erreur :', err);
                                     }
                                 };
 
@@ -1031,7 +1034,7 @@ let definitionDesActions = () => {
 
                             } else if (difDelta < 0) {
 
-                                console.log('⭐ deltaAirPrecedent - delta | < à 0 | Ouverture vanne ');
+                                //  console.log('⭐ deltaAirPrecedent - delta | < à 0 | Ouverture vanne ');
 
                                 let ouvertureVanne = () => {
                                     return new Promise((resolve, reject) => {
@@ -1039,10 +1042,10 @@ let definitionDesActions = () => {
 
                                             new Gpio(23, 'out');
 
-                                            console.log(
-                                                "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= delta > -0.3 && delta < 1.5 | Début ouverture du froid",
-                                                'color: green'
-                                            );
+                                            // console.log(
+                                            //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= delta > -0.3 && delta < 1.5 | Début ouverture du froid",
+                                            //     'color: green'
+                                            // );
 
                                             actionRelay = 1;
                                             etatRelay = etatRelay;
@@ -1066,27 +1069,28 @@ let definitionDesActions = () => {
                                             //
                                             let preconisation;
                                             let preconisationBrut = (difDelta / 0.05) * 1000;
-                                            console.log('preconisationBrut :', preconisationBrut);
+                                            //  console.log('preconisationBrut :', preconisationBrut);
 
                                             if (preconisationBrut >= 0) {
 
                                                 preconisation = preconisationBrut;
-                                                console.log('⭐ gestions Air ==> preconisation : ', preconisation);
+                                                //   console.log('⭐ gestions Air ==> preconisation : ', preconisation);
 
                                             } else {
 
                                                 preconisation = preconisationBrut * -1;
-                                                console.log('⭐ gestions Air ==> preconisation : ', preconisation);
+                                                // console.log('⭐ gestions Air ==> preconisation : ', preconisation);
 
                                             }
 
                                             setTimeout(() => {
                                                 //
                                                 const relay_23_OFF = new Gpio(23, 'in');
-                                                console.log(
-                                                    "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= delta > -0.3 && delta < 1.5 | Fin ouverture du froid",
-                                                    'color: green'
-                                                );
+
+                                                // console.log(
+                                                //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta <= delta > -0.3 && delta < 1.5 | Fin ouverture du froid",
+                                                //     'color: green'
+                                                // );
 
                                                 actionRelay = 0;
                                                 etatRelay = preconisation / 40000 * 100;
@@ -1108,10 +1112,10 @@ let definitionDesActions = () => {
 
                                 let resolveAction = async () => {
 
-                                    console.log(
-                                        "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta >= -0.3 && delta < 1.5 | Fin Action sélectionnée",
-                                        'color: green'
-                                    );
+                                    // console.log(
+                                    //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta >= -0.3 && delta < 1.5 | Fin Action sélectionnée",
+                                    //     'color: green'
+                                    // );
 
                                     resolve();
 
@@ -1127,6 +1131,7 @@ let definitionDesActions = () => {
 
                                     }
                                     catch (err) {
+
                                         console.log('🔺 Erreur -0.3 && delta < 1.5 :', err);
                                     }
                                 };
@@ -1148,10 +1153,10 @@ let definitionDesActions = () => {
 
                 let resolveAction = async () => {
 
-                    console.log(
-                        "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta >= -0.3 && delta < 1 | Fin des actions",
-                        'color: green'
-                    );
+                    // console.log(
+                    //     "✅ %c SUCCÈS ==> gestions Air ==> Definition des actions delta >= -0.3 && delta < 1 | Fin des actions",
+                    //     'color: green'
+                    // );
 
                     resolve();
 
@@ -1216,10 +1221,10 @@ let enregistrementDatas = () => {
 
                 .then(function (result) {
 
-                    console.log(
-                        "✅ %c SUCCÈS ==> gestions Air ==> Enregistrement des datas dans la base de données sous l'id :",
-                        'color: green', result["dataValues"].id
-                    );
+                    // console.log(
+                    //     "✅ %c SUCCÈS ==> gestions Air ==> Enregistrement des datas dans la base de données sous l'id :",
+                    //     'color: green', result["dataValues"].id
+                    // );
 
                 })
 

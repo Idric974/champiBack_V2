@@ -1,87 +1,109 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Champi</title>
-    <link rel="icon" type="image/png" href="./images/champignon.ico" />
-    <link rel="stylesheet" type="text/css" href="./styles/globaleStyles.css" />
-    <link rel="stylesheet" type="text/css" href="./styles/style.css" />
-  </head>
-  <body>
-    <!-- NAVIGATION -->
-    <div class="boxTab">
-      <div class="box1">
-        <button class="boutonAccueil"><a href="/">Accueil</a></button>
-        <button class="boutonAccueil">
-          <a href="/pageRelay.html">Gestion Relay</a>
-        </button>
-        <button class="boutonAccueil">
-          <a href="/pageCourbes.html">Courbe</a>
-        </button>
-      </div>
-      <!-- FIN NAVIGATION -->
 
-      <!-- MAIN -->
-      <div class="box2">
-        <div class="demarrerCycle">
-          <div class="boxButtonDemCycle">
-            <div class="cont">
-              <button id="btnAir" class="demarrerCycleButton">
-                Démarrer un cycle
-              </button>
-            </div>
-            <div id="dateDuJourCycle" class="cont1"></div>
-            <div id="dateDemarrageCycle" class="cont2"></div>
-            <div id="jourDuCycle" class="cont3"></div>
-          </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Champi</title>
+  <link rel="icon" type="image/png" href="./images/favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="./styles/globaleStyles.css" />
+  <link rel="stylesheet" type="text/css" href="./styles/pageCourbes.css" />
+</head>
 
-          <small id="infoSmallId" class="infoSmall infoSmallDisplay"
-            >La date de début de cycle à été créé et enregistrée dans la base de
-            données.</small
-          >
-        </div>
+<body>
 
-        <div class="container">
-          <!-- Boutons des tabs. -->
-          <div class="container-onglets">
-            <div class="onglets active">Gestion courbes air</div>
-            <div class="onglets">Gestion courbes humidité</div>
-            <div class="onglets">Gestion courbes Co2</div>
-          </div>
-          <!-- Fin Boutons des tabs. -->
 
-          <!-- Courbes gestionAir -->
-          <div class="contenu active-contenu">
-            <div class="graphData">
-              <canvas id="myChartAir"></canvas>
-            </div>
-            <div class="graphVanne">
-              <canvas id="myChartAirVanne"></canvas>
-            </div>
-          </div>
-          <!-- FIN Courbes gestionAir -->
+  <div class="box">
 
-          <!-- Courbes gestionHum -->
-          <div class="contenu">
-            <canvas id="myChartHum"></canvas>
-          </div>
-          <!-- FIN Courbes gestionHum -->
 
-          <!-- Courbes gestionHum -->
-          <div class="contenu">
-            <canvas id="myChartCo2"></canvas>
-          </div>
-          <!-- Courbes gestionCo2 -->
-        </div>
-      </div>
+    <!-- ➖➖➖➖➖➖ 🟢 NAVIGATION 🟢 ➖➖➖➖➖➖ -->
 
-      <!-- FIN MAIN -->
+    <div class="boxMenu">
+      <div class="boxMenuTitle">Menu</div>
+      <button class="boutonAccueil"><a href="/">Accueil</a></button>
+      <button class="boutonAccueil">
+        <a href="/pageRelay.html">Gestion Relay</a>
+      </button>
+      <button class="boutonAccueil">
+        <a href="/pageCourbes.html">Courbe</a>
+      </button>
     </div>
 
-    <script src="/gestion/gestionCourbes/bundle.js"></script>
+    <!-- ➖➖➖➖➖➖ ❌ FIN NAVIGATION ❌ ➖➖➖➖➖➖ -->
 
-    <!--  browserify /home/pi/Desktop/champiBack_V2/gestion/gestionCourbes/courbes.js > /home/pi/Desktop/champiBack_V2/gestion/gestionCourbes/bundle.js   -->
-  </body>
+    <!-- MAIN -->
+    <div class="boxAffichage">
+
+      <!-- ➖➖ ⭐ DATE BOX ⭐ ➖➖ -->
+
+      <div class="dateBox">
+        <div id="afficheDate" class="laDate"></div>
+        <h1 class="version">Version 2.0 | 15/09/2022</h1>
+      </div>
+
+      <!-- ➖➖ ⭐ SHOW DATA ⭐ ➖➖ -->
+
+
+      <div class="demarrerCycle">
+        <div class="boxButtonDemCycle">
+          <div class="cont">
+            <button id="btnAir" class="demarrerCycleButton">
+              Démarrer un cycle
+            </button>
+          </div>
+          <div id="dateDuJourCycle" class="cont1"></div>
+          <div id="dateDemarrageCycle" class="cont2"></div>
+          <div id="jourDuCycle" class="cont3"></div>
+        </div>
+
+        <small id="infoSmallId" class="infoSmall infoSmallDisplay">La date de début de cycle à été créé et enregistrée
+          dans la base de
+          données.</small>
+      </div>
+
+      <div class="container">
+        <!-- Boutons des tabs. -->
+        <div class="container-onglets">
+          <p class="onglets active">Gestion courbes air</p>
+          <p class="onglets">Gestion courbes humidité</p>
+          <p class="onglets">Gestion courbes Co2</p>
+        </div>
+        <!-- Fin Boutons des tabs. -->
+
+        <!-- Courbes gestionAir -->
+        <div class="contenu active-contenu">
+
+          <div class="graphData">
+            <canvas id="myChartAir"></canvas>
+          </div>
+
+          <div class="graphVanne">
+            <canvas id="myChartAirVanne"></canvas>
+          </div>
+        </div>
+        <!-- FIN Courbes gestionAir -->
+
+        <!-- Courbes gestionHum -->
+        <div class="contenu">
+          <canvas id="myChartHum"></canvas>
+        </div>
+        <!-- FIN Courbes gestionHum -->
+
+        <!-- Courbes gestionHum -->
+        <div class="contenu">
+          <canvas id="myChartCo2"></canvas>
+        </div>
+        <!-- Courbes gestionCo2 -->
+      </div>
+    </div>
+
+    <!-- FIN MAIN -->
+  </div>
+
+  <script src="/gestion/gestionCourbes/bundle.js"></script>
+
+  <!--  browserify /home/pi/Desktop/champiBack_V2/gestion/gestionCourbes/courbes.js > /home/pi/Desktop/champiBack_V2/gestion/gestionCourbes/bundle.js   -->
+</body>
+
 </html>

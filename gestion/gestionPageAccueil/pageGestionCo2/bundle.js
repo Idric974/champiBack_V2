@@ -314,9 +314,9 @@ let getConsigneCo2 = () => {
     .then(() => {
       let CalculeNombreJour = () => {
         if (
-          getDernierConsigneCo2Entree == 0 ||
-          getDernierConsigneCo2Entree == '' ||
-          getDernierConsigneCo2Entree == null ||
+          consigneCo2 == 0 ||
+          consigneCo2 == '' ||
+          consigneCo2 == null ||
           getDernierObjectifCo2Entree == 0 ||
           getDernierObjectifCo2Entree == '' ||
           getDernierObjectifCo2Entree == null ||
@@ -328,7 +328,7 @@ let getConsigneCo2 = () => {
 
           return;
         } else {
-          let dureeDescenteCo2 = ((getDernierConsigneCo2Entree - getDernierObjectifCo2Entree) / getDernierPasCo2Entree) * 12;
+          let dureeDescenteCo2 = ((consigneCo2 - getDernierObjectifCo2Entree) / getDernierPasCo2Entree) * 12;
 
           console.log('Durée Descente Co2', dureeDescenteCo2);
 
