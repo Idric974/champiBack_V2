@@ -379,7 +379,7 @@ let constructionAxeX = () => {
 
 //? Mesure de la température Air.
 
-let mcpBroche = 2;
+let mcpBroche = 0;
 const mcpadc = require('mcp-spi-adc');
 
 let getTemperatures = () => {

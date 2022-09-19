@@ -52,7 +52,7 @@ let getTemperatureSubstrat = () => {
         consigneMaxDataSubstratLocalStorage;
 
       let consigneMinDataSubstratLocalStorage = localStorage.getItem(
-        'gestionSubstrat ==> Consigne Min :'
+        'gestionSubstrat ==> Dernier Consigne Min:'
       );
 
       document.getElementById('dernierConsigneSubstratMinEntree').innerHTML =
@@ -154,21 +154,14 @@ if (typeof document !== 'undefined') {
 
       localStorage.setItem('gestionSubstrat ==> Dernier Consigne Max:', consigneMaxDataSubstrat);
 
-
-
       //* -----------------------------------------
 
       //* Consigne Min Substrat.
 
       let consigneMinDataSubstrat = document.getElementById('inputConsigneMinDataSubstrat').value;
+
       // console.log('consigneMinDataSubstrat', consigneMinDataSubstrat);
       localStorage.setItem('gestionSubstrat ==> Dernier Consigne Min:', consigneMinDataSubstrat);
-
-      localStorage.setItem('gestionSubstrat ==> Dernier Consigne Max:', consigneMaxDataSubstrat);
-
-
-
-
 
       //* -----------------------------------------
 
