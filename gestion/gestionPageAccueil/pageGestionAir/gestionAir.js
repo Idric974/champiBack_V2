@@ -1,5 +1,3 @@
-//! Gestion Air.
-
 const axios = require('axios');
 
 //! Rafraichissement de la page.
@@ -13,7 +11,7 @@ let date = myDate.toLocaleString();
 
 console.log('Page actualisée le : ' + date);
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+//! -------------------------------------------------
 
 //! Afficher la date.
 
@@ -48,11 +46,11 @@ async function afficherDate() {
 
 afficherDate();
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+//! -------------------------------------------------
 
-//! I) Gesiont Air.
 
-//? 1 Récupération de la tempèrature Air dans la base.
+
+//! Récupération de la tempèrature Air dans la base.
 
 //* Température Air.
 
@@ -96,9 +94,9 @@ setInterval(() => {
   // console.log('récup tempAir');
 }, 10000);
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//! -------------------------------------------------
 
-//? 2 Récupération de la consigne Air dans la base.
+//! Récupération de la consigne Air dans la base.
 
 //* température Air.
 
@@ -283,9 +281,9 @@ setInterval(() => {
   // console.log('récup consigneAir');
 }, 15000);
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//! -------------------------------------------------
 
-//? 3 Post consigne air dans la base.
+//! 3 Post consigne air dans la base.
 
 document
   .getElementById('validationConsigneAir')
@@ -310,7 +308,7 @@ document
       });
   });
 
-//? 4 Post des datas air dans la base.
+//! Post des datas air dans la base.
 
 document
   .getElementById('validationdataAir')
@@ -350,6 +348,5 @@ document
     window.location.reload();
   });
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//! -------------------------------------------------
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖

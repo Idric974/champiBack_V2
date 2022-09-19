@@ -324,7 +324,7 @@ let getConsigneCo2 = () => {
           getDernierPasCo2Entree == '' ||
           getDernierPasCo2Entree == null
         ) {
-          console.log('Pas de paramètre pas de calcule des jours Hum');
+          // console.log('Pas de paramètre pas de calcule des jours Hum');
 
           return;
         } else {
