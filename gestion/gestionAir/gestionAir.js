@@ -1305,7 +1305,7 @@ let handleMyPromise = async () => {
 
         await enregistrementDatas();
 
-        await rechagerLaPage();
+        // await rechagerLaPage();
 
     }
     catch (err) {
