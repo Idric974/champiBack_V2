@@ -189,6 +189,19 @@ process.umask = function() { return 0; };
 
 const axios = require('axios');
 
+//! Rafraichissement de la page.
+
+setInterval(() => {
+  window.location.reload();
+}, 30000);
+
+let myDate = new Date();
+let date = myDate.toLocaleString();
+
+console.log('Page actualisée le : ' + date);
+
+//! -------------------------------------------------
+
 //? 1 Récupération du taux humidité dans la base.
 
 //* Taux humidité.
@@ -514,6 +527,8 @@ document
   });
 
 //? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 
 //! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 

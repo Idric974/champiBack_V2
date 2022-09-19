@@ -9,7 +9,7 @@ const db = require('../../models');
 
 //! -------------------------------------------------- !
 
-//! variable pour tests.
+//! variables pour tests.
 
 // let etatRelay;
 
@@ -65,10 +65,69 @@ let miseAjourEtatRelay = () => {
 
 //! Les fonctions asynchrones.
 
+//? Récupération de la température Sec.
+
+let getTemperatureSec;
+
+const gestionHumsModels = db.gestionHum;
+
+let recupérationTempératureSec = () => {
+    return new Promise((resolve, reject) => {
+
+        try {
+            gestionHumsModels
+                .findOne({
+                    attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
+                    raw: true,
+                })
+                .then((id) => {
+                    // console.log(id.maxid);
+
+                    gestionHumsModels
+                        .findOne({
+                            where: { id: id.maxid },
+                        })
+                        .then((result) => {
+                            //  console.log(result);
+
+
+                            getTemperatureSec = result['valeursMesureSec180'];
+
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération de la température ==> ",
+                            //     'color: green', getTemperatureSec
+                            // );
+
+                            // pas = result['pasAir'];
+
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération du Pas Air ==========> ",
+                            //     'color: green', pas
+                            // );
+
+                        })
+                        .then(() => {
+
+                            resolve();
+
+                        });
+                });
+        } catch (error) {
+
+            console.log('❌ %c ERREUR ==> gestions Air ==> Récupération de la consigne',
+                'color: orange', error);
+
+            reject();
+        }
+
+    });
+}
+
+//? --------------------------------------------------
+
 //? Récupération de la consigne.
 
 let consigne;
-let pas;
 let objectif;
 
 const gestionAirsDataModels = db.gestionAirData;
@@ -100,13 +159,6 @@ let recupérationDeLaConsigne = () => {
                             // console.log(
                             //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération de la Consigne Air ==> ",
                             //     'color: green', consigne
-                            // );
-
-                            // pas = result['pasAir'];
-
-                            // console.log(
-                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération du Pas Air ==========> ",
-                            //     'color: green', pas
                             // );
 
                             objectif = result['objectifAir'];
@@ -276,9 +328,9 @@ let constructionAxeX = () => {
                         })
                         .then((result) => {
 
-                            //* dade démarrage du cycle.
+                            //* date démarrage du cycle.
 
-                            dateDemarrageCycle = result['dateDemarrageCycle'];
+                            // dateDemarrageCycle = result['dateDemarrageCycle'];
 
                             // console.log(
                             //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X",
@@ -287,72 +339,61 @@ let constructionAxeX = () => {
 
                             //* --------------------------------------------------
 
-                            // console.log('Le dernier id de gestionAir est : ', id);
-                            // console.log(id.maxid);
+                            //* Date de démarrage du cycle.
 
-                            gestionCourbesModels
-                                .findOne({
-                                    where: { id: id.maxid },
-                                })
-                                .then((result) => {
+                            dateDemarrageCycle = new Date(result['dateDemarrageCycle']);
 
-                                    //* Date de démarrage du cycle.
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Date de démarrage du cycle ===>",
+                            //     'color: green', dateDemarrageCycle
+                            // );
 
-                                    dateDemarrageCycle = new Date(result['dateDemarrageCycle']);
+                            //* --------------------------------------------------
 
-                                    // console.log(
-                                    //     "✅ %c SUCCÈS ==> gestions Air ==> Date de démarrage du cycle ===>",
-                                    //     'color: green', dateDemarrageCycle
-                                    // );
+                            //* Date du jour.
 
-                                    //* --------------------------------------------------
+                            dateDuJour = new Date();
 
-                                    //* Date du jour.
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Date du jour",
+                            //     'color: green', dateDuJour
+                            // );
 
-                                    dateDuJour = new Date();
+                            //* --------------------------------------------------
 
-                                    // console.log(
-                                    //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Date du jour",
-                                    //     'color: green', dateDuJour
-                                    // );
+                            //* Calcul du nombre de jour du cycle.
 
-                                    //* --------------------------------------------------
+                            let nbJourBrut = dateDuJour.getTime() - dateDemarrageCycle.getTime();
+                            jourDuCycle = Math.round(nbJourBrut / (1000 * 3600 * 24)) + 1;
 
-                                    //* Calcul du nombre de jour du cycle.
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Calcul du nombre de jour du cycle",
+                            //     'color: green', jourDuCycle
+                            // );
 
-                                    let nbJourBrut = dateDuJour.getTime() - dateDemarrageCycle.getTime();
-                                    jourDuCycle = Math.round(nbJourBrut / (1000 * 3600 * 24)) + 1;
+                            //* --------------------------------------------------
 
-                                    // console.log(
-                                    //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Calcul du nombre de jour du cycle",
-                                    //     'color: green', jourDuCycle
-                                    // );
+                            //* Affichage de l'heure.
+                            heureDuCycle = new Date().getHours();
+                            minuteDuCycle = new Date().getMinutes();
+                            heureMinute = heureDuCycle + 'h' + minuteDuCycle;
 
-                                    //* --------------------------------------------------
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Affichage de l'heure",
+                            //     'color: green', heureMinute
+                            // );
 
-                                    //* Affichage de l'heure.
-                                    heureDuCycle = new Date().getHours();
-                                    minuteDuCycle = new Date().getMinutes();
-                                    heureMinute = heureDuCycle + 'h' + minuteDuCycle;
+                            //* --------------------------------------------------
 
-                                    // console.log(
-                                    //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Affichage de l'heure",
-                                    //     'color: green', heureMinute
-                                    // );
+                            //* Valeure de l'axe x.
+                            valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
 
-                                    //* --------------------------------------------------
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Valeure de l'axe X",
+                            //     'color: green', valeurAxeX
+                            // );
 
-                                    //* Valeure de l'axe x.
-                                    valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
-
-                                    // console.log(
-                                    //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Valeure de l'axe X",
-                                    //     'color: green', valeurAxeX
-                                    // );
-
-                                    //* --------------------------------------------------
-
-                                })
+                            //* --------------------------------------------------
 
                         })
 
@@ -521,7 +562,7 @@ let definitionDuDelta = () => {
 
         try {
 
-            delta = parseFloat((temperatureCorrigee - consigne).toFixed(1));
+            delta = parseFloat((getTemperatureSec - consigne).toFixed(1));
 
             // console.log(
             //     "✅ %c SUCCÈS ==> gestions Air ==> Définition du delta ===> ",
@@ -555,7 +596,7 @@ let definitionDesActions = () => {
 
             if (delta >= 1.5) {
 
-                //   console.log('🔺 Action sélectionnée ==> gestions Air ==> delta >= 1.5');
+                console.log('🔺 Action sélectionnée ==> gestions Air ==> delta >= 1.5');
 
                 //* Actions.
 
@@ -657,7 +698,7 @@ let definitionDesActions = () => {
 
                 //! Delta = 0.
 
-                // console.log('🔺 Action sélectionnée ==> gestions Air ==> delta === 0');
+                console.log('🔺 Action sélectionnée ==> gestions Air ==> delta === 0');
 
                 //* Actions.
                 let fermetureTotalVanne40 = () => {
@@ -812,7 +853,7 @@ let definitionDesActions = () => {
 
                 //! Delta <= -0.3
 
-                //  console.log('🔺 Action sélectionnée ==> gestions Air ==> delta <= -0.3');
+                console.log('🔺 Action sélectionnée ==> gestions Air ==> delta <= -0.3');
 
 
                 //* Actions.
@@ -915,7 +956,7 @@ let definitionDesActions = () => {
 
                 //! Delta delta > -0.3 && delta < 1.5.
 
-                //  console.log('🔺 Action sélectionnée ==> gestions Air ==> delta > -0.3 && delta < 1.5');
+                console.log('🔺 Action sélectionnée ==> gestions Air ==> delta > -0.3 && delta < 1.5');
 
                 //* Action.
 
@@ -1211,7 +1252,7 @@ let enregistrementDatas = () => {
 
             gestionAirModels
                 .create({
-                    temperatureAir: temperatureCorrigee,
+                    temperatureAir: getTemperatureSec,
                     deltaAir: delta,
                     actionRelay: actionRelay,
                     etatRelay: etatRelay,
@@ -1222,10 +1263,10 @@ let enregistrementDatas = () => {
 
                 .then(function (result) {
 
-                    // console.log(
-                    //     "✅ %c SUCCÈS ==> gestions Air ==> Enregistrement des datas dans la base de données sous l'id :",
-                    //     'color: green', result["dataValues"].id
-                    // );
+                    console.log(
+                        "✅ %c SUCCÈS ==> gestions Air ==> Enregistrement des datas dans la base de données sous l'id :",
+                        'color: green', result["dataValues"].id
+                    );
 
                 })
 
@@ -1258,19 +1299,21 @@ let handleMyPromise = async () => {
 
     try {
 
+        await recupérationTempératureSec();
+
         await recupérationDeLaConsigne();
 
-        await recuperationDeEtalonage();
+        // await recuperationDeEtalonage();
 
         await recuperationEtatVanneFroid();
 
         await constructionAxeX();
 
-        await getTemperatures();
+        // await getTemperatures();
 
-        await calculeDeLaTemperatureMoyenne();
+        // await calculeDeLaTemperatureMoyenne();
 
-        await definitionTemperatureAirCorrigee();
+        // await definitionTemperatureAirCorrigee();
 
         await definitionDuDelta();
 

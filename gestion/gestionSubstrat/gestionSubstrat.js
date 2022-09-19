@@ -124,6 +124,7 @@ let recuperationEtatRelay = () => {
                             // console.log(result);
 
                             etatVanneBDD = result['etatRelay'];
+
                             // console.log(
                             //     jaune,
                             //     '[ GESTION AIR CALCULES  ] Dernier état vanne de la BDD : ',
@@ -149,6 +150,7 @@ let recuperationEtatRelay = () => {
 
 //? Construction de la valeur de l'axe X.
 
+let dateDemarrageCycle;
 let jourDuCycle;
 let heureDuCycle;
 let minuteDuCycle;
@@ -161,10 +163,13 @@ let getDateDemarrageCycle = () => {
         axios
             .get('http://localhost:3003/api/gestionCourbeRoutes/getDateDemarrageCycle')
             .then((response) => {
+
                 // console.log(
                 //     'Date démarrage du cycle :----------:',
                 //     response.data.dateDemarrageCycle.dateDemarrageCycle
                 // );
+
+                dateDemarrageCycle = response.data.dateDemarrageCycle.dateDemarrageCycle
 
                 //* Date du jour.
 
@@ -205,6 +210,7 @@ let getDateDemarrageCycle = () => {
                 //* Valeure de l'axe X.
 
                 valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
+
                 // console.log(
                 //     jaune,
                 //     "[ GESTION AIR CALCULES  ] Valeure de l'axe X : ",
@@ -289,7 +295,10 @@ let calculeDeLaTemperatureMoyenne = () => {
 
             temperatureSubstratMoyenne = Math.round((sumlistValAir / arrayLength) * 100) / 100;
 
-            // console.log('Temperature substrat moyenne : ', temperatureSubstratMoyenne);
+            console.log(
+                "✅ %c SUCCÈS ==> gestions Subtrat ==> Temperature substrat moyenne :",
+                'color: green', temperatureSubstratMoyenne
+            );
 
             resolve();
 
@@ -312,6 +321,8 @@ let definitionAction = () => {
         try {
 
             if (temperatureSubstratMoyenne >= consigneMaxDataSubstrat) {
+
+                console.log('🔺 Action sélectionnée ==> gestions Substrat ==> temperatureSubstratMoyenne >= consigneMaxDataSubstrat');
 
                 //! Condition à 40 secondes.
 
@@ -342,16 +353,18 @@ let definitionAction = () => {
                     miseAjourEtatRelay();
                     //
 
-                    // resolve();
+                    resolve();
                 }, preconisation);
 
                 //! -----------------------------------------------
 
             }
 
-            if (temperatureSubstratMoyenne <= consigneMinDataSubstrat) {
+            if (temperatureSubstratMoyenne < consigneMinDataSubstrat) {
 
                 //! Condition à 40 secondes.
+
+                console.log('🔺 Action sélectionnée ==> gestions Substrat ==> temperatureSubstratMoyenne <= consigneMaxDataSubstrat');
 
                 let preconisation = 40000;
 
@@ -388,6 +401,10 @@ let definitionAction = () => {
             }
 
         } catch (error) {
+
+            console.log("❌ %c ERREUR =====> Definition des actions delta",
+                'color: orange');
+
             logger.info(
                 'Fchier source : gestionAir | Module : Définition des actions | Type erreur : ',
                 error

@@ -187,19 +187,6 @@ process.umask = function() { return 0; };
 },{}],2:[function(require,module,exports){
 const axios = require('axios');
 
-//! Rafraichissement de la page.
-
-setInterval(() => {
-  window.location.reload();
-}, 1800000);
-
-let myDate = new Date();
-let date = myDate.toLocaleString();
-
-console.log('Page actualisée le : ' + date);
-
-//! -------------------------------------------------
-
 //! Afficher la date.
 
 function pause(ms) {
@@ -235,8 +222,6 @@ afficherDate();
 
 //! -------------------------------------------------
 
-
-
 //! Récupération de la tempèrature Air dans la base.
 
 //* Température Air.
@@ -251,13 +236,13 @@ let deltaAirLocalStorage;
 
 let getTemperatureAir = () => {
   axios({
-    url: 'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/',
+    url: 'http://localhost:3003/api/gestionHumiditeRoutes/getTauxHumidite/',
     method: 'get',
   })
     .then((response) => {
-      // console.log(response.data.temperatureAir.temperatureAir);
+      // console.log(response.data.gestionTauxHum.valeursMesureSec180);
 
-      temperatureAir = response.data.temperatureAir.temperatureAir;
+      temperatureAir = response.data.gestionTauxHum.valeursMesureSec180;
 
       localStorage.setItem('gestionAir ==> Tempèrature Air:', temperatureAir);
 
@@ -537,12 +522,6 @@ document
 
 //! -------------------------------------------------
 
-let reloadPage = () => {
-  window.location.reload();
-  alert('Page rechargée')
-}
-
-module.exports = { reloadPage };
 
 },{"axios":3}],3:[function(require,module,exports){
 module.exports = require('./lib/axios');

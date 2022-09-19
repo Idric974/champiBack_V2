@@ -178,13 +178,13 @@ db.connect(function (err) {
 
   //! Gestion de la température substrat.
 
-  let tableLog =
-    'CREATE TABLE  gestion_substrats_datas (id int auto_increment, consigneMaxDataSubstrat FLOAT, consigneMinDataSubstrat FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
+  // let tableLog =
+  //   'CREATE TABLE  gestion_substrats_datas (id int auto_increment, consigneMaxDataSubstrat FLOAT, consigneMinDataSubstrat FLOAT, createdAt DATE, updatedAt DATE, primary key(id))';
 
-  db.query(tableLog, function (err, result) {
-    if (err) throw err;
-    console.log('Table gestion_substrats_datas créé : ', result);
-  });
+  // db.query(tableLog, function (err, result) {
+  //   if (err) throw err;
+  //   console.log('Table gestion_substrats_datas créé : ', result);
+  // });
 
   //* -----------------------
 });

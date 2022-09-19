@@ -251,17 +251,65 @@ const Sequelize = require('sequelize');
 
 //* etat_Bouton_Eau_Sol .
 
-const miseAJourEtatEauAuSol = db.gestionEtatBoutonRelayEauAuSol;
+// const miseAJourEtatEauAuSol = db.gestionEtatBoutonRelayEauAuSol;
 
-const newEtalAir = miseAJourEtatEauAuSol
-  .create({
-    etatRelayEauAuSol: 0,
-  })
-  .then((result) => {
-    console.log('Table mise à jour');
-  })
-  .catch((error) => {
-    console.log('Table non mise à jour', error);
-  });
+// const newEtalAir = miseAJourEtatEauAuSol
+//   .create({
+//     etatRelayEauAuSol: 0,
+//   })
+//   .then((result) => {
+//     console.log('Table mise à jour');
+//   })
+//   .catch((error) => {
+//     console.log('Table non mise à jour', error);
+//   });
+
+//! --------------------------------------------------
+
+//! Gestion Substrat.
+
+//* Valeurs.
+
+// const majSubstrat = db.gestionSubstrat;
+
+// const newEtatRelay = majSubstrat
+//   .create({
+//     temperatureSubstrat: 0,
+//     days: 0,
+//     heures: 0,
+//     actionRelay: 0,
+//     etatRelay: 0,
+//     valeurAxeX: '0',
+//     jourDuCycle: '1',
+//   })
+//   .then((result) => {
+//     console.log('Table mise à jour Gestion Substrat');
+//   })
+//   .catch((error) => {
+//     console.log('Table non mise à jour Gestion Substrat', error);
+//   });
+
+//* -------------------------*
+
+//! Gestion Substrat Data.
+
+//* Data.
+
+// const miseAJourGestionSubstrat = db.gestionAirData;
+
+// const newDataCo2 = miseAJourGestionSubstrat
+//   .create({
+//     consigneMaxDataSubstrat: 0,
+//     consigneMinDataSubstrat: 0,
+
+//   })
+//   .then((result) => {
+//     console.log('Table mise à jour Gestion Substrat Data');
+//   })
+//   .catch((error) => {
+//     console.log('Table non mise à jour Gestion Substrat Data', error);
+//   });
+
+//* -------------------------*
 
 //! --------------------------------------------------
