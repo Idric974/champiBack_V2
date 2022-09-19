@@ -1250,33 +1250,6 @@ let enregistrementDatas = () => {
 
 //? --------------------------------------------------
 
-//? Rechager la page.
-
-const reloadPage = require('../reloadPage/bundle');
-
-let rechagerLaPage = () => {
-    return new Promise((resolve, reject) => {
-        try {
-
-            reloadPage();
-
-
-            resolve();
-        } catch (error) {
-
-            console.log("❌ %c ERREUR ==> gestions Air ==> Rechager la page",
-                'color: orange', error);
-
-            reject();
-        }
-    });
-}
-
-
-
-//? --------------------------------------------------
-
-
 //! -------------------------------------------------- !
 
 //! Exécution des fonctions asynchrones.
@@ -1305,7 +1278,6 @@ let handleMyPromise = async () => {
 
         await enregistrementDatas();
 
-        // await rechagerLaPage();
 
     }
     catch (err) {
