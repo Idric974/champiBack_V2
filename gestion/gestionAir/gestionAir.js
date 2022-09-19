@@ -1278,7 +1278,6 @@ let handleMyPromise = async () => {
 
         await enregistrementDatas();
 
-
     }
     catch (err) {
         console.log('err finale :', err);
