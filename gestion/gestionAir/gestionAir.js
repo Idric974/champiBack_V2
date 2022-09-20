@@ -588,6 +588,9 @@ let definitionDuDelta = () => {
 
 //? Définition des actions.
 
+const ouvertureRelay = 23;
+const fermetureRelay = 22;
+
 //! Variable de tests.
 // let delta = 1.5; //* L559
 // let deltaAirPrecedent = 0.5;
@@ -608,7 +611,7 @@ let definitionDesActions = () => {
                     return new Promise((resolve, reject) => {
                         if (delta) {
                             //
-                            new Gpio(23, 'in');
+                            new Gpio(fermetureRelay, 'in');
 
                             console.log(
                                 "✅ %c SUCCÈS ==> gestions Air ==> Actions delta (<= -0.3) | Fermeture vanne pour 40 secondes.",
@@ -636,7 +639,7 @@ let definitionDesActions = () => {
                         if (delta) {
 
                             setTimeout(() => {
-                                new Gpio(23, 'out');
+                                new Gpio(ouvertureRelay, 'in');
 
                                 console.log(
                                     "✅ %c SUCCÈS ==> gestions Air ==> Actions delta (<= -0.3) | Stope fermeture vanne pour 40 secondes.",
@@ -695,7 +698,7 @@ let definitionDesActions = () => {
                     return new Promise((resolve, reject) => {
                         if (delta) {
                             //
-                            new Gpio(23, 'in');
+                            new Gpio(fermetureRelay, 'in');
 
                             console.log(
                                 "✅ %c SUCCÈS ==> gestions Air ==> Actions delta (-0.3 & <= 0) | Fermeture vanne pour 40 secondes.",
@@ -723,7 +726,7 @@ let definitionDesActions = () => {
                         if (delta) {
 
                             setTimeout(() => {
-                                new Gpio(23, 'out');
+                                new Gpio(ouvertureRelay, 'in');
 
                                 console.log(
                                     "✅ %c SUCCÈS ==> gestions Air ==> Actions delta (-0.3 & <= 0) | Stope fermeture vanne pour 40 secondes.",
@@ -752,7 +755,7 @@ let definitionDesActions = () => {
                     return new Promise((resolve, reject) => {
                         if (delta) {
                             //
-                            new Gpio(23, 'out');
+                            new Gpio(ouvertureRelay, 'in');
 
                             console.log(
                                 "✅ %c SUCCÈS ==> gestions Air ==> Actions delta (-0.3 & <= 0) | Ouverture vanne pour 15 secondes.",
@@ -780,7 +783,7 @@ let definitionDesActions = () => {
                         if (delta) {
 
                             setTimeout(() => {
-                                new Gpio(23, 'in');
+                                new Gpio(fermetureRelay, 'in');
 
                                 console.log(
                                     "✅ %c SUCCÈS ==> gestions Air ==> Actions delta (-0.3 & <= 0) | Stope fermeture vanne pour 15 secondes.",
@@ -841,7 +844,7 @@ let definitionDesActions = () => {
                     return new Promise((resolve, reject) => {
                         if (delta) {
                             //
-                            new Gpio(23, 'in');
+                            new Gpio(fermetureRelay, 'in');
 
                             console.log(
                                 "✅ %c SUCCÈS ==> gestions Air ==> Actions delta (-0.3 & <= 0) | Fermeture vanne pour 40 secondes.",
@@ -869,7 +872,7 @@ let definitionDesActions = () => {
                         if (delta) {
 
                             setTimeout(() => {
-                                new Gpio(23, 'out');
+                                new Gpio(ouvertureRelay, 'in');
 
                                 console.log(
                                     "✅ %c SUCCÈS ==> gestions Air ==> Actions delta (-0.3 & <= 0) | Stope fermeture vanne pour 40 secondes.",
@@ -898,7 +901,7 @@ let definitionDesActions = () => {
                     return new Promise((resolve, reject) => {
                         if (delta) {
                             //
-                            new Gpio(23, 'out');
+                            new Gpio(ouvertureRelay, 'in');
 
                             console.log(
                                 "✅ %c SUCCÈS ==> gestions Air ==> Actions delta (-0.3 & <= 0) | Ouverture vanne pour 15 secondes.",
@@ -926,7 +929,7 @@ let definitionDesActions = () => {
                         if (delta) {
 
                             setTimeout(() => {
-                                new Gpio(23, 'in');
+                                new Gpio(fermetureRelay, 'in');
 
                                 console.log(
                                     "✅ %c SUCCÈS ==> gestions Air ==> Actions delta (-0.3 & <= 0) | Stope fermeture vanne pour 15 secondes.",
@@ -1001,7 +1004,7 @@ let definitionDesActions = () => {
                             return new Promise((resolve, reject) => {
                                 if (delta) {
                                     //
-                                    new Gpio(23, 'in');
+                                    new Gpio(fermetureRelay, 'in');
 
                                     console.log('✅ %c SUCCÈS ==> gestions Air ==> Actions delta (> 0.3 & < 1.5) | Fermeture vanne');
 
@@ -1038,7 +1041,7 @@ let definitionDesActions = () => {
 
                                     setTimeout(() => {
                                         //
-                                        new Gpio(23, 'out');
+                                        new Gpio(ouvertureRelay, 'in');
 
                                         console.log("✅ %c SUCCÈS ==> gestions Air ==> Actions delta (> 0.3 & < 1.5) | Fin fermeture du froid", 'color: green');
 
@@ -1095,7 +1098,7 @@ let definitionDesActions = () => {
                             return new Promise((resolve, reject) => {
                                 if (delta) {
 
-                                    new Gpio(23, 'out');
+                                    new Gpio(ouvertureRelay, 'in');
 
                                     console.log("✅ %c SUCCÈS ==> gestions Air ==> Actions delta (> 0.3 & < 1.5) | Début ouverture du froid", 'color: green');
 
@@ -1134,7 +1137,7 @@ let definitionDesActions = () => {
 
                                     setTimeout(() => {
                                         //
-                                        const relay_23_OFF = new Gpio(23, 'in');
+                                        const relay_23_OFF = new Gpio(fermetureRelay, 'in');
 
                                         console.log("✅ %c SUCCÈS ==> gestions Air ==> Actions delta (> 0.3 & < 1.5) | Fin ouverture du froid", 'color: green');
 
@@ -1197,7 +1200,7 @@ let definitionDesActions = () => {
                     return new Promise((resolve, reject) => {
                         if (delta) {
                             //
-                            new Gpio(23, 'out');
+                            new Gpio(ouvertureRelay, 'in');
 
                             console.log(
                                 "✅ %c SUCCÈS ==> gestions Air ==> Actions delta (>=  1.5) | Ouverture vanne pour 40 secondes.",
@@ -1225,7 +1228,7 @@ let definitionDesActions = () => {
                         if (delta) {
 
                             setTimeout(() => {
-                                new Gpio(23, 'in');
+                                new Gpio(fermetureRelay, 'in');
 
                                 console.log(
                                     "✅ %c SUCCÈS ==> gestions Air ==> Actions delta (>=  1.5) | Stope fermeture vanne pour 40 secondes.",
