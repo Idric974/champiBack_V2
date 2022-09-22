@@ -77,16 +77,10 @@ let recuperationDeEtalonage = () => {
                             etalonnage = result['etalonnageAir'];
 
                             console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage",
+                                "✅ %c SUCCÈS ==> gestions Substrat ==> Récupération de l'étalonage",
                                 'color: green',
                                 etalonnage
                             );
-
-                            // console.log(
-                            //   "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage Type",
-                            //   'color: green',
-                            //   typeof etalonnage
-                            // );
 
                         })
                         .then(() => {
@@ -95,7 +89,7 @@ let recuperationDeEtalonage = () => {
                 });
         } catch (error) {
             console.log(
-                "❌ %c ERREUR ==> gestions Air ==> Récupération de l'étalonage",
+                "❌ %c ERREUR ==> gestions Substrat ==> Récupération de l'étalonage",
                 'color: orange',
                 error
             );
@@ -181,7 +175,7 @@ let recuperationEtatRelay = () => {
 
                             // console.log(
                             //     jaune,
-                            //     '[ GESTION AIR CALCULES  ] Dernier état vanne de la BDD : ',
+                            //     '[ GESTION gestions Substrat CALCULES  ] Dernier état vanne de la BDD : ',
                             //     etatVanneBDD
                             // );
 
@@ -190,7 +184,7 @@ let recuperationEtatRelay = () => {
                 });
         } catch (error) {
             logger.info(
-                'Fchier source : gestionAir | Module : recuperation etatVanneBDD | Type erreur : ',
+                'Fchier source : gestions Substrat | Module : recuperation etatVanneBDD | Type erreur : ',
                 error
             );
 
@@ -350,7 +344,7 @@ let calculeDeLaTemperatureMoyenne = () => {
             temperatureSubstratMoyenne = Math.round((sumlistValAir / arrayLength) * 100) / 100;
 
             console.log(
-                "✅ %c SUCCÈS ==> gestions Subtrat ==> Temperature substrat moyenne :",
+                "✅ %c SUCCÈS ==> gestions Substrat ==> Temperature substrat moyenne :",
                 'color: green', temperatureSubstratMoyenne
             );
 
@@ -400,6 +394,9 @@ let definitionTemperatureAirCorrigee = () => {
 
 //? Définition des actions.
 
+const ouvertureRelay = 23;
+const fermetureRelay = 22;
+
 let definitionAction = () => {
     return new Promise((resolve, reject) => {
 
@@ -407,21 +404,15 @@ let definitionAction = () => {
 
             if (temperatureCorrigee >= consigneMaxDataSubstrat) {
 
-                console.log('🔺 Action sélectionnée ==> gestions Substrat ==> temperatureSubstratMoyenne >= consigneMaxDataSubstrat');
+                console.log('🔺 Action sélectionnée ==> gestions Substrat ==> (temperatureCorrigee >= consigneMaxDataSubstrat)');
 
                 //! Condition à 40 secondes.
 
                 let preconisation = 40000;
 
-                const relay_23_ON = new Gpio(23, 'out');
+                new Gpio(ouvertureRelay, 'out');
 
-                console.log('DÉBUT ouverture du froid');
-
-                if (etatVanneBDD >= 100) {
-                    etatRelay = 100;
-                } else {
-                    etatRelay = 100;
-                }
+                console.log('🟢 DÉBUT ouverture du froid.');
 
                 actionRelay = 1;
 
@@ -429,9 +420,15 @@ let definitionAction = () => {
 
                 setTimeout(() => {
                     //
-                    const relay_23_OFF = new Gpio(23, 'in');
+                    new Gpio(ouvertureRelay, 'in');
 
-                    console.log('FIN Ouverture du froid');
+                    console.log('🔴 FIN Ouverture du froid.');
+
+                    if (etatVanneBDD >= 100) {
+                        etatRelay = 100;
+                    } else {
+                        etatRelay = 100;
+                    }
 
                     actionRelay = 0;
 
@@ -449,19 +446,13 @@ let definitionAction = () => {
 
                 //! Condition à 40 secondes.
 
-                console.log('🔺 Action sélectionnée ==> gestions Substrat ==> temperatureSubstratMoyenne <= consigneMaxDataSubstrat');
+                console.log('🔺 Action sélectionnée ==> gestions Substrat ==> (temperatureCorrigee <= consigneMaxDataSubstrat)');
 
                 let preconisation = 40000;
 
-                const relay_23_ON = new Gpio(23, 'in');
+                new Gpio(fermetureRelay, 'in');
 
-                console.log('DÉBUT fermeture du froid');
-
-                if (etatVanneBDD >= 100) {
-                    etatRelay = 100;
-                } else {
-                    etatRelay = 100;
-                }
+                console.log('🟢 DÉBUT fermeture du froid.');
 
                 actionRelay = 1;
 
@@ -469,9 +460,15 @@ let definitionAction = () => {
 
                 setTimeout(() => {
                     //
-                    const relay_23_OFF = new Gpio(23, 'out');
+                    new Gpio(fermetureRelay, 'out');
 
-                    console.log('FIN Fermeture du froid');
+                    console.log('🔴 FIN Fermeture du froid.');
+
+                    if (etatVanneBDD <= 0) {
+                        etatRelay = 0;
+                    } else {
+                        etatRelay = 0;
+                    }
 
                     actionRelay = 0;
 
@@ -491,7 +488,7 @@ let definitionAction = () => {
                 'color: orange');
 
             logger.info(
-                'Fchier source : gestionAir | Module : Définition des actions | Type erreur : ',
+                'Fchier source : gestions Substrat | Module : Définition des actions | Type erreur : ',
                 error
             );
             reject();
@@ -519,7 +516,8 @@ let enregistrementTemperature = () => {
             .then(function (result) {
 
                 console.log(
-                    'Enregistrement des datas dans la base =======> ' + result
+                    "✅ %c SUCCÈS ==> gestions Substrat ==> Enregistrement des datas dans la base sous l'ID :",
+                    'color: green', result["dataValues"].id
                 );
 
                 resolve();
