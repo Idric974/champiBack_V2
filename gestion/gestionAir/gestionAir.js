@@ -1306,7 +1306,7 @@ let handleMyPromise = async () => {
 
     await recupérationDeLaConsigne();
 
-    await recuperationDeEtalonage();
+    // await recuperationDeEtalonage();
 
     await recuperationEtatVanneFroid();
 
@@ -1316,7 +1316,7 @@ let handleMyPromise = async () => {
 
     //// await calculeDeLaTemperatureMoyenne();
 
-    await definitionTemperatureAirCorrigee();
+    //// await definitionTemperatureAirCorrigee();
 
     await definitionDuDelta();
 

@@ -52,6 +52,60 @@ let miseAjourEtatRelay = () => {
 
 //! Les fonctions synchrone. 
 
+//? Récupération de l'étalonnage.
+
+const gestionAirEtalonnageModels = db.etalonnageAir;
+
+let recuperationDeEtalonage = () => {
+    return new Promise((resolve, reject) => {
+        try {
+            gestionAirEtalonnageModels
+                .findOne({
+                    attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
+                    raw: true,
+                })
+                .then((id) => {
+                    // console.log(id.maxid);
+
+                    gestionAirEtalonnageModels
+                        .findOne({
+                            where: { id: id.maxid },
+                        })
+                        .then((result) => {
+                            // console.log(result);
+
+                            etalonnage = result['etalonnageAir'];
+
+                            console.log(
+                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage",
+                                'color: green',
+                                etalonnage
+                            );
+
+                            // console.log(
+                            //   "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage Type",
+                            //   'color: green',
+                            //   typeof etalonnage
+                            // );
+
+                        })
+                        .then(() => {
+                            resolve();
+                        });
+                });
+        } catch (error) {
+            console.log(
+                "❌ %c ERREUR ==> gestions Air ==> Récupération de l'étalonage",
+                'color: orange',
+                error
+            );
+
+            reject();
+        }
+    });
+};
+
+//? --------------------------------------------------
 
 //? Récupération des consignes substrat. 
 
@@ -313,6 +367,37 @@ let calculeDeLaTemperatureMoyenne = () => {
 
 //? --------------------------------------------------
 
+//? Définition de la température air corrigée.
+
+let temperatureCorrigee;
+
+let definitionTemperatureAirCorrigee = () => {
+    return new Promise((resolve, reject) => {
+        try {
+            temperatureCorrigee =
+                temperatureSubstratMoyenne + etalonnage;
+
+            console.log(
+                '✅ %c SUCCÈS ==> gestions Substrat ==> Définition de la température Substrat corrigée ===> ',
+                'color: green',
+                temperatureCorrigee
+            );
+
+            resolve();
+        } catch (error) {
+            console.log(
+                '❌ %c ERREUR ==> gestions Substrat ==> Définition de la température Substrat corrigée',
+                'color: orange',
+                error
+            );
+
+            reject();
+        }
+    });
+};
+
+//? --------------------------------------------------
+
 //? Définition des actions.
 
 let definitionAction = () => {
@@ -320,7 +405,7 @@ let definitionAction = () => {
 
         try {
 
-            if (temperatureSubstratMoyenne >= consigneMaxDataSubstrat) {
+            if (temperatureCorrigee >= consigneMaxDataSubstrat) {
 
                 console.log('🔺 Action sélectionnée ==> gestions Substrat ==> temperatureSubstratMoyenne >= consigneMaxDataSubstrat');
 
@@ -360,7 +445,7 @@ let definitionAction = () => {
 
             }
 
-            if (temperatureSubstratMoyenne < consigneMinDataSubstrat) {
+            if (temperatureCorrigee < consigneMinDataSubstrat) {
 
                 //! Condition à 40 secondes.
 
@@ -424,7 +509,7 @@ let enregistrementTemperature = () => {
 
         gestionSubstratModels
             .create({
-                temperatureSubstrat: temperatureSubstratMoyenne,
+                temperatureSubstrat: temperatureCorrigee,
                 actionRelay: actionRelay,
                 etatRelay: etatRelay,
                 valeurAxeX: valeurAxeX,
@@ -464,6 +549,8 @@ let handleMyPromise = async () => {
 
     try {
 
+        await recuperationDeEtalonage();
+
         await getConsignesSubstrat();
 
         await recuperationEtatRelay();
@@ -473,6 +560,8 @@ let handleMyPromise = async () => {
         await getTemperatures();
 
         await calculeDeLaTemperatureMoyenne();
+
+        await definitionTemperatureAirCorrigee();
 
         await definitionAction();
 
