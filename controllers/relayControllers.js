@@ -3,20 +3,16 @@
 const Sequelize = require('sequelize');
 const db = require('../models');
 const gestionAirModels = db.gestionAir;
-const relayBoutonEauAuSol = db.gestionEtatBoutonRelayEauAuSol;
-const fs = require('fs');
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+//! -------------------------------------------------
 
 //! Les variables.
 
 let Gpio = require('onoff').Gpio;
 let test = 27;
-let eauAuSol = 16; // 16
-let ventilateur = 17; // 17
 let etatRelay;
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+//! -------------------------------------------------
 
 //! Les fonctions.
 
@@ -44,7 +40,7 @@ miseAjourEtatRelay = () => {
     });
 };
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//? -------------------------------------------------
 
 //? Mise à jour etat Relay.
 
@@ -70,7 +66,7 @@ miseAjourActionRelay = () => {
     });
 };
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//? -------------------------------------------------
 
 //? Recuperation état Relay.
 
@@ -99,7 +95,7 @@ recuperationEtatRlay = () => {
     });
 };
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//? -------------------------------------------------
 
 //? Mise à etat Relay eau au sol.
 
@@ -125,9 +121,7 @@ miseAjourEtatRelayEauAuSol = () => {
     });
 };
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+//? -------------------------------------------------
 
 //! Les requêtes.
 
@@ -157,7 +151,7 @@ exports.miseAZeroEtatVanne = (res, req) => {
     });
 };
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//? -------------------------------------------------
 
 //? Gestion etat bouton relay eau au sol.
 
@@ -185,65 +179,23 @@ exports.getEtatBoutonEauAuSol = (req, res) => {
   }
 };
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//? -------------------------------------------------
 
-//? Activer ou désactiver l’eau au sol.
+//! Clic sur le bouton eau au sol.
 
 let etatRelayEauAuSol;
+let eauAuSol = 16; // 16
 
-exports.relayEauAuSol = (req, res) => {
-  //
-  //* 1) Determiner la position du boutton.
+const relayBoutonEauAuSol = db.gestionEtatBoutonRelayEauAuSol;
 
-  const maPromesse = new Promise((resolve, reject) => {
-    try {
-      relayBoutonEauAuSol
-        .findOne({
-          attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
-          raw: true,
-        })
-        .then((id) => {
-          // console.log('Le dernier id de gestionAir est : ', id);
-          // console.log(id.maxid);
+exports.relayEauAuSol = (req, res, next) => {
 
-          relayBoutonEauAuSol
-            .findOne({
-              where: { id: id.maxid },
-            })
-            .then((result) => {
-              etatRelayEauAuSol = result['etatRelayEauAuSol'];
-              resolve();
+  //? Les promesses.
 
-              console.log(
-                'Etat Relay au eau au Sol de départ : ',
-                etatRelayEauAuSol
-              );
-            });
-        });
-    } catch (error) {
-      console.error(error);
-      reject();
-    }
-  });
+  let getEtatRelayEauAuSol = () => {
+    return new Promise((resolve, reject) => {
 
-  let action = async () => {
-    let go = await maPromesse;
-    return go;
-  };
-
-  action()
-    //
-    //* Activer ou désactiver l’eau au sol.
-
-    .then(() => {
-      if (etatRelayEauAuSol === 0) {
-        //
-
-        // const relayOn = new Gpio(27, 'out');
-        const relayOn = new Gpio(eauAuSol, 'out');
-        console.log('Relay au sol = On');
-
-        //* Mise à jour de la basede donnée.
+      try {
 
         relayBoutonEauAuSol
           .findOne({
@@ -253,21 +205,108 @@ exports.relayEauAuSol = (req, res) => {
           .then((id) => {
             // console.log('Le dernier id de gestionAir est : ', id);
             // console.log(id.maxid);
-            lastId = id.maxid;
 
             relayBoutonEauAuSol
-              .update({ etatRelayEauAuSol: 1 }, { where: { id: lastId } })
-
-              .then(function (result) {
-                console.log('Activation relay ===> ', result);
+              .findOne({
+                where: { id: id.maxid },
               })
+              .then((result) => {
+                etatRelayEauAuSol = result['etatRelayEauAuSol'];
+                resolve();
 
-              .catch((err) => console.log(err));
+                // console.log(
+                //   'Etat Relay au eau au Sol de départ : ',
+                //   etatRelayEauAuSol
+                // );
+
+              });
           });
 
-        setTimeout(() => {
-          // const relayOn = new Gpio(27, 'in');
-          const relayOn = new Gpio(eauAuSol, 'in');
+      } catch (error) {
+
+        console.log("❌ %c ERREUR ==> Relays eau au sol ==> Clic sur le bouton eau au sol",
+          'color: orange', error);
+
+        reject();
+
+      }
+    });
+  }
+
+  let activationDeactivationBoutonRelayEauAuSol = () => {
+    return new Promise((resolve, reject) => {
+
+      try {
+
+        if (etatRelayEauAuSol === 0) {
+          //
+          new Gpio(eauAuSol, 'out');
+
+          console.log('Relay au sol = On');
+
+          //* Mise à jour de la basede donnée.
+
+          relayBoutonEauAuSol
+            .findOne({
+              attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+              raw: true,
+            })
+            .then((id) => {
+              // console.log('Le dernier id de gestionAir est : ', id);
+              // console.log(id.maxid);
+              lastId = id.maxid;
+
+              relayBoutonEauAuSol
+                .update({ etatRelayEauAuSol: 1 }, { where: { id: lastId } })
+
+                .then(function (result) {
+                  console.log('Activation relay ===> ', result);
+                })
+
+                .catch((err) => console.log(err));
+            });
+
+          setTimeout(() => {
+
+            new Gpio(eauAuSol, 'in');
+
+            console.log('Relay au sol = Off');
+
+            //* Mise à jour de la basede donnée.
+
+            relayBoutonEauAuSol
+              .findOne({
+                attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+                raw: true,
+              })
+              .then((id) => {
+                // console.log('Le dernier id de gestionAir est : ', id);
+                // console.log(id.maxid);
+                lastId = id.maxid;
+
+                relayBoutonEauAuSol
+                  .update({ etatRelayEauAuSol: 0 }, { where: { id: lastId } })
+
+                  .then(function (result) {
+                    console.log(
+                      'Déactivation relay après setTimeout  ===> ',
+                      result
+                    );
+                  })
+
+                  .catch((err) => console.log(err));
+              });
+
+            res.status(200).json({ message: 'Eau au sol déactivé ✅' });
+
+            resolve();
+
+            //*-------------------------------------
+          }, 120000);
+        } else if (etatRelayEauAuSol === 1) {
+
+          new Gpio(eauAuSol, 'in');
+
           console.log('Relay au sol = Off');
 
           //* Mise à jour de la basede donnée.
@@ -286,94 +325,81 @@ exports.relayEauAuSol = (req, res) => {
                 .update({ etatRelayEauAuSol: 0 }, { where: { id: lastId } })
 
                 .then(function (result) {
-                  console.log(
-                    'Déactivation relay après setTimeout  ===> ',
-                    result
-                  );
+                  console.log('Déactivation relay au clic  ===> ', result);
                 })
 
                 .catch((err) => console.log(err));
             });
 
+          //*-------------------------------------
+
           res.status(200).json({ message: 'Eau au sol déactivé ✅' });
 
-          //*-------------------------------------
-        }, 120000);
-      } else if (etatRelayEauAuSol === 1) {
-        //
-        // const relayOff = new Gpio(27, 'in');
-        const relayOff = new Gpio(eauAuSol, 'in');
-        console.log('Relay au sol = Off');
+          resolve();
+        }
 
-        //* Mise à jour de la basede donnée.
+      } catch (error) {
 
-        relayBoutonEauAuSol
-          .findOne({
-            attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
-            raw: true,
-          })
-          .then((id) => {
-            // console.log('Le dernier id de gestionAir est : ', id);
-            // console.log(id.maxid);
-            lastId = id.maxid;
+        console.log("❌ %c ERREUR ==> Relays eau au sol ==> Action bouton",
+          'color: orange', error);
 
-            relayBoutonEauAuSol
-              .update({ etatRelayEauAuSol: 0 }, { where: { id: lastId } })
+        reject();
 
-              .then(function (result) {
-                console.log('Déactivation relay au clic  ===> ', result);
-              })
-
-              .catch((err) => console.log(err));
-          });
-
-        //*-------------------------------------
-
-        res.status(200).json({ message: 'Eau au sol déactivé ✅' });
       }
-    })
 
-    //*---------------------------------------------------
-
-    //* Réecriture du fichier.
-
-    .then(() => {})
-
-    //*---------------------------------------------------
-
-    //* Catch des erreur.
-
-    .catch((e) => {
-      console.log(e);
     });
+  }
 
-  //*---------------------------------------------------
+  //?---------------------------------------------------
+
+  //? Resolve promise. 
+
+  let handleMyPromise = async () => {
+
+    try {
+
+      await getEtatRelayEauAuSol();
+
+      await activationDeactivationBoutonRelayEauAuSol();
+
+    }
+    catch (err) {
+      console.log('err :', err);
+    }
+  };
+
+  handleMyPromise();
+
+  //?---------------------------------------------------
+
 };
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//!---------------------------------------------------
 
-//? Gestion relay Ventilateur humidité.
+//! Gestion relay Ventilateur humidité.
+
+let ventilateur = 17; // 17
 
 exports.relayVentilo = (req, res, next) => {
   let relayVentilo = req.body.relayVentilo;
 
   if (relayVentilo == 1) {
-    const relay27On = new Gpio(ventilateur, 'out');
+    new Gpio(ventilateur, 'out');
     // const relay27On = new Gpio(27, 'out');
 
     res.status(200).json({ message: 'ventilateur ON' });
   }
   if (relayVentilo == 0) {
-    const relay27On = new Gpio(ventilateur, 'in');
+    new Gpio(ventilateur, 'in');
     // const relay27On = new Gpio(27, 'in');
 
     res.status(200).json({ message: 'ventilateur OFF' });
   }
 };
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//!---------------------------------------------------
 
-//? Gestion relay Vanne Froid à 5 secondes.
+//! Gestion relay Vanne Froid à 5 secondes.
 
 exports.relayVanneFroid5SecondesOn = (req, res, next) => {
   //
@@ -385,14 +411,14 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
 
     recuperationEtatRlay();
 
-    const relay_22_ON = new Gpio(23, 'out'); //! << Mode Test >>
+    new Gpio(23, 'out'); //! << Mode Test >>
     // const relay_22_ON = new Gpio(27, 'out');
 
     res.status(200).json({ message: 'Relay Vanne Froid à 5 Secondes ON: OK' });
 
     setTimeout(() => {
       //
-      const relay_22_OFF = new Gpio(23, 'in');
+      new Gpio(23, 'in');
       // const relay_22_OFF = new Gpio(27, 'in'); //! << Mode Test >>
 
       if (valEtatRelay >= 100) {
@@ -413,12 +439,10 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
 
     recuperationEtatRlay();
 
-    const relay_22_ON = new Gpio(22, 'out');
-    //const relay_22_ON = new Gpio(27, 'out'); //! << Mode Test >>
+    new Gpio(22, 'out');
 
     setTimeout(() => {
-      const relay_22_OFF = new Gpio(22, 'in');
-      // const relay_22_OFF = new Gpio(27, 'in'); //! << Mode Test >>
+      new Gpio(22, 'in');
 
       if (valEtatRelay <= 0) {
         etatRelay = 0;
@@ -436,9 +460,9 @@ exports.relayVanneFroid5SecondesOn = (req, res, next) => {
   }
 };
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//!---------------------------------------------------
 
-//? Gestion relay Vanne Froid 40 secondes.
+//! Gestion relay Vanne Froid 40 secondes.
 
 exports.relayVanneFroid40SecondesOn = (req, res, next) => {
   //
@@ -450,14 +474,13 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
 
     recuperationEtatRlay();
 
-    const relay_22_ON = new Gpio(23, 'out');
-    // const relay_22_OFF = new Gpio(27, 'out'); //! << Mode Test >>
+    new Gpio(23, 'out');
 
     res.status(200).json({ message: 'Relay Vanne Froid à 40 Secondes ON: OK' });
 
     setTimeout(() => {
-      const relay_22_OFF = new Gpio(23, 'in');
-      // const relay_22_OFF = new Gpio(27, 'in'); //! << Mode Test >>
+      new Gpio(23, 'in');
+
 
       if (valEtatRelay >= 100) {
         etatRelay = 100;
@@ -477,12 +500,12 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
 
     recuperationEtatRlay();
 
-    const relay_22_ON = new Gpio(22, 'out');
-    // const relay_22_OFF = new Gpio(27, 'out'); //! << Mode Test >>
+    new Gpio(22, 'out');
+
 
     setTimeout(() => {
-      const relay_22_OFF = new Gpio(22, 'in');
-      //const relay_22_OFF = new Gpio(27, 'in'); //! << Mode Test >>
+      new Gpio(22, 'in');
+
 
       if (valEtatRelay <= 0) {
         etatRelay = 0;
@@ -502,6 +525,5 @@ exports.relayVanneFroid40SecondesOn = (req, res, next) => {
   }
 };
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//!---------------------------------------------------
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖

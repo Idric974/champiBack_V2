@@ -1,4 +1,8 @@
+//! Les constantes.
+
 const axios = require('axios');
+
+//! -------------------------------------------------- !
 
 //! Rafraichissement de la page.
 
@@ -11,7 +15,7 @@ let date = myDate.toLocaleString();
 
 console.log('Page actualisée le : ' + date);
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+//! -------------------------------------------------
 
 //! Afficher la date.
 
@@ -46,12 +50,11 @@ async function afficherDate() {
 
 afficherDate();
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+//! -------------------------------------------------
 
+//! Gestion de l'eau au sol.
 
-//! I) Gestion de l'eau au sol.
-
-//? Clic sur le bouton eau au sol.
+//? Récupération de l’état du bouton eau au sol.
 
 let etatBoutonEauAuSol;
 
@@ -70,7 +73,7 @@ let getEtatBoutonEauAuSol = () => {
       } else {
         let element = document.getElementById('btnRelayEauSol');
         element.style.backgroundColor = 'red';
-        element.innerHTML = 'Déactivation';
+        element.innerHTML = 'Eau au sol activée';
       }
     })
     .catch(function (error) {
@@ -79,9 +82,9 @@ let getEtatBoutonEauAuSol = () => {
 };
 getEtatBoutonEauAuSol();
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//! -------------------------------------------------
 
-//? Requete (Clic sur le bouton eau au sol.)
+//! Clic sur le bouton eau au sol.
 
 document
   .getElementById('btnRelayEauSol')
@@ -89,12 +92,10 @@ document
     //
     let element = document.getElementById('btnRelayEauSol');
     element.style.backgroundColor = 'red';
-    element.innerHTML = 'Déactivation';
+    element.innerHTML = 'Eau au sol activée';
 
     axios
-      .post('http://localhost:3003/api/relayRoutes/relayEauAuSol/', {
-        relayEau: 'test',
-      })
+      .get('http://localhost:3003/api/relayRoutes/relayEauAuSol/')
       .then(function (response) {
         console.log(response.data);
 
@@ -105,11 +106,9 @@ document
       });
   });
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//! -------------------------------------------------
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
-
-//! II) Gestion ventilateur humidité.
+//! Gestion ventilateur humidité.
 
 let ventilateurHumidite = 0;
 
@@ -135,7 +134,7 @@ document
       });
   });
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//? -------------------------------------------------
 
 //? Ventilateur OFF.
 document
@@ -157,11 +156,11 @@ document
       });
   });
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//? -------------------------------------------------
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+//! -------------------------------------------------
 
-//! III) Gestion vanne froid état.
+//! Gestion vanne froid état.
 
 //? Mise a zero de l'étatvanne.
 
@@ -178,9 +177,9 @@ let miseAZeroEtatVanne = () => {
     });
 };
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//! -------------------------------------------------
 
-//? Affichage de l'état de la vanne froid.
+//! Affichage de l'état de la vanne froid.
 
 let etatRelay;
 let etatRelayBrute;
@@ -211,9 +210,9 @@ let afficheEtatRelay = () => {
 
 afficheEtatRelay();
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//! -------------------------------------------------
 
-//? Gestion de vanne frois à 5 secondes ON.
+//! Gestion de vanne frois à 5 secondes ON.
 
 document
   .getElementById('vanneFroid5SesoncdesOn')
@@ -276,9 +275,9 @@ document
     }, 6000);
   });
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//! -------------------------------------------------
 
-//? Gestion de vanne frois à 5 secondes OFF.
+//! Gestion de vanne frois à 5 secondes OFF.
 
 document
   .getElementById('vanneFroid5SesoncdesOff')
@@ -339,9 +338,9 @@ document
     }, 6000);
   });
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//! -------------------------------------------------
 
-//? Gestion de vanne frois à 40 secondes ON.
+//! Gestion de vanne frois à 40 secondes ON.
 
 document
   .getElementById('vanneFroid40SesoncdesOn')
@@ -466,6 +465,6 @@ document
     }, 40500);
   });
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//! -------------------------------------------------
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+

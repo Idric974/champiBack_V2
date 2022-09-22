@@ -304,11 +304,15 @@ label {
   box-shadow: 0 4px rgb(122, 122, 122);
 }
 
+
+
 .boutonAccueil:active {
   box-shadow: 0 0px black;
   top: 6px;
   color: white;
 }
+
+
 
 .boxAffichage {
   width: 100%;
@@ -340,6 +344,7 @@ label {
   font-size: 3rem;
   margin: 10px 0px 10px 0px;
   color: white;
+  text-align: center;
 }
 
 .version {

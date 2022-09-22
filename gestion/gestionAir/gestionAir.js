@@ -211,10 +211,10 @@ let recuperationDeEtalonage = () => {
 
                             etalonnage = result['etalonnageAir'];
 
-                            // console.log(
-                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage",
-                            //     'color: green', etalonnage
-                            // );
+                            console.log(
+                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage",
+                                'color: green', etalonnage
+                            );
                         })
                         .then(() => {
 
@@ -791,7 +791,7 @@ let definitionDesActions = () => {
                                 );
 
                                 actionRelay = 0;
-                                etatRelay = 0;
+                                etatRelay = 37.5;
                                 miseAjourEtatRelay();
 
                                 resolve();
@@ -937,7 +937,7 @@ let definitionDesActions = () => {
                                 );
 
                                 actionRelay = 0;
-                                etatRelay = 0;
+                                etatRelay = 50;
                                 miseAjourEtatRelay();
 
                                 resolve();
@@ -1236,7 +1236,7 @@ let definitionDesActions = () => {
                                 );
 
                                 actionRelay = 0;
-                                etatRelay = 0;
+                                etatRelay = 100;
                                 miseAjourEtatRelay();
 
                                 resolve();
@@ -1354,7 +1354,7 @@ let handleMyPromise = async () => {
 
         await recupérationDeLaConsigne();
 
-        //// await recuperationDeEtalonage();
+        await recuperationDeEtalonage();
 
         await recuperationEtatVanneFroid();
 

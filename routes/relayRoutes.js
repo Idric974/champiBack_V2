@@ -8,7 +8,7 @@ const relayCtrl = require('../controllers/relayControllers');
 
 //? POST.
 
-router.post('/relayEauAuSol', relayCtrl.relayEauAuSol);
+
 
 router.post('/relayVentilo', relayCtrl.relayVentilo);
 
@@ -29,6 +29,8 @@ router.post('/miseAZeroEtatVanne', relayCtrl.miseAZeroEtatVanne);
 //? GET.
 
 router.get('/getEtatBoutonEauAuSol', relayCtrl.getEtatBoutonEauAuSol);
+
+router.get('/relayEauAuSol', relayCtrl.relayEauAuSol);
 
 //? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
