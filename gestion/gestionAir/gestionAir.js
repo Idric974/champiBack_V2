@@ -536,7 +536,7 @@ let definitionTemperatureAirCorrigee = () => {
 
 //? Calcul du delta.
 
-// let delta;
+// let delta = -0.4;
 
 let definitionDuDelta = () => {
   return new Promise((resolve, reject) => {
@@ -564,8 +564,8 @@ let definitionDuDelta = () => {
 
 //? Définition des actions.
 
-const ouvertureRelay = 27; //* 23.
-const fermetureRelay = 27; //* 22.
+const ouvertureRelay = 23; //* 23.
+const fermetureRelay = 22; //* 22.
 
 //! Variable de tests.
 // let delta = 1.5; //* L559
@@ -586,7 +586,8 @@ let definitionDesActions = () => {
           return new Promise((resolve, reject) => {
             if (delta) {
               //
-              const relay = new Gpio(22, 'in');
+              const relay = new Gpio(22, 'out');
+              // const relay = new Gpio(27, 'in');
 
               console.log(
                 '✅ %c SUCCÈS ==> gestions Air ==> Actions delta (<= -0.3) | Fermeture vanne pour 40 secondes.',
@@ -613,7 +614,8 @@ let definitionDesActions = () => {
           return new Promise((resolve, reject) => {
             if (delta) {
               setTimeout(() => {
-                const relay = new Gpio(23, 'in');
+                const relay = new Gpio(22, 'in');
+                //const relay = new Gpio(27, 'in');
 
                 console.log(
                   '✅ %c SUCCÈS ==> gestions Air ==> Actions delta (<= -0.3) | Stope fermeture vanne pour 40 secondes.',
@@ -1166,6 +1168,7 @@ let definitionDesActions = () => {
             if (delta) {
               //
               const relay = new Gpio(23, 'in');
+              //const relay = new Gpio(27, 'in');
 
               console.log(
                 '✅ %c SUCCÈS ==> gestions Air ==> Actions delta (>=  1.5) | Ouverture vanne pour 40 secondes.',
@@ -1193,6 +1196,7 @@ let definitionDesActions = () => {
             if (delta) {
               setTimeout(() => {
                 const relay = new Gpio(22, 'in');
+                // const relay = new Gpio(27, 'in');
 
                 console.log(
                   '✅ %c SUCCÈS ==> gestions Air ==> Actions delta (>=  1.5) | Stope fermeture vanne pour 40 secondes.',
