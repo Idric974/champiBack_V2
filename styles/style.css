@@ -1,16 +1,16 @@
-.box{
-    width: 100%;
+.box {
+  width: 100%;
   /* border: solid red 1px; */
 }
 
-.boxMenuTitle{
+.boxMenuTitle {
   width: 100%;
   height: 9vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
+  font-size: 1.5rem;
   text-align: center;
   /* padding: 10px 0px 10px 0px ; */
   background-color: #146ec2;
@@ -45,14 +45,14 @@
 
 .dateBox {
   /* border: solid 1px red; */
-   width: 100%;
-   height: 9vh;
+  width: 100%;
+  height: 9vh;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
- background-color: #146ec2;
- border-bottom: solid black 1px;
+  background-color: #146ec2;
+  border-bottom: solid black 1px;
 }
 
 .laDate {
@@ -131,10 +131,10 @@
   justify-content: center;
   justify-content: space-between;
   border-radius: 10px;
-    margin: 10px 0px 5px 0px ;
+  margin: 10px 0px 5px 0px;
 }
 
-.boxCardData1{
+.boxCardData1 {
   /* border: solid 1px red; */
   width: 95%;
   height: 33vh;
@@ -149,7 +149,7 @@
 .boxCardData2 {
   border: solid 1px green;
   width: 95%;
-   height: 55vh;
+  height: 55vh;
   box-shadow: 0px 0px 10px 1px black;
   border-radius: 10px;
   background-color: white;
@@ -162,15 +162,14 @@
 
 
 
-.boxCardDataTitle
- {
+.boxCardDataTitle {
   /* border: solid 1px green; */
   width: 100%;
   display: flex;
   flex-direction: column;
   text-align: center;
   border-radius: 10px 10px 0px 0px;
-  padding: 20px 0px 20px 0px ;
+  padding: 20px 0px 20px 0px;
   background-color: #146ec2;
   color: white;
   margin-bottom: 10px;
@@ -178,8 +177,7 @@
 
 }
 
-.boxCardDataValue
- {
+.boxCardDataValue {
   /* border: solid 1px red; */
   width: 100%;
   display: flex;
@@ -191,10 +189,9 @@
 }
 
 
-.boxCardDataParams
- {
+.boxCardDataParams {
   /* border: solid 1px green; */
-   width: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -209,14 +206,13 @@
 }
 
 
-.boxCardData2Title
- {
+.boxCardData2Title {
   width: 100%;
   display: flex;
   flex-direction: column;
   text-align: center;
   border-radius: 10px 10px 0px 0px;
-  padding: 20px 0px 20px 0px ;
+  padding: 20px 0px 20px 0px;
   background-color: #146ec2;
   color: white;
   margin-bottom: 10px;
@@ -224,8 +220,7 @@
 }
 
 
-.boxCardData2Form
-{
+.boxCardData2Form {
   border: solid 1px green;
   width: 100%;
   display: flex;
@@ -242,7 +237,7 @@
   flex-direction: column;
   /* align-items: center; */
   text-align: center;
-  
+
 }
 
 .boutonActivation {
@@ -629,6 +624,7 @@
   display: flex;
   border-bottom: 1px solid #333;
 }
+
 .onglets {
   width: 33.33%;
   display: flex;
@@ -638,6 +634,7 @@
   font-weight: 700;
   cursor: pointer;
 }
+
 .onglets:not(:nth-child(3)) {
   border-right: 1px solid #333;
 }
@@ -678,18 +675,22 @@
   -webkit-animation: fade 0.5s forwards;
   animation: fade 0.5s forwards;
 }
+
 @-webkit-keyframes fade {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
+
 @keyframes fade {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
