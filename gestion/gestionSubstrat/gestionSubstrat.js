@@ -561,7 +561,7 @@ let handleMyPromise = async () => {
 
         await definitionTemperatureAirCorrigee();
 
-        await definitionAction();
+        // await definitionAction();
 
         await enregistrementTemperature();
     }

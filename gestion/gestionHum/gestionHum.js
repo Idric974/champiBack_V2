@@ -162,10 +162,10 @@ let getTemperaturesSec = () => {
             if (err) throw err;
             listValSec.push(reading.value * 40);
 
-            // console.log(
-            //   "✅ %c SUCCÈS ==> gestions Hum ==> Mesure de la température Sec",
-            //   'color: green', listValSec
-            // );
+            console.log(
+              "✅ %c SUCCÈS ==> gestions Hum ==> Mesure de la température Sec",
+              'color: green', listValSec
+            );
 
             if (listValSec.length >= 10) {
               // console.log('listValSec.length >=10');
