@@ -564,8 +564,8 @@ let definitionDuDelta = () => {
 
 //? Définition des actions.
 
-const ouvertureRelay = 22; //* 22.
-const fermetureRelay = 23; //* 23.
+const ouvertureRelay = 23; //* 22.
+const fermetureRelay = 22; //* 23.
 
 //! Variable de tests.
 // let delta = 1.5; //* L559
