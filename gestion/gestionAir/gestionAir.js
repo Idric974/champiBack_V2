@@ -90,15 +90,15 @@ let recupérationTempératureSec = () => {
               getTemperatureSec = result['valeursMesureSec180'];
 
               console.log(
-                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de la température ==> ",
-                'color: green', getTemperatureSec
+                '✅ %c SUCCÈS ==> gestions Air ==> Récupération de la température ==> ',
+                'color: green',
+                getTemperatureSec
               );
 
               // console.log(
               //   "✅ %c SUCCÈS ==> gestions Air ==> Récupération de la température Type ==> ",
               //   'color: green', typeof getTemperatureSec
               // );
-
             })
             .then(() => {
               resolve();
@@ -213,7 +213,6 @@ let recuperationDeEtalonage = () => {
               //   'color: green',
               //   typeof etalonnage
               // );
-
             })
             .then(() => {
               resolve();
@@ -510,8 +509,7 @@ let temperatureCorrigee;
 let definitionTemperatureAirCorrigee = () => {
   return new Promise((resolve, reject) => {
     try {
-      temperatureCorrigee =
-        getTemperatureSec + etalonnage;
+      temperatureCorrigee = getTemperatureSec + etalonnage;
 
       console.log(
         '✅ %c SUCCÈS ==> gestions Air ==> Définition de la température air corrigée ===> ',
@@ -793,8 +791,8 @@ let definitionDesActions = () => {
           try {
             await fermetureTotalVanne();
             await stopFermetureTotalVanne();
-            await ouvertureVanne();
-            await stopOuvertureVanne();
+            // await ouvertureVanne();
+            // await stopOuvertureVanne();
             await resolveAction();
           } catch (err) {
             console.log(
@@ -886,7 +884,7 @@ let definitionDesActions = () => {
               resolve();
             } else {
               console.log(
-                '❌ %c ERREUR ==> gestions Air ==> Actions delta (-0.3 & <= 0) | Ouverture vanne pour 20 secondes.',
+                '❌ %c ERREUR ==> gestions Air ==> Actions delta (-0.3 & <= 0) | Ouverture vanne pour 15 secondes.',
                 'color: orange'
               );
 
@@ -936,8 +934,8 @@ let definitionDesActions = () => {
           try {
             await fermetureTotalVanne();
             await stopFermetureTotalVanne();
-            await ouvertureVanne();
-            await stopOuvertureVanne();
+            // await ouvertureVanne();
+            // await stopOuvertureVanne();
             await resolveAction();
           } catch (err) {
             console.log(
