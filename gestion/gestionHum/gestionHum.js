@@ -106,10 +106,10 @@ let recuperationDeEtalonageSec = () => {
 
               etalonnageSec = result['etalonnageSec'];
 
-              // console.log(
-              //   "✅ %c SUCCÈS ==> gestions Hum ==> Récupération de l'étalonage Sec =================>",
-              //   'color: green', etalonnageSec
-              // );
+              console.log(
+                "✅ %c SUCCÈS ==> gestions Hum ==> 1️⃣  Récupération de l'étalonage Sec =========================>",
+                'color: green', etalonnageSec
+              );
 
             })
             .then(() => {
@@ -162,10 +162,10 @@ let getTemperaturesSec = () => {
             if (err) throw err;
             listValSec.push(reading.value * 40);
 
-            console.log(
-              "✅ %c SUCCÈS ==> gestions Hum ==> Mesure de la température Sec",
-              'color: green', listValSec
-            );
+            // console.log(
+            //   "✅ %c SUCCÈS ==> gestions Hum ==> Mesure de la température Sec",
+            //   'color: green', listValSec
+            // );
 
             if (listValSec.length >= 10) {
               // console.log('listValSec.length >=10');
@@ -210,16 +210,16 @@ let calculeDeLaTemperatureMoyenneSec = () => {
 
       temperatureMoyenneSec = Math.round((sumlistVal / arrayLength) * 100) / 100;
 
-      // console.log(
-      //   "✅ %c SUCCÈS ==> gestions Hum ==> Temperature Hum moyenne Sec =====================>",
-      //   'color: green ', temperatureMoyenneSec
-      // );
+      console.log(
+        "✅ %c SUCCÈS ==> gestions Hum ==> 1️⃣  Temperature moyenne Brute Sec ===========================>",
+        'color: green ', temperatureMoyenneSec
+      );
 
       resolve();
 
     } catch (error) {
 
-      console.log("❌ %c ERREUR ==> gestions Hum ==> Temperature Hum moyenne Hum",
+      console.log("❌ %c ERREUR ==> gestions Hum ==> Temperature moyenne Hum",
         'color: orange', error);
 
       reject();
@@ -231,7 +231,7 @@ let calculeDeLaTemperatureMoyenneSec = () => {
 
 //? --------------------------------------------------
 
-//? Définition de la température Hum corrigée Sec.
+//? Définition de la température corrigée Sec.
 
 let temperatureCorrigeeSec;
 
@@ -244,7 +244,7 @@ let definitionTemperatureSeccorrigee = () => {
         parseFloat(temperatureMoyenneSec.toFixed(1)) + etalonnageSec;
 
       console.log(
-        "✅ %c SUCCÈS ==> gestions Hum ==> Définition de la température Hum corrigée Sec ===>",
+        "✅ %c SUCCÈS ==> gestions Hum ==> 1️⃣  Définition de la température corrigée Sec ===============>",
         'color: green', temperatureCorrigeeSec
       );
 
@@ -818,10 +818,10 @@ let recuperationDeEtalonageHum = () => {
 
               etalonnageHum = result['etalonnageHum'];
 
-              // console.log(
-              //   "✅ %c SUCCÈS ==> gestions Hum ==> Récupération de l'étalonage Hum =================>",
-              //   'color: green', etalonnageHum
-              // );
+              console.log(
+                "✅ %c SUCCÈS ==> gestions Hum ==> 2️⃣  Récupération de l'étalonage Hum =========================>",
+                'color: green', etalonnageHum
+              );
 
             })
             .then(() => {
@@ -922,10 +922,10 @@ let calculeDeLaTemperatureMoyenneHum = () => {
 
       temperatureMoyenneHum = Math.round((sumlistVal / arrayLength) * 100) / 100;
 
-      // console.log(
-      //   "✅ %c SUCCÈS ==> gestions Hum ==> Temperature Hum moyenne Hum =====================>",
-      //   'color: green ', temperatureMoyenneHum
-      // );
+      console.log(
+        "✅ %c SUCCÈS ==> gestions Hum ==> 2️⃣  Temperature moyenne brute Hum ===========================>",
+        'color: green ', temperatureMoyenneHum
+      );
 
       resolve();
 
@@ -958,7 +958,7 @@ let definitionTemperatureHumcorrigee = () => {
       temperatureCorrigeeHum = Math.round(temperatureCorrigeeHumBrut * 100) / 100
 
       console.log(
-        "✅ %c SUCCÈS ==> gestions Hum ==> Définition de la température Hum corrigée Hum ===>",
+        "✅ %c SUCCÈS ==> gestions Hum ==> 2️⃣  Définition de la température corrigée Hum ===============>",
         'color: green', temperatureCorrigeeHum
       );
 

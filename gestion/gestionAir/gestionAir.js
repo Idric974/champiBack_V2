@@ -89,11 +89,11 @@ let recupérationTempératureSec = () => {
 
               getTemperatureSec = result['valeursMesureSec180'];
 
-              console.log(
-                '✅ %c SUCCÈS ==> gestions Air ==> Récupération de la température ==> ',
-                'color: green',
-                getTemperatureSec
-              );
+              // console.log(
+              //   '✅ %c SUCCÈS ==> gestions Air ==> Récupération de la température ==> ',
+              //   'color: green',
+              //   getTemperatureSec
+              // );
 
               // console.log(
               //   "✅ %c SUCCÈS ==> gestions Air ==> Récupération de la température Type ==> ",
@@ -202,11 +202,11 @@ let recuperationDeEtalonage = () => {
 
               etalonnage = result['etalonnageAir'];
 
-              console.log(
-                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage",
-                'color: green',
-                etalonnage
-              );
+              // console.log(
+              //   "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage",
+              //   'color: green',
+              //   etalonnage
+              // );
 
               // console.log(
               //   "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage Type",
@@ -511,11 +511,11 @@ let definitionTemperatureAirCorrigee = () => {
     try {
       temperatureCorrigee = getTemperatureSec + etalonnage;
 
-      console.log(
-        '✅ %c SUCCÈS ==> gestions Air ==> Définition de la température air corrigée ===> ',
-        'color: green',
-        temperatureCorrigee
-      );
+      // console.log(
+      //   '✅ %c SUCCÈS ==> gestions Air ==> Définition de la température air corrigée ===> ',
+      //   'color: green',
+      //   temperatureCorrigee
+      // );
 
       resolve();
     } catch (error) {
@@ -1274,11 +1274,13 @@ let enregistrementDatas = () => {
         })
 
         .then(function (result) {
-          console.log(
-            "✅ %c SUCCÈS ==> gestions Air ==> Enregistrement des datas dans la base de données sous l'id :",
-            'color: green',
-            result['dataValues'].id
-          );
+
+          // console.log(
+          //   "✅ %c SUCCÈS ==> gestions Air ==> Enregistrement des datas dans la base de données sous l'id :",
+          //   'color: green',
+          //   result['dataValues'].id
+          // );
+
         })
 
         .then(() => {
