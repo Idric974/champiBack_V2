@@ -198,6 +198,7 @@ let recuperationEtatRelay = () => {
 
 //? Construction de la valeur de l'axe X.
 
+let dateDuJour;
 let dateDemarrageCycle;
 let jourDuCycle;
 let heureDuCycle;
@@ -205,79 +206,111 @@ let minuteDuCycle;
 let heureMinute;
 let valeurAxeX;
 
-let getDateDemarrageCycle = () => {
+const gestionCourbesModels = db.gestionCourbes;
+
+let constructionAxeX = () => {
     return new Promise((resolve, reject) => {
+        try {
+            gestionCourbesModels
+                .findOne({
+                    attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+                    raw: true,
+                })
+                .then((id) => {
+                    // console.log('Le dernier id de gestionAir est : ', id);
+                    // console.log(id.maxid);
 
-        axios
-            .get('http://localhost:3003/api/gestionCourbeRoutes/getDateDemarrageCycle')
-            .then((response) => {
+                    gestionCourbesModels
+                        .findOne({
+                            where: { id: id.maxid },
+                        })
+                        .then((result) => {
+                            //* date démarrage du cycle.
 
-                // console.log(
-                //     'Date démarrage du cycle :----------:',
-                //     response.data.dateDemarrageCycle.dateDemarrageCycle
-                // );
+                            // dateDemarrageCycle = result['dateDemarrageCycle'];
 
-                dateDemarrageCycle = response.data.dateDemarrageCycle.dateDemarrageCycle
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X",
+                            //     'color: green', dateDemarrageCycle
+                            // );
 
-                //* Date du jour.
+                            //* --------------------------------------------------
 
-                dateDuJour = new Date();
-                // console.log('Date du Jour :---------------------:', dateDuJour);
+                            //* Date de démarrage du cycle.
 
-                //* --------------------------------------------------
+                            dateDemarrageCycle = new Date(result['dateDemarrageCycle']);
 
-                //* Date de demarrage du cycle
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Date de démarrage du cycle ===>",
+                            //     'color: green', dateDemarrageCycle
+                            // );
 
-                dateDemarrageCycle = new Date(
-                    response.data.dateDemarrageCycle.dateDemarrageCycle
-                );
+                            //* --------------------------------------------------
 
-                // console.log('La date de démarrage du cycle :----:', dateDemarrageCycle);
+                            //* Date du jour.
 
-                //* --------------------------------------------------
+                            dateDuJour = new Date();
 
-                //* Calcul du nombre de jour du cycle.
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Date du jour",
+                            //     'color: green', dateDuJour
+                            // );
 
-                let nbJourBrut = dateDuJour.getTime() - dateDemarrageCycle.getTime();
+                            //* --------------------------------------------------
 
-                jourDuCycle = Math.round(nbJourBrut / (1000 * 3600 * 24)) + 1;
+                            //* Calcul du nombre de jour du cycle.
 
-                // console.log('Le jour du cycle :-----------------:', jourDuCycle, ' jours');
+                            let nbJourBrut =
+                                dateDuJour.getTime() - dateDemarrageCycle.getTime();
+                            jourDuCycle = Math.round(nbJourBrut / (1000 * 3600 * 24)) + 1;
 
-                //* --------------------------------------------------
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Calcul du nombre de jour du cycle",
+                            //     'color: green', jourDuCycle
+                            // );
 
-                //* Affichage de l'heure.
+                            //* --------------------------------------------------
 
-                heureDuCycle = new Date().getHours();
-                minuteDuCycle = new Date().getMinutes();
-                heureMinute = heureDuCycle + 'h' + minuteDuCycle;
-                // console.log("l'heure du cycle :-----------------:", heureMinute);
+                            //* Affichage de l'heure.
 
-                //* --------------------------------------------------
+                            heureDuCycle = new Date().getHours();
+                            minuteDuCycle = new Date().getMinutes();
+                            heureMinute = heureDuCycle + 'h' + minuteDuCycle;
 
-                //* Valeure de l'axe X.
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Affichage de l'heure",
+                            //     'color: green', heureMinute
+                            // );
 
-                valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
+                            //* --------------------------------------------------
 
-                // console.log(
-                //     jaune,
-                //     "[ GESTION AIR CALCULES  ] Valeure de l'axe X : ",
-                //     valeurAxeX
-                // );
+                            //* Valeure de l'axe x.
 
-                //* --------------------------------------------------
-            })
-            .then(() => {
-                resolve();
-            })
-            .catch((error) => {
-                console.log(error);
+                            valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
 
-                reject();
-            });
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Valeure de l'axe X",
+                            //     'color: green', valeurAxeX
+                            // );
 
+                            //* --------------------------------------------------
+                        })
+
+                        .then(() => {
+                            resolve();
+                        });
+                });
+        } catch (error) {
+            console.log(
+                "❌ %c ERREUR ==> gestions Air ==> Construction de la valeur de l'axe X",
+                'color: orange',
+                error
+            );
+
+            reject();
+        }
     });
-}
+};
 
 //? -------------------------------------------------- !
 
@@ -553,7 +586,7 @@ let handleMyPromise = async () => {
 
         await recuperationEtatRelay();
 
-        await getDateDemarrageCycle();
+        await constructionAxeX();
 
         await getTemperatures();
 
