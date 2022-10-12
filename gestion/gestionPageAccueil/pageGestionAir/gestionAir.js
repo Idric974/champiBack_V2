@@ -49,13 +49,13 @@ let deltaAirLocalStorage;
 
 let getTemperatureAir = () => {
   axios({
-    url: 'http://localhost:3003/api/gestionHumiditeRoutes/getTauxHumidite/',
+    url: 'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/',
     method: 'get',
   })
     .then((response) => {
-      // console.log(response.data.gestionTauxHum.valeursMesureSec180);
+      console.log(response.data);
 
-      temperatureAir = response.data.gestionTauxHum.valeursMesureSec180;
+      temperatureAir = response.data.temperatureAir.temperatureAir;
 
       localStorage.setItem('gestionAir ==> Tempèrature Air:', temperatureAir);
 
@@ -76,7 +76,7 @@ getTemperatureAir();
 
 setInterval(() => {
   getTemperatureAir();
-  // console.log('récup tempAir');
+  //console.log('récup tempAir');
 }, 10000);
 
 //! -------------------------------------------------

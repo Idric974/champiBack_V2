@@ -16,14 +16,14 @@ const con = mysql.createConnection({
 
 //* gestion Hummidité.
 
-// let table = 'gestion_hums';
+let table = 'gestion_hums';
 // let table = 'gestion_hums_datas';
 // let table = 'gestion_hums_etalonnage_hums';
 // let table = 'gestion_hums_etalonnage_secs';
 
 //* gestion Co2
 
-let table = 'gestion_co2s';
+// let table = 'gestion_co2s';
 // let table = 'gestion_co2s_datas';
 
 //* gestion Substrat.

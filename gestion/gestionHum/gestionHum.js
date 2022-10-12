@@ -79,6 +79,139 @@ let recuperationDeLaConsigne = () => {
 
 //? --------------------------------------------------
 
+//? Construction de la valeur de l'axe x.
+
+let dateDuJour;
+let dateDemarrageCycle;
+let jourDuCycle;
+let heureDuCycle;
+let minuteDuCycle;
+let heureMinute;
+let valeurAxeX;
+
+const gestionCourbesModels = db.gestionCourbes;
+
+let constructionAxeX = () => {
+  return new Promise((resolve, reject) => {
+
+    try {
+
+      gestionCourbesModels
+        .findOne({
+          attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+          raw: true,
+        })
+        .then((id) => {
+          // console.log('Le dernier id de gestionAir est : ', id);
+          // console.log(id.maxid);
+
+          gestionCourbesModels
+            .findOne({
+              where: { id: id.maxid },
+            })
+            .then((result) => {
+
+              //* dade démarrage du cycle.
+
+              dateDemarrageCycle = result['dateDemarrageCycle'];
+
+              // console.log(
+              //   "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X",
+              //   'color: green', dateDemarrageCycle
+              // );
+
+              //* --------------------------------------------------
+
+              // console.log('Le dernier id de gestionAir est : ', id);
+              // console.log(id.maxid);
+
+              gestionCourbesModels
+                .findOne({
+                  where: { id: id.maxid },
+                })
+                .then((result) => {
+
+                  //* Date de démarrage du cycle.
+
+                  dateDemarrageCycle = new Date(result['dateDemarrageCycle']);
+
+                  // console.log(
+                  //   "✅ %c SUCCÈS ==> gestions Air ==> Date de démarrage du cycle ===>",
+                  //   'color: green', dateDemarrageCycle
+                  // );
+
+                  //* --------------------------------------------------
+
+                  //* Date du jour.
+
+                  dateDuJour = new Date();
+
+                  // console.log(
+                  //   "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Date du jour",
+                  //   'color: green', dateDuJour
+                  // );
+
+                  //* --------------------------------------------------
+
+                  //* Calcul du nombre de jour du cycle.
+
+                  let nbJourBrut = dateDuJour.getTime() - dateDemarrageCycle.getTime();
+                  jourDuCycle = Math.round(nbJourBrut / (1000 * 3600 * 24)) + 1;
+
+                  // console.log(
+                  //   "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Calcul du nombre de jour du cycle",
+                  //   'color: green', jourDuCycle
+                  // );
+
+                  //* --------------------------------------------------
+
+                  //* Affichage de l'heure.
+                  heureDuCycle = new Date().getHours();
+                  minuteDuCycle = new Date().getMinutes();
+                  heureMinute = heureDuCycle + 'h' + minuteDuCycle;
+
+                  // console.log(
+                  //   "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Affichage de l'heure",
+                  //   'color: green', heureMinute
+                  // );
+
+                  //* --------------------------------------------------
+
+                  //* Valeure de l'axe x.
+                  valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
+
+                  // console.log(
+                  //   "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Valeure de l'axe X",
+                  //   'color: green', valeurAxeX
+                  // );
+
+                  //* --------------------------------------------------
+
+                })
+
+            })
+
+            .then(() => {
+
+              resolve();
+
+            });
+        });
+
+    } catch (error) {
+
+      console.log("❌ %c ERREUR ==> gestions Air ==> Construction de la valeur de l'axe X",
+        'color: orange', error);
+
+      reject();
+
+    }
+
+  });
+}
+
+//? --------------------------------------------------
+
 //? Récupération de l'étalonage Sec.
 
 let etalonnageSec
@@ -208,7 +341,7 @@ let calculeDeLaTemperatureMoyenneSec = () => {
       let sumlistVal = listValSec.reduce(reducer)
       // console.log('Somme valeurs listValSec : ', sumlistValHum);
 
-      temperatureMoyenneSec = Math.round((sumlistVal / arrayLength) * 100) / 100;
+      temperatureMoyenneSec = sumlistVal / arrayLength;
 
       console.log(
         "✅ %c SUCCÈS ==> gestions Hum ==> 1️⃣  Temperature moyenne Brute Sec ===========================>",
@@ -241,7 +374,7 @@ let definitionTemperatureSeccorrigee = () => {
     try {
 
       temperatureCorrigeeSec =
-        parseFloat(temperatureMoyenneSec.toFixed(1)) + etalonnageSec;
+        parseFloat((temperatureMoyenneSec + etalonnageSec).toFixed(1));
 
       console.log(
         "✅ %c SUCCÈS ==> gestions Hum ==> 1️⃣  Définition de la température corrigée Sec ===============>",
@@ -920,7 +1053,9 @@ let calculeDeLaTemperatureMoyenneHum = () => {
       let sumlistVal = listValHum.reduce(reducer)
       // console.log('Somme valeurs listValHum : ', sumlistValHum);
 
-      temperatureMoyenneHum = Math.round((sumlistVal / arrayLength) * 100) / 100;
+      // temperatureMoyenneHum = Math.round((sumlistVal / arrayLength) * 100) / 100;
+
+      temperatureMoyenneHum = (sumlistVal / arrayLength);
 
       console.log(
         "✅ %c SUCCÈS ==> gestions Hum ==> 2️⃣  Temperature moyenne brute Hum ===========================>",
@@ -952,10 +1087,8 @@ let definitionTemperatureHumcorrigee = () => {
 
     try {
 
-      let temperatureCorrigeeHumBrut =
-        temperatureMoyenneHum + etalonnageHum;
+      temperatureCorrigeeHum = parseFloat((temperatureMoyenneHum + etalonnageHum).toFixed(1));
 
-      temperatureCorrigeeHum = Math.round(temperatureCorrigeeHumBrut * 100) / 100
 
       console.log(
         "✅ %c SUCCÈS ==> gestions Hum ==> 2️⃣  Définition de la température corrigée Hum ===============>",
@@ -1489,7 +1622,7 @@ let tableauCorrespondanceHum = () => {
         console.log("==> Correspondance des pressions Hum :  ", 55.926); correspondancePressionsHum = 55.926; resolve();
       } else if (temperatureCorrigeeHum == 35) {
         console.log("==> Correspondance des pressions Hum :  ", 56.23); correspondancePressionsHum = 56.23; resolve();
-      } else { (console.log('ERREUR')) }
+      } else { (console.log('ERREUR Correspondance des pressions Hum')) }
     } catch (error) {
 
       console.log("❌ %c ERREUR ==> gestions Hum ==> Tableau de correspondance Hum",
@@ -1513,17 +1646,17 @@ let calculeTauxHumidite = () => {
   return new Promise((resolve, reject) => {
     try {
 
-      tauxHumidite = (
+      tauxHumidite = parseFloat((
         ((correspondancePressionsHum -
           1013 *
           0.000662 *
           (temperatureCorrigeeSec - temperatureCorrigeeHum)) /
           correspondancePressions) *
         100
-      ).toFixed(2);
+      ).toFixed(2));
 
       console.log(
-        "✅ %c SUCCÈS ==> gestions Hum ==> Taux Humidite =================>",
+        "✅ %c SUCCÈS ==> gestions Hum ==> Taux Humidite ==============================================>",
         'color: green', tauxHumidite
       );
 
@@ -1532,7 +1665,7 @@ let calculeTauxHumidite = () => {
       deltaHum = parseFloat((tauxHumidite - consigne).toFixed(1));
 
       console.log(
-        "✅ %c SUCCÈS ==> gestions Hum ==> delta humidité =================>",
+        "✅ %c SUCCÈS ==> gestions Hum ==> delta humidité =============================================>",
         'color: green', deltaHum
       );
 
@@ -1556,14 +1689,116 @@ let calculeTauxHumidite = () => {
 
 let actionApresCalculeDelta = () => {
   return new Promise((resolve, reject) => {
-    if (deltaHum > 2) {
-      console.log('Test myPromise OK');
-      resolve();
-      resolve();
-    } else {
-      console.log('Test myPromise Pas OK');
+
+    try {
+
+      if (deltaHum > 2) {
+        console.log(
+          magenta,
+          '[ GESTION HUM CALCULES  ] DeltaHum >  0 : On ne fait rien'
+        );
+        //! ----------------------------------------
+        //
+        resolve();
+      } else if (deltaHum <= 2 && deltaHum >= -2) {
+        //*
+        //* Pas d'action car interval entre 2% et -2%"
+        //*
+        //! ----------------------------------------
+        //
+        resolve();
+      } else if (deltaHum >= -5 && deltaHum < -2) {
+        //
+
+        let eau = () => {
+          //* Activation de l'eau au sol.
+
+          new Gpio(16, 'out');
+
+          console.log(
+            magenta,
+            "[ GESTION HUM CALCULES  ] DeltaHum <  0 : Activation de l'eau au sol."
+          );
+        };
+        eau();
+
+        //* Déactivation de l'eau au sol.
+        setTimeout((eau) => {
+          new Gpio(16, 'in');
+
+          console.log(
+            magenta,
+            "[ GESTION HUM CALCULES  ] Déactivation de l'eau au sol."
+          );
+          resolve();
+        }, 10000);
+        //! ----------------------------------------
+        //
+      } else if (deltaHum >= -10 && deltaHum < -5) {
+        //
+
+        let eau = () => {
+          //* Activation de l'eau au sol.
+
+          new Gpio(16, 'out');
+
+          console.log(
+            magenta,
+            "[ GESTION HUM CALCULES  ] DeltaHum <  0 : Activation de l'eau au sol."
+          );
+        };
+        eau();
+
+        //* Déactivation de l'eau au sol.
+        setTimeout((eau) => {
+          new Gpio(16, 'in');
+
+          console.log(
+            magenta,
+            "[ GESTION HUM CALCULES  ] Déactivation de l'eau au sol."
+          );
+
+          resolve();
+        }, 30000);
+        //! ----------------------------------------
+        //
+      } else if (deltaHum < -10) {
+        //
+
+        let eau = () => {
+          //* Activation de l'eau au sol.
+
+          new Gpio(16, 'out');
+
+          console.log(
+            magenta,
+            "[ GESTION HUM CALCULES  ] DeltaHum <  0 : Activation de l'eau au sol."
+          );
+        };
+        eau();
+
+        //* Déactivation de l'eau au sol.
+        setTimeout((eau) => {
+          new Gpio(16, 'in');
+
+          console.log(
+            magenta,
+            "[ GESTION HUM CALCULES  ] Déactivation de l'eau au sol."
+          );
+          resolve();
+        }, 120000);
+
+        //! ----------------------------------------
+      }
+
+    } catch (error) {
+
       reject();
+
+      console.log('ERREUR calcul action delta :', error);
+
     }
+
   });
 }
 
@@ -1578,19 +1813,19 @@ let enregistrementDesDonnees = () => {
 
     gestionHumModels
       .create({
-        tauxHumidite: 0,
-        deltaHum: 0,
+        tauxHumidite: tauxHumidite,
+        deltaHum: deltaHum,
         valeursMesureSec180: temperatureCorrigeeSec,
         valeursMesureHum90: temperatureCorrigeeHum,
         consigne: consigne,
-        valeurAxeX: 1,
-        jourDuCycle: 2,
+        valeurAxeX: valeurAxeX,
+        jourDuCycle: jourDuCycle,
       })
 
       .then((result) => {
 
         console.log(
-          "✅ %c SUCCÈS ==> gestions Hum ==> Enregistrement des données dans la BD sous l'ID =========>",
+          "✅ %c SUCCÈS ==> gestions Hum ==> Enregistrement des données dans la BD sous l'ID ============>",
           'color: green', result["dataValues"].id
         );
 
@@ -1623,6 +1858,8 @@ let handleMyPromise = async () => {
 
     await recuperationDeLaConsigne();
 
+    await constructionAxeX();
+
     await recuperationDeEtalonageSec();
 
     await getTemperaturesSec();
@@ -1631,7 +1868,7 @@ let handleMyPromise = async () => {
 
     await definitionTemperatureSeccorrigee();
 
-    // await tableauCorrespondanceSec();
+    await tableauCorrespondanceSec();
 
     await recuperationDeEtalonageHum();
 
@@ -1641,11 +1878,11 @@ let handleMyPromise = async () => {
 
     await definitionTemperatureHumcorrigee();
 
-    // await tableauCorrespondanceHum();
+    await tableauCorrespondanceHum();
 
-    // await calculeTauxHumidite();
+    await calculeTauxHumidite();
 
-    // await actionApresCalculeDelta();
+    await actionApresCalculeDelta();
 
     await enregistrementDesDonnees();
 
