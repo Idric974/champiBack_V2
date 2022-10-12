@@ -1,6 +1,6 @@
 const schedule = require('node-schedule');
 
-//*! 1) Gestion Air
+//*! 1) Gestion Air.
 
 //? Calcules.
 
@@ -247,7 +247,7 @@ const consigneCo2Auto = schedule.scheduleJob(' 02 * * * * ', () => {
 
 //! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-//*! 4) Gestion Substrat
+//*! 4) Gestion Substrat cronTab.
 
 //? Calcules.
 
