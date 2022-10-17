@@ -96,24 +96,24 @@ let recupérationDeLaConsigne = () => {
 
                             consigne = result['consigneAir'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de la Consigne Air ==> ",
-                                'color: green', consigne
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération de la Consigne Air ============>",
+                            //     'color: green', consigne
+                            // );
 
                             pas = result['pasAir'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération du Pas Air ==========> ",
-                                'color: green', pas
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération du Pas Air ====================>",
+                            //     'color: green', pas
+                            // );
 
                             objectif = result['objectifAir'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'Objectif Air ===> ",
-                                'color: green', objectif
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'Objectif Air =============>",
+                            //     'color: green', objectif
+                            // );
                         })
                         .then(() => {
 
@@ -159,10 +159,10 @@ let recuperationDeEtalonage = () => {
 
                             etalonnage = result['etalonnageAir'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage",
-                                'color: green', etalonnage
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'étalonage ================>",
+                            //     'color: green', etalonnage
+                            // );
                         })
                         .then(() => {
 
@@ -211,17 +211,17 @@ let recuperationEtatVanneFroid = () => {
 
                             etatVanneBDD = result['etatRelay'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'état de la vanne froid",
-                                'color: green', etatVanneBDD
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération de l'état de la vanne froid ===>",
+                            //     'color: green', etatVanneBDD
+                            // );
 
                             deltaAirPrecedent = result['deltaAir'];
 
-                            console.log(
-                                "✅ %c SUCCÈS ==> gestions Air ==> Récupération du delta air",
-                                'color: green', deltaAirPrecedent
-                            );
+                            // console.log(
+                            //     "✅ %c SUCCÈS ==> gestions Air ==> Récupération du delta air ==================>",
+                            //     'color: green', deltaAirPrecedent
+                            // );
 
                         }).then(() => {
 
@@ -457,10 +457,10 @@ let calculeDeLaTemperatureMoyenne = () => {
 
             temperatureMoyenneAir = Math.round((sumlistValAir / arrayLength) * 100) / 100;
 
-            console.log(
-                "✅ %c SUCCÈS ==> gestions Air ==> Temperature air moyenne",
-                'color: green ', temperatureMoyenneAir
-            );
+            // console.log(
+            //     "✅ %c SUCCÈS ==> gestions Air ==> Temperature air moyenne ====================>",
+            //     'color: green ', temperatureMoyenneAir
+            // );
 
             resolve();
 
@@ -490,10 +490,10 @@ let definitionTemperatureAirCorrigee = () => {
             temperatureCorrigee =
                 parseFloat(temperatureMoyenneAir.toFixed(1)) + etalonnage;
 
-            console.log(
-                "✅ %c SUCCÈS ==> gestions Air ==> Définition de la température air corrigée ===> ",
-                'color: green', temperatureCorrigee
-            );
+            // console.log(
+            //     "✅ %c SUCCÈS ==> gestions Air ==> Définition de la température air corrigée ==>",
+            //     'color: green', temperatureCorrigee
+            // );
 
             resolve();
 
@@ -522,10 +522,10 @@ let definitionDuDelta = () => {
 
             delta = parseFloat((temperatureCorrigee - consigne).toFixed(1));
 
-            console.log(
-                "✅ %c SUCCÈS ==> gestions Air ==> Définition du delta ===> ",
-                'color: green', delta
-            );
+            // console.log(
+            //     "✅ %c SUCCÈS ==> gestions Air ==> Définition du delta ========================>",
+            //     'color: green', delta
+            // );
 
             resolve();
 
@@ -550,10 +550,13 @@ let definitionDesActions = () => {
 
         try {
             if (delta > 1.5) {
-                //
+
                 //! Condition à 40 secondes.
 
-                let preconisation = 40000;
+                console.log(
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta > 1.5");
+
+                let dureeAction = 40000;
 
                 new Gpio(23, 'out');
 
@@ -579,7 +582,7 @@ let definitionDesActions = () => {
                     miseAjourEtatRelay();
                     //
                     resolve();
-                }, preconisation);
+                }, dureeAction);
 
                 //! -----------------------------------------------
                 //
@@ -587,14 +590,17 @@ let definitionDesActions = () => {
                 //
                 //! Condition à 15 secondes.
 
-                let preconisation = 15000;
+                console.log(
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta <= 1.5 && delta > 1");
+
+                let dureeAction = 15000;
 
                 new Gpio(23, 'out');
 
                 if (etatVanneBDD >= 100) {
                     etatRelay = 100;
                 } else {
-                    etatRelay = 37.5;
+                    etatRelay = etatVanneBDD + 37.5;
                 }
 
                 actionRelay = 1;
@@ -608,7 +614,7 @@ let definitionDesActions = () => {
                     miseAjourEtatRelay();
                     //
                     resolve();
-                }, preconisation);
+                }, dureeAction);
 
                 //! -----------------------------------------------
                 //
@@ -616,14 +622,17 @@ let definitionDesActions = () => {
                 //
                 //! Condition à 5 secondes.
 
-                let preconisation = 5000;
+                console.log(
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta <= 1 && delta > 0.5");
+
+                let dureeAction = 5000;
 
                 new Gpio(23, 'out');
 
                 if (etatVanneBDD >= 100) {
                     etatRelay = 100;
                 } else {
-                    etatRelay = 12.5;
+                    etatRelay = etatVanneBDD + 12.5;
                 }
 
                 actionRelay = 1;
@@ -637,7 +646,7 @@ let definitionDesActions = () => {
                     miseAjourEtatRelay();
                     //
                     resolve();
-                }, preconisation);
+                }, dureeAction);
 
                 //! -----------------------------------------------
                 //
@@ -645,14 +654,17 @@ let definitionDesActions = () => {
                 //
                 //! Condition à 2 secondes.
 
-                let preconisation = 2000;
+                console.log(
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta <= 0.5 && delta > 0.3");
+
+                let dureeAction = 2000;
 
                 new Gpio(23, 'out');
 
                 if (etatVanneBDD >= 100) {
                     etatRelay = 100;
                 } else {
-                    etatRelay = 5;
+                    etatRelay = etatVanneBDD + 5;
                 }
 
                 actionRelay = 1;
@@ -666,13 +678,17 @@ let definitionDesActions = () => {
                     miseAjourEtatRelay();
                     //
                     resolve();
-                }, preconisation);
+                }, dureeAction);
 
                 //! -----------------------------------------------
                 //
             } else if (delta <= 0.3 && delta >= -0.3) {
                 //***************************************************************
                 //! Pas d'action car interval entre -0.3 et 0.3"
+
+                console.log(
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta <= 0.3 && delta >= -0.3");
+
                 etatRelay = etatVanneBDD;
                 miseAjourEtatRelay();
                 resolve();
@@ -681,17 +697,19 @@ let definitionDesActions = () => {
                 //
                 //! Condition à 2 secondes.
 
-                let preconisation = 2000;
+                console.log(
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action fermeture ==> delta >= -0.5 && delta < -0.3");
+
+                let dureeAction = 2000;
 
                 new Gpio(22, 'out');
 
                 if (etatVanneBDD <= 0) {
                     etatRelay = 0;
                 } else {
-                    etatRelay = preconisation;
+                    etatRelay = etatVanneBDD - 5;
                 }
 
-                etatRelay = 5;
                 actionRelay = 1;
                 miseAjourEtatRelay();
 
@@ -703,7 +721,7 @@ let definitionDesActions = () => {
                     miseAjourEtatRelay();
                     //
                     resolve();
-                }, preconisation);
+                }, dureeAction);
 
                 //! -----------------------------------------------
                 //
@@ -711,17 +729,19 @@ let definitionDesActions = () => {
                 //
                 //! Condition à 5 secondes.
 
-                let preconisation = 5000;
+                console.log(
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action fermeture ==> delta > -1 && delta < -0.5");
+
+                let dureeAction = 5000;
 
                 new Gpio(22, 'out');
 
                 if (etatVanneBDD <= 0) {
                     etatRelay = 0;
                 } else {
-                    etatRelay = preconisation;
+                    etatRelay = etatVanneBDD - 12.5;
                 }
 
-                etatRelay = 12.5;
                 actionRelay = 1;
                 miseAjourEtatRelay();
 
@@ -733,7 +753,7 @@ let definitionDesActions = () => {
                     miseAjourEtatRelay();
                     //
                     resolve();
-                }, preconisation);
+                }, dureeAction);
 
                 //! -----------------------------------------------
                 //
@@ -741,14 +761,17 @@ let definitionDesActions = () => {
                 //
                 //! Condition à 15 secondes.
 
-                let preconisation = 15000;
+                console.log(
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action fermeture ==> delta >= -1.5 && delta < -1");
+
+                let dureeAction = 15000;
 
                 new Gpio(22, 'out');
 
                 if (etatVanneBDD <= 0) {
                     etatRelay = 0;
                 } else {
-                    etatRelay = 37.5;
+                    etatRelay = etatVanneBDD - 37.5;
                 }
 
                 actionRelay = 1;
@@ -762,7 +785,7 @@ let definitionDesActions = () => {
                     miseAjourEtatRelay();
                     //
                     resolve();
-                }, preconisation);
+                }, dureeAction);
 
                 //! -----------------------------------------------
                 //
@@ -770,14 +793,17 @@ let definitionDesActions = () => {
                 //
                 //! Condition à 5 secondes.
 
-                let preconisation = 40000;
+                console.log(
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action fermeture ==> delta < -1.5");
+
+                let dureeAction = 40000;
 
                 new Gpio(22, 'out');
 
                 if (etatVanneBDD <= 0) {
                     etatRelay = 0;
                 } else {
-                    etatRelay = 100;
+                    etatRelay = 0;
                 }
 
                 actionRelay = 1;
@@ -791,7 +817,7 @@ let definitionDesActions = () => {
                     miseAjourEtatRelay();
                     //
                     resolve();
-                }, preconisation);
+                }, dureeAction);
 
                 //! -----------------------------------------------
                 //
