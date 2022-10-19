@@ -52,11 +52,10 @@ const getTauxCo2 = new Promise((resolve, reject) => {
       resp.on('end', () => {
         // console.log(
         //   'data 2 ============>',
-        //   parseFloat(data.split('undefined')[1])
+        //   parseFloat(data.split('undefined"')[1])
         // );
 
-        tauxCo2 = parseFloat(data.split('undefined')[1]);
-        //tauxCo2 = data.split('"')[1].split('\\')[0];
+        tauxCo2 = parseFloat(data.split('undefined"')[1]);
 
         // console.log('*************** : ', tauxCo2);
       });
@@ -88,7 +87,7 @@ let actionGetTauxCo2 = async () => {
 
 //! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//! Action saprès validation.
+//! Action après validation.
 
 actionGetTauxCo2(tauxCo2)
   //
@@ -132,8 +131,8 @@ actionGetTauxCo2(tauxCo2)
               console.log(
                 cyan,
                 '[ GESTION CO2 CALCULES  ] Le taux de Co2 est de :' +
-                  tauxCo2 +
-                  ' ppm'
+                tauxCo2 +
+                ' ppm'
               );
               // console.log(
               //   cyan,
