@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const url = 'http://192.168.1.9:4000/api/getSms/getSms';
+const url = 'http://192.168.1.4:4000/api/getSms/getSms';
 let smsList;
 
 axios

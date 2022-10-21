@@ -5,6 +5,8 @@ const jaune = '\x1b[33m';
 const sequelize = require('sequelize');
 const Sequelize = require('sequelize');
 const db = require('../../models');
+const axios = require('axios');
+const numSalle = require('../../configNumSalle');
 
 //! -------------------------------------------------- !
 
@@ -57,6 +59,46 @@ let miseAjourEtatRelay = () => {
                 .catch((err) => console.log(err));
         });
 };
+
+//? --------------------------------------------------
+
+//? Envoyer un SMS d’alerte.
+
+const sendSMS = (temperatureDuMessage) => {
+
+    console.log('temperatureDuMessage :', temperatureDuMessage);
+
+    //! Url de la master.
+    const url = 'http://192.168.1.10:5000/api/postSms/postSms';
+
+    let date1 = new Date();
+
+    let dateLocale = date1.toLocaleString('fr-FR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+    });
+
+    let message = `ALERTE : Salle ${numSalle} | ${temperatureDuMessage} | ${dateLocale}`;
+
+    axios
+        .post(url, {
+            message,
+        })
+        .then(function (response) {
+            console.log('Reponse de SMS808 : ', response.data);
+            resolve();
+        })
+        .catch(function (error) {
+            console.log(error);
+            reject();
+        });
+
+}
 
 //? --------------------------------------------------
 
@@ -549,12 +591,57 @@ let definitionDesActions = () => {
     return new Promise((resolve, reject) => {
 
         try {
-            if (delta > 1.5) {
+
+            if (delta >= 3) {
+
+                console.log(
+                    "🔺 %c SUCCÈS ==> gestions Air ==> ALERTE, le delta est supérieur à 3°C");
+
+                //  let temperatureDuMessage = 'le delta est supérieur à 3°C'
+
+                // sendSMS(temperatureDuMessage);
 
                 //! Condition à 40 secondes.
 
                 console.log(
-                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta > 1.5");
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta >= 3");
+
+                let dureeAction = 40000;
+
+                new Gpio(23, 'out');
+
+                // console.log('Ouverture du froid');
+
+                if (etatVanneBDD >= 100) {
+                    etatRelay = 100;
+                } else {
+                    etatRelay = 100;
+                }
+
+                actionRelay = 1;
+
+                miseAjourEtatRelay();
+
+                setTimeout(() => {
+                    //
+                    new Gpio(23, 'in');
+
+                    // console.log('FIN Ouverture du froid');
+
+                    actionRelay = 0;
+                    miseAjourEtatRelay();
+                    //
+                    resolve();
+                }, dureeAction);
+
+                //! -----------------------------------------------
+
+            } else if (delta > 1.5 && delta < 3) {
+
+                //! Condition à 40 secondes.
+
+                console.log(
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta > 1.5 && delta < 3");
 
                 let dureeAction = 40000;
 
@@ -586,12 +673,12 @@ let definitionDesActions = () => {
 
                 //! -----------------------------------------------
                 //
-            } else if (delta <= 1.5 && delta > 1) {
+            } else if (delta > 1 && delta <= 1.5) {
                 //
                 //! Condition à 15 secondes.
 
                 console.log(
-                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta <= 1.5 && delta > 1");
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta > 1 && delta <= 1.5");
 
                 let dureeAction = 15000;
 
@@ -618,12 +705,13 @@ let definitionDesActions = () => {
 
                 //! -----------------------------------------------
                 //
-            } else if (delta <= 1 && delta > 0.5) {
+            } else if (delta > 0.5 && delta <= 1) {
                 //
                 //! Condition à 5 secondes.
 
                 console.log(
-                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta <= 1 && delta > 0.5");
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta > 0.5 && delta <= 1");
+
 
                 let dureeAction = 5000;
 
@@ -650,12 +738,12 @@ let definitionDesActions = () => {
 
                 //! -----------------------------------------------
                 //
-            } else if (delta <= 0.5 && delta > 0.3) {
+            } else if (delta > 0.3 && delta <= 0.5) {
                 //
                 //! Condition à 2 secondes.
 
                 console.log(
-                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta <= 0.5 && delta > 0.3");
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta > 0.3 && delta <= 0.5");
 
                 let dureeAction = 2000;
 
@@ -682,23 +770,28 @@ let definitionDesActions = () => {
 
                 //! -----------------------------------------------
                 //
-            } else if (delta <= 0.3 && delta >= -0.3) {
+            } else if (delta >= -0.3 && delta <= 0.3) {
+
                 //***************************************************************
+
                 //! Pas d'action car interval entre -0.3 et 0.3"
 
                 console.log(
-                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta <= 0.3 && delta >= -0.3");
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta >= -0.3 && delta <= 0.3");
 
                 etatRelay = etatVanneBDD;
+                actionRelay = 0;
                 miseAjourEtatRelay();
                 resolve();
+
                 //***************************************************************
-            } else if (delta >= -0.5 && delta < -0.3) {
+
+            } else if (delta < -0.3 && delta >= -0.5) {
                 //
                 //! Condition à 2 secondes.
 
                 console.log(
-                    "⭐ %c SUCCÈS ==> gestions Air ==> Action fermeture ==> delta >= -0.5 && delta < -0.3");
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta < -0.3 && delta >= -0.5");
 
                 let dureeAction = 2000;
 
@@ -725,12 +818,12 @@ let definitionDesActions = () => {
 
                 //! -----------------------------------------------
                 //
-            } else if (delta > -1 && delta < -0.5) {
+            } else if (delta < -0.5 && delta >= -1) {
                 //
                 //! Condition à 5 secondes.
 
                 console.log(
-                    "⭐ %c SUCCÈS ==> gestions Air ==> Action fermeture ==> delta > -1 && delta < -0.5");
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta < -0.5 && delta >= -1");
 
                 let dureeAction = 5000;
 
@@ -757,12 +850,12 @@ let definitionDesActions = () => {
 
                 //! -----------------------------------------------
                 //
-            } else if (delta >= -1.5 && delta < -1) {
+            } else if (delta < -1 && delta >= -1.5) {
                 //
                 //! Condition à 15 secondes.
 
                 console.log(
-                    "⭐ %c SUCCÈS ==> gestions Air ==> Action fermeture ==> delta >= -1.5 && delta < -1");
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action fermeture ==> delta < -1 && delta >= -1.5");
 
                 let dureeAction = 15000;
 
@@ -789,8 +882,47 @@ let definitionDesActions = () => {
 
                 //! -----------------------------------------------
                 //
-            } else if (delta < -1.5) {
+            } else if (delta < -1.5 && delta < -3) {
                 //
+                //! Condition à 5 secondes.
+
+                console.log(
+                    "⭐ %c SUCCÈS ==> gestions Air ==> Action fermeture ==> delta < -1.5 && delta < -3");
+
+                let dureeAction = 40000;
+
+                new Gpio(22, 'out');
+
+                if (etatVanneBDD <= 0) {
+                    etatRelay = 0;
+                } else {
+                    etatRelay = 0;
+                }
+
+                actionRelay = 1;
+                miseAjourEtatRelay();
+
+                setTimeout(() => {
+                    //
+                    new Gpio(22, 'in');
+
+                    actionRelay = 0;
+                    miseAjourEtatRelay();
+                    //
+                    resolve();
+                }, dureeAction);
+
+                //! -----------------------------------------------
+                //
+            } else if (delta <= -3) {
+
+                console.log(
+                    "🔺 %c SUCCÈS ==> gestions Air ==> ALERTE, le delta est supérieur à -3°C");
+
+                // let temperatureDuMessage = 'le delta est inférieur à -3°C'
+
+                // sendSMS(temperatureDuMessage);
+
                 //! Condition à 5 secondes.
 
                 console.log(
@@ -820,13 +952,16 @@ let definitionDesActions = () => {
                 }, dureeAction);
 
                 //! -----------------------------------------------
-                //
+
             }
+
         } catch (error) {
-            logger.info(
-                'Fchier source : gestionAir | Module : Définition des actions | Type erreur : ',
-                error
-            );
+            // logger.info(
+            //     'Fchier source : gestionAir | Module : Définition des actions | Type erreur : ',
+            //     error
+            // );
+
+            console.log('🔴 Définition des actions :', error);
 
             reject();
 

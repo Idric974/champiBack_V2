@@ -1,8 +1,10 @@
 const axios = require('axios');
 
-const url = 'http://192.168.1.9:4000/api/postSms/postSms';
+//! Url de la master.
+const url = 'http://192.168.1.4:4000/api/postSms/postSms';
 
-let message = "Message test du 05/08/2022 ==> 11h54";
+let date = new Date();
+let message = `Salut c'est bon, l'application post et reçoit les messages : ${date}`;
 
 axios
   .post(url, {
