@@ -281,7 +281,7 @@ let getTemperaturesSec = () => {
 
         //console.log(temps++);
 
-        if (temps++ === 9) {
+        if (temps++ === 39) {
           clearInterval(conteur);
 
         }
@@ -300,8 +300,8 @@ let getTemperaturesSec = () => {
             //   'color: green', listValSec
             // );
 
-            if (listValSec.length >= 10) {
-              // console.log('listValSec.length >=10');
+            if (listValSec.length >= 40) {
+              // console.log('listValSec.length >=40');
               resolve()
             }
           });
@@ -993,7 +993,7 @@ let getTemperaturesHum = () => {
 
         //console.log(temps++);
 
-        if (temps++ === 9) {
+        if (temps++ === 39) {
           clearInterval(conteur);
 
         }
@@ -1012,8 +1012,8 @@ let getTemperaturesHum = () => {
             //   'color: green', listValHum
             // );
 
-            if (listValHum.length >= 10) {
-              // console.log('listValHum.length >=10');
+            if (listValHum.length >= 40) {
+              // console.log('listValHum.length >=40');
               resolve()
             }
           });
