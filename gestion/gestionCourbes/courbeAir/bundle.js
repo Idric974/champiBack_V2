@@ -206,6 +206,7 @@ let consigneCourbeAir;
 
 let loopNumberAir;
 let loopNumberConsigne;
+let axiosResponse;
 
 const getDataCourbeAir = () => {
     return new Promise((resolve, reject) => {
@@ -216,6 +217,8 @@ const getDataCourbeAir = () => {
         })
             .then((response) => {
                 console.log('🟢 SUCCESS AIR 1/7 ==> Récupération des datas courbes air :', response.data);
+
+                axiosResponse = response.status
 
                 //* Tempèrature air.
 
@@ -240,9 +243,18 @@ const getDataCourbeAir = () => {
 
                 //* ---------------------------------------------------
 
-                resolve();
+            })
 
-            }).catch((error) => {
+            .then(() => {
+
+                if (axiosResponse === 200) {
+                    resolve();
+                } else {
+                    reject();
+                }
+            })
+
+            .catch((error) => {
 
                 console.log('🔴 ERREUR AIR 1/7 ==> Récupération des datas courbes air :', error);
 
@@ -256,7 +268,6 @@ const getDataCourbeAir = () => {
 
 //? Stockage de la température de l'air.
 
-
 let valeurTemperatureAir = [];
 
 const stockageTempératureAir = () => {
@@ -264,37 +275,17 @@ const stockageTempératureAir = () => {
 
         try {
 
-            let loopCont = 0;
+            dataCourbeAir.forEach((item, index) =>
+                valeurTemperatureAir.push({
+                    // x: item['createdAt'],
+                    x: item['valeurAxeX'],
+                    y: item['temperatureAir'],
+                })
+            );
 
-            const forLoop = async _ => {
+            resolve();
 
-                for (let i = 0; i < loopNumberAir.length; i++) {
-
-                    loopCont++;
-
-                    // console.log(`Num loop ============> ${loopCont}/${loopNumberAir.length}`);
-
-                    dataCourbeAir.forEach((item, index) =>
-                        valeurTemperatureAir.push({
-                            // x: item['createdAt'],
-                            x: item['valeurAxeX'],
-                            y: item['temperatureAir'],
-                        })
-                    );
-
-                    if (loopCont === loopNumberAir.length) {
-
-                        resolve();
-
-                        console.log('🟢 SUCCESS AIR 2/7 ==> Valeur temperature air :', valeurTemperatureAir);
-                    }
-
-                };
-
-                console.log("FIN Stockage de la température de l'air")
-            }
-
-            forLoop();
+            console.log('🟢 SUCCESS AIR 2/7 ==> Valeur temperature air :', valeurTemperatureAir.length);
 
         } catch (error) {
 
@@ -318,36 +309,16 @@ const stockageConsigneAir = () => {
 
         try {
 
-            let loopCont = 0;
+            consigneCourbeAir.forEach((item, index) =>
+                valeurConsigneAir.push({
+                    x: item['valeurAxeX'],
+                    y: item['consigne'],
+                })
+            );
 
-            const forLoop = async _ => {
+            resolve();
 
-                for (let i = 0; i < loopNumberConsigne.length; i++) {
-
-                    loopCont++;
-
-                    // console.log(`Num loop ============> ${loopCont}/${loopNumberConsigne.length}`);
-
-                    consigneCourbeAir.forEach((item, index) =>
-                        valeurConsigneAir.push({
-                            x: item['valeurAxeX'],
-                            y: item['consigne'],
-                        })
-                    );
-
-                    if (loopCont === loopNumberConsigne.length) {
-
-                        resolve();
-
-                        console.log('🟢 SUCCESS AIR 3/7 ==> Valeur consigne air :', valeurConsigneAir);
-                    }
-
-                };
-
-                console.log('FIN Stockage de la consigne air')
-            }
-
-            forLoop();
+            console.log('🟢 SUCCESS AIR 3/7 ==> Valeur consigne air :', valeurConsigneAir.length);
 
         } catch (error) {
 
@@ -449,6 +420,8 @@ let constructionDuGraphiqueTemperatureAir = () => {
 
 //? Récupération des datas vanne air.
 
+let loopNumberVanne;
+
 const getDataVanneAir = () => {
     return new Promise((resolve, reject) => {
 
@@ -460,6 +433,11 @@ const getDataVanneAir = () => {
                 console.log('🟢 SUCCESS AIR 5/7 ==> Récupération des datas vanne air :', response.data);
 
                 dataCourbeAirVanne = response.data.temperatureAirCourbe;
+
+                loopNumberVanne = Object.keys(dataCourbeAirVanne).map(function (cle) {
+                    return [Number(cle), dataCourbeAir[cle]];
+                });
+                console.log('loopNumberVanne :', loopNumberVanne.length);
 
                 resolve();
 
@@ -495,59 +473,7 @@ const stockageDesValeuresVanne = () => {
 
             resolve();
 
-            console.log('🟢 SUCCESS AIR 6/7 ==> Stockage des valeures vanne :', dataCourbeAirVanne);
-
-
-            let loopCont = 0;
-
-            const forLoop = async _ => {
-
-                for (let i = 0; i < loopNumberAir.length; i++) {
-
-                    loopCont++;
-
-                    // console.log(`Num loop ============> ${loopCont}/${loopNumberAir.length}`);
-
-                    dataCourbeAir.forEach((item, index) =>
-                        valeurTemperatureAir.push({
-                            // x: item['createdAt'],
-                            x: item['valeurAxeX'],
-                            y: item['temperatureAir'],
-                        })
-                    );
-
-                    if (loopCont === loopNumberAir.length) {
-
-                        resolve();
-
-                        console.log('🟢 SUCCESS AIR 2/7 ==> Valeur temperature air :', valeurTemperatureAir);
-                    }
-
-                };
-
-                console.log('End')
-            }
-
-            forLoop();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            console.log('🟢 SUCCESS AIR 6/7 ==> Stockage des valeures vanne :', dataCourbeAirVanne.length);
 
         } catch (error) {
 
@@ -648,9 +574,9 @@ const handleMyPromise = async () => {
         await constructionDuGraphiqueTemperatureAir();
 
         //* Graphique vanne air.
-        //  await getDataVanneAir();
-        //  await stockageDesValeuresVanne();
-        // await constructionDuGraphiqueVanneAir();
+        await getDataVanneAir();
+        await stockageDesValeuresVanne();
+        await constructionDuGraphiqueVanneAir();
 
     }
     catch (err) {

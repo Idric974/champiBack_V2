@@ -202,6 +202,10 @@ let consigneCourbeCo2;
 
 //? Récupération des datas courbes.
 
+let loopNumberCo2;
+let loopNumberConsigne;
+let axiosResponse;
+
 const getDataCourbeAir = () => {
     return new Promise((resolve, reject) => {
 
@@ -212,13 +216,43 @@ const getDataCourbeAir = () => {
             .then((response) => {
                 console.log('🟢 SUCCESS CO2 1/4 ==> Récupération des datas courbes Co2:', response.data);
 
+                axiosResponse = response.status
+
+                //* Tempèrature air.
+
                 dataCourbeCo2 = response.data.tauxCo2Courbe;
+
+                loopNumberCo2 = Object.keys(dataCourbeCo2).map(function (cle) {
+                    return [Number(cle), dataCourbeCo2[cle]];
+                });
+                console.log('loopNumberCo2 :', loopNumberCo2.length);
+
+                //* ---------------------------------------------------
+
+                //* Consigne air.
 
                 consigneCourbeCo2 = response.data.tauxCo2Courbe;
 
-                resolve();
+                loopNumberConsigne = Object.keys(consigneCourbeCo2).map(function (cle) {
+                    return [Number(cle), consigneCourbeCo2[cle]];
+                });
 
-            }).catch((error) => {
+                console.log('loopNumberConsigne :', loopNumberConsigne.length);
+
+                //* ---------------------------------------------------
+
+            })
+
+            .then(() => {
+
+                if (axiosResponse === 200) {
+                    resolve();
+                } else {
+                    reject();
+                }
+            })
+
+            .catch((error) => {
 
                 console.log('🔴 ERREUR CO2 1/4 ==> Récupération des datas courbes Co2 :', error);
 
@@ -419,7 +453,7 @@ const handleMyPromiseCo2 = async () => {
     }
 };
 
-// handleMyPromiseCo2();
+handleMyPromiseCo2();
 },{"axios":3,"chart.js":32,"chartjs-plugin-zoom":34}],3:[function(require,module,exports){
 module.exports = require('./lib/axios');
 },{"./lib/axios":5}],4:[function(require,module,exports){
