@@ -91,11 +91,11 @@ const sendSMS = (temperatureDuMessage) => {
         })
         .then(function (response) {
             console.log('Reponse de SMS808 : ', response.data);
-            resolve();
+
         })
         .catch(function (error) {
             console.log(error);
-            reject();
+
         });
 
 }
