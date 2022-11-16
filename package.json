@@ -41,6 +41,7 @@
     "express": "^4.17.2",
     "fs": "^0.0.1-security",
     "gpio": "^0.2.10",
+    "hammerjs": "^2.0.8",
     "mcp-spi-adc": "^3.2.0",
     "moment": "^2.29.1",
     "mysql": "^2.18.1",

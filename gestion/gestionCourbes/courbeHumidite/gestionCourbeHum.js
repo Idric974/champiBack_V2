@@ -28,8 +28,6 @@ const getDataCourbe = () => {
         })
             .then((response) => {
 
-                console.log('🟢 SUCCESS HUM 1/4 ==> Récupération des datas courbes :', response.data.tauxHumiditeCourbe);
-
                 axiosResponse = response.status
 
                 //* Humidité air.
@@ -39,7 +37,8 @@ const getDataCourbe = () => {
                 loopNumberHum = Object.keys(dataCourbeHumidite).map(function (cle) {
                     return [Number(cle), dataCourbeHumidite[cle]];
                 });
-                console.log('loopNumberHum :', loopNumberHum.length);
+
+                // console.log('loopNumberHum :', loopNumberHum.length);
 
                 //* ---------------------------------------------------
 
@@ -51,9 +50,11 @@ const getDataCourbe = () => {
                     return [Number(cle), consigneCourbeHumidite[cle]];
                 });
 
-                console.log('loopNumberConsigneHum :', loopNumberConsigneHum.length);
+                // console.log('loopNumberConsigneHum :', loopNumberConsigneHum.length);
 
                 //* ---------------------------------------------------
+
+                console.log('🟢 SUCCESS HUM 1/4 ==> Get datas :', response.data.tauxHumiditeCourbe.length);
 
             })
 
@@ -68,7 +69,7 @@ const getDataCourbe = () => {
 
             .catch((error) => {
 
-                console.log('🔴 ERREUR HUM 1/4 ==> Récupération des datas courbes:', error);
+                console.log('🔴 ERREUR HUM 1/4 ==> Get datas :', error);
 
                 reject();
             });
@@ -97,11 +98,11 @@ const stockageValeuresTauxHumidite = () => {
 
             resolve();
 
-            console.log('🟢 SUCCESS HUM 2/4 ==> Stockage des valeures taux humidité :', valeurTauxHumidite.length);
+            console.log('🟢 SUCCESS HUM 2/4 ==> Stockage valeures :', valeurTauxHumidite.length);
 
         } catch (error) {
 
-            console.log("🔴 ERREUR HUM 2/4 ==> Stockage des valeures taux humidité :", error);
+            console.log("🔴 ERREUR HUM 2/4 ==> Stockage valeures :", error);
 
             reject();
 
@@ -131,11 +132,11 @@ const stockageConsignehumidite = () => {
 
             resolve();
 
-            console.log('🟢 SUCCESS HUM 3/4 ==> Valeur consigne humidité :', valeurConsigneHumidite.length);
+            console.log('🟢 SUCCESS HUM 3/4 ==> Stockage consigne :', valeurConsigneHumidite.length);
 
         } catch (error) {
 
-            console.log("🔴 ERREUR  HUM 3/4 ==> Stockage de la consigne humidité :", error);
+            console.log("🔴 ERREUR  HUM 3/4 ==> Stockage consigne :", error);
 
             reject();
 
@@ -233,13 +234,13 @@ let constructionDuGraphiquehumiditeAir = () => {
 
             const myChartHum = new Chart(ctxHum, configHum);
 
-            console.log('🟢 SUCCESS HUM 4/4 ==> Construction du graphique Gestion courbes humidité');
+            console.log('🟢 SUCCESS HUM 4/4 ==> Construction graphique');
 
             resolve();
 
         } catch (error) {
 
-            console.log("🔴 ERREUR HUM 4/4 ==> Construction du graphique Gestion courbes humidité:", error);
+            console.log("🔴 ERREUR HUM 4/4 ==> Construction graphique :", error);
 
             reject();
 

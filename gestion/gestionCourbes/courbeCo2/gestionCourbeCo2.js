@@ -27,7 +27,6 @@ const getDataCourbeAir = () => {
             method: 'get',
         })
             .then((response) => {
-                console.log('🟢 SUCCESS CO2 1/4 ==> Récupération des datas courbes Co2:', response.data);
 
                 axiosResponse = response.status
 
@@ -38,7 +37,8 @@ const getDataCourbeAir = () => {
                 loopNumberCo2 = Object.keys(dataCourbeCo2).map(function (cle) {
                     return [Number(cle), dataCourbeCo2[cle]];
                 });
-                console.log('loopNumberCo2 :', loopNumberCo2.length);
+
+                // console.log('loopNumberCo2 :', loopNumberCo2.length);
 
                 //* ---------------------------------------------------
 
@@ -50,9 +50,11 @@ const getDataCourbeAir = () => {
                     return [Number(cle), consigneCourbeCo2[cle]];
                 });
 
-                console.log('loopNumberConsigne :', loopNumberConsigne.length);
+                // console.log('loopNumberConsigne :', loopNumberConsigne.length);
 
                 //* ---------------------------------------------------
+
+                console.log('🟢 SUCCESS CO2 1/4 ==> Get datas :', response.data.tauxCo2Courbe.length);
 
             })
 
@@ -67,7 +69,7 @@ const getDataCourbeAir = () => {
 
             .catch((error) => {
 
-                console.log('🔴 ERREUR CO2 1/4 ==> Récupération des datas courbes Co2 :', error);
+                console.log('🔴 ERREUR CO2 1/4 ==> Get datas :', error);
 
                 reject();
             });
@@ -95,11 +97,11 @@ const stockageValeuresCo2 = () => {
 
             resolve();
 
-            console.log('🟢 SUCCESS CO2 2/4 ==> Stockage des valeures Co2 :', valeurTauxCo2);
+            console.log('🟢 SUCCESS CO2 2/4 ==> Stockage valeures :', valeurTauxCo2);
 
         } catch (error) {
 
-            console.log("🔴 ERREUR CO2 2/4 ==> Stockage des valeures Co2 :", error);
+            console.log("🔴 ERREUR CO2 2/4 ==> Stockage valeures :", error);
 
             reject();
 
@@ -129,11 +131,11 @@ const stockageConsigneCo2 = () => {
 
             resolve();
 
-            console.log('🟢 SUCCESS CO2 3/4 ==> Valeur consigne air :', valeurConsigneCo2);
+            console.log('🟢 SUCCESS CO2 3/4 ==> Stockage consigne :', valeurConsigneCo2);
 
         } catch (error) {
 
-            console.log("🔴 ERREUR CO2 3/4 ==> Stockage de la consigne air :", error);
+            console.log("🔴 ERREUR CO2 3/4 ==> Stockage consigne :", error);
 
             reject();
 
@@ -231,13 +233,13 @@ let constructionDuGraphiqueCo2 = () => {
             const myChartCo2 = new Chart(ctxCo2, configCo2);
 
 
-            console.log('🟢 SUCCESS CO2 4/4 ==> Construction du graphique Gestion courbes Co2');
+            console.log('🟢 SUCCESS CO2 4/4 ==> Construction graphique');
 
             resolve();
 
         } catch (error) {
 
-            console.log("🔴 ERREUR CO2 4/7 ==> Construction du graphique Gestion courbes Co2 :", error);
+            console.log("🔴 ERREUR CO2 4/7 ==> Construction graphique :", error);
 
             reject();
 

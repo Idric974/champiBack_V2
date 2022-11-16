@@ -195,68 +195,54 @@ const zoomPlugin = require('chartjs-plugin-zoom');
 
 //! Les variables.
 
-let dataCourbeHumidite;
-let consigneCourbeHumidite;
+let dataCourbeAir;
 
 //! --------------------------------------------------------------
 
-//? Récupération des datas courbes air.
+//? Récupération des datas vanne air.
 
-let loopNumberHum;
-let loopNumberConsigneHum;
+let loopNumberVanne;
 let axiosResponse;
 
-const getDataCourbe = () => {
+const getDataVanneAir = () => {
     return new Promise((resolve, reject) => {
 
         axios({
-            url: 'http://localhost:3003/api/gestionCourbeRoutes/getTauxHumiditeCourbe/',
+            url: 'http://localhost:3003/api/gestionCourbeRoutes/getTemperatureAirCourbe/',
             method: 'get',
         })
             .then((response) => {
 
                 axiosResponse = response.status
 
-                //* Humidité air.
+                dataCourbeAirVanne = response.data.temperatureAirCourbe;
 
-                dataCourbeHumidite = response.data.tauxHumiditeCourbe;
-
-                loopNumberHum = Object.keys(dataCourbeHumidite).map(function (cle) {
-                    return [Number(cle), dataCourbeHumidite[cle]];
+                loopNumberVanne = Object.keys(dataCourbeAirVanne).map(function (cle) {
+                    return [Number(cle), dataCourbeAirVanne[cle]];
                 });
 
-                // console.log('loopNumberHum :', loopNumberHum.length);
+                // console.log('loopNumberVanne :', loopNumberVanne.length);
 
-                //* ---------------------------------------------------
-
-                //* Consigne air.
-
-                consigneCourbeHumidite = response.data.tauxHumiditeCourbe;
-
-                loopNumberConsigneHum = Object.keys(consigneCourbeHumidite).map(function (cle) {
-                    return [Number(cle), consigneCourbeHumidite[cle]];
-                });
-
-                // console.log('loopNumberConsigneHum :', loopNumberConsigneHum.length);
-
-                //* ---------------------------------------------------
-
-                console.log('🟢 SUCCESS HUM 1/4 ==> Get datas :', response.data.tauxHumiditeCourbe.length);
+                console.log('🟢 SUCCESS VANNE 1/3 ==> Get datas :', response.data.temperatureAirCourbe.length);
 
             })
 
             .then(() => {
 
                 if (axiosResponse === 200) {
+
                     resolve();
+
                 } else {
                     reject();
                 }
             })
 
+
+
             .catch((error) => {
 
-                console.log('🔴 ERREUR HUM 1/4 ==> Get datas :', error);
+                console.log('🔴 ERREUR VANNE 1/3 ==> Get datas :', error);
 
                 reject();
             });
@@ -266,30 +252,31 @@ const getDataCourbe = () => {
 
 //? -------------------------------------------------
 
-//? Stockage des valeures taux humidité.
+//? Stockage des valeures vanne.
 
-let valeurTauxHumidite = [];
+let dataCourbeAirVanne;
+let valeurTemperatureAirVanne = [];
 
-const stockageValeuresTauxHumidite = () => {
+const stockageDesValeuresVanne = () => {
     return new Promise((resolve, reject) => {
 
         try {
 
-            dataCourbeHumidite.forEach((item, index) =>
-                valeurTauxHumidite.push({
-                    // x: item['createdAt'].split('.')[0].split('T')[0],
+            dataCourbeAirVanne.forEach((item, index) =>
+                valeurTemperatureAirVanne.push({
+                    // x: item['createdAt'],
                     x: item['valeurAxeX'],
-                    y: item['tauxHumidite'],
+                    y: item['etatRelay'],
                 })
             );
 
             resolve();
 
-            console.log('🟢 SUCCESS HUM 2/4 ==> Stockage valeures :', valeurTauxHumidite.length);
+            console.log('🟢 SUCCESS VANNE 2/3 ==> Stockage valeures :', dataCourbeAirVanne.length);
 
         } catch (error) {
 
-            console.log("🔴 ERREUR HUM 2/4 ==> Stockage valeures :", error);
+            console.log("🔴 ERREUR VANNE 2/3 ==> Stockage valeures :", error);
 
             reject();
 
@@ -300,134 +287,69 @@ const stockageValeuresTauxHumidite = () => {
 
 //? -------------------------------------------------
 
-//? Stockage de la consigne humidité.
+//? Construction du graphique vanne air.
 
-let valeurConsigneHumidite = [];
-
-const stockageConsignehumidite = () => {
+let constructionDuGraphiqueVanneAir = () => {
     return new Promise((resolve, reject) => {
 
         try {
 
-            consigneCourbeHumidite.forEach((item, index) =>
-                valeurConsigneHumidite.push({
-                    // x: item['createdAt'].split('.')[0].split('T')[0],
-                    x: item['valeurAxeX'],
-                    y: item['consigne'],
-                })
-            );
+            const ctxVanne = document
+                .getElementById('myChartAirVanne')
+                .getContext('2d');
 
-            resolve();
-
-            console.log('🟢 SUCCESS HUM 3/4 ==> Stockage consigne :', valeurConsigneHumidite.length);
-
-        } catch (error) {
-
-            console.log("🔴 ERREUR  HUM 3/4 ==> Stockage consigne :", error);
-
-            reject();
-
-        }
-
-    });
-}
-
-//? -------------------------------------------------
-
-//? Construction du graphique humidité air.
-
-let constructionDuGraphiquehumiditeAir = () => {
-    return new Promise((resolve, reject) => {
-
-        try {
-
-            const ctxHum = document.getElementById('myChartHum').getContext('2d');
-
-
-            const myLabelsHum = [];
+            const myLabelsVanne = [];
 
             const data = {
-                labels: myLabelsHum,
+                labels: myLabelsVanne,
 
                 datasets: [
                     // Courbe taux humidité
                     {
-                        label: 'Courbe Taux Humidité',
-                        data: valeurTauxHumidite,
+                        label: 'Courbe Vanne Air',
+                        data: valeurTemperatureAirVanne,
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
                         borderColor: 'rgba(255, 99, 132, 1)',
                         borderWidth: 1,
                         lineTension: 0.2,
                         pointRadius: 0,
-                        // xAxisID: 'xAxis1',
                     },
-
-                    // Courbe consigne humidité
-                    {
-                        label: 'Courbe Consigne humidité',
-                        data: valeurConsigneHumidite,
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1,
-                        lineTension: 0.2,
-                        pointRadius: 0,
-                        // xAxisID: 'xAxis2',
-                    },
-                    // ------------------------------
                 ],
             };
 
-            const optionsHum = {
+            const optionsVanne = {
                 animation: {
                     duration: 0,
                 },
                 scales: {
-                    x: {
-                        display: false,
-                        // id: 'xAxis1',
-                        time: {
-                            displayFormats: {
-                                quarter: 'HH:mm',
-                            },
-                        },
-                        ticks: {
-                            // callback: function (label) {
-                            // },
-                        },
-                    },
+                    x: {},
 
-                    x: {
-                        display: false,
-                        // id: 'xAxis2',
-                        time: {
-                            displayFormats: {
-                                quarter: 'HH:mm',
+                    y: {
+                        ticks: {
+                            // Include a dollar sign in the ticks
+                            callback: function (item, index, ticks) {
+                                return item + '%';
                             },
                         },
-                        ticks: {
-                            // callback: function (label) {
-                            // },
-                        },
                     },
-                    y: {},
                 },
             };
 
-            const configHum = {
+            const configVanne = {
                 type: 'line',
                 data,
-                optionsHum,
+                optionsVanne,
             };
 
-            const myChartHum = new Chart(ctxHum, configHum);
+            new Chart(ctxVanne, configVanne);
 
-            console.log('🟢 SUCCESS HUM 4/4 ==> Construction graphique');
+            console.log('🟢 SUCCESS VANNE 3/3 ==> Construction graphique');
 
             resolve();
 
         } catch (error) {
 
-            console.log("🔴 ERREUR HUM 4/4 ==> Construction graphique :", error);
+            console.log("🔴 ERREUR VANNE 3/3 ==> Construction graphique :", error);
 
             reject();
 
@@ -440,15 +362,14 @@ let constructionDuGraphiquehumiditeAir = () => {
 
 //! Resolve promise. 
 
-const handleMyPromiseHum = async () => {
+const handleMyPromise = async () => {
 
     try {
 
-        //* Graphique température air.
-        await getDataCourbe();
-        await stockageValeuresTauxHumidite();
-        await stockageConsignehumidite();
-        await constructionDuGraphiquehumiditeAir();
+        //* Graphique vanne air.
+        await getDataVanneAir();
+        await stockageDesValeuresVanne();
+        await constructionDuGraphiqueVanneAir();
 
     }
     catch (err) {
@@ -456,7 +377,7 @@ const handleMyPromiseHum = async () => {
     }
 };
 
-handleMyPromiseHum();
+handleMyPromise();
 },{"axios":3,"chart.js":32,"chartjs-plugin-zoom":34}],3:[function(require,module,exports){
 module.exports = require('./lib/axios');
 },{"./lib/axios":5}],4:[function(require,module,exports){
