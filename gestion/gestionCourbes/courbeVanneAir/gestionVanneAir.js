@@ -114,9 +114,11 @@ let constructionDuGraphiqueVanneAir = () => {
             const myLabelsVanne = [];
 
             const data = {
+
                 labels: myLabelsVanne,
 
                 datasets: [
+
                     // Courbe taux humidité
                     {
                         label: 'Courbe Vanne Air',
@@ -131,9 +133,11 @@ let constructionDuGraphiqueVanneAir = () => {
             };
 
             const optionsVanne = {
+
                 animation: {
                     duration: 0,
                 },
+
                 scales: {
                     x: {},
 

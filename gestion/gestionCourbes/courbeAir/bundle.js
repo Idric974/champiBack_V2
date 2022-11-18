@@ -338,11 +338,12 @@ const stockageConsigneAir = () => {
 //? Construction du graphique temperature air.
 
 let constructionDuGraphiqueTemperatureAir = () => {
+
     return new Promise((resolve, reject) => {
 
         try {
 
-            const ctx = document.getElementById('myChartAir').getContext('2d');
+            const ctxAir = document.getElementById('myChartAir').getContext('2d');
 
             const myLabelsAir = [];
 
@@ -361,6 +362,7 @@ let constructionDuGraphiqueTemperatureAir = () => {
                         borderWidth: 1,
                         lineTension: 0.2,
                         pointRadius: 0,
+                        // xAxisID: 'xAxis1',
                     },
 
                     // Courbe consigne air.
@@ -372,52 +374,34 @@ let constructionDuGraphiqueTemperatureAir = () => {
                         borderWidth: 1,
                         lineTension: 0.2,
                         pointRadius: 0,
-                        // display: false,
+                        // xAxisID: 'xAxis2',
                     },
+                    // ------------------------------
                 ],
             };
 
-            const options = {
-
+            const optionsAir = {
                 animation: {
                     duration: 0,
                 },
 
-                scales: {
-                    x: {},
-
-                    y: {},
-                },
-
-                plugins: {
-                    zoom: {
-                        zoom: {
-                            wheel: {
-                                enabled: true
-                            }
-                        }
-                    },
-                },
-
             };
 
-            const config = {
+            const configCo2 = {
                 type: 'line',
                 data,
-                options,
+                optionsAir,
             };
 
-            Chart.register(zoomPlugin);
+            new Chart(ctxAir, configCo2);
 
-            new Chart(ctx, config);
-
-            console.log('🟢 SUCCESS AIR 4/4 ==> Construction graphique');
+            console.log('🟢 SUCCESS CO2 4/4 ==> Construction graphique');
 
             resolve();
 
         } catch (error) {
 
-            console.log("🔴 ERREUR AIR 4/4 ==> Construction graphique :", error);
+            console.log("🔴 ERREUR CO2 4/7 ==> Construction graphique :", error);
 
             reject();
 

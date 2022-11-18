@@ -1759,7 +1759,7 @@ let actionApresCalculeDelta = () => {
           );
 
           resolve();
-        }, 30000);
+        }, 10000);
         //! ----------------------------------------
         //
       } else if (deltaHum < -10) {
@@ -1786,7 +1786,7 @@ let actionApresCalculeDelta = () => {
             "[ GESTION HUM CALCULES  ] Déactivation de l'eau au sol."
           );
           resolve();
-        }, 120000);
+        }, 10000);
 
         //! ----------------------------------------
       }

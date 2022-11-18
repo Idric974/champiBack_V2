@@ -601,12 +601,12 @@ let definitionDesActions = () => {
 
                 // sendSMS(temperatureDuMessage);
 
-                //! Condition à 15 secondes.
+                //! Condition à 40 secondes.
 
                 console.log(
                     "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta >= 3");
 
-                let dureeAction = 15000;
+                let dureeAction = 40000;
 
                 new Gpio(23, 'out');
 
@@ -638,12 +638,12 @@ let definitionDesActions = () => {
 
             } else if (delta > 1.5 && delta < 3) {
 
-                //! Condition à 15 secondes.
+                //! Condition à 40 secondes.
 
                 console.log(
                     "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta > 1.5 && delta < 3");
 
-                let dureeAction = 15000;
+                let dureeAction = 40000;
 
                 new Gpio(23, 'out');
 
@@ -680,7 +680,7 @@ let definitionDesActions = () => {
                 console.log(
                     "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta > 1 && delta <= 1.5");
 
-                let dureeAction = 5000;
+                let dureeAction = 15000;
 
                 new Gpio(23, 'out');
 
@@ -713,7 +713,7 @@ let definitionDesActions = () => {
                     "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta > 0.5 && delta <= 1");
 
 
-                let dureeAction = 2000;
+                let dureeAction = 5000;
 
                 new Gpio(23, 'out');
 
@@ -745,7 +745,7 @@ let definitionDesActions = () => {
                 console.log(
                     "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta > 0.3 && delta <= 0.5");
 
-                let dureeAction = 1000;
+                let dureeAction = 2000;
 
                 new Gpio(23, 'out');
 
@@ -793,7 +793,7 @@ let definitionDesActions = () => {
                 console.log(
                     "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta < -0.3 && delta >= -0.5");
 
-                let dureeAction = 1000;
+                let dureeAction = 2000;
 
                 new Gpio(22, 'out');
 
@@ -825,7 +825,7 @@ let definitionDesActions = () => {
                 console.log(
                     "⭐ %c SUCCÈS ==> gestions Air ==> Action ouverture ==> delta < -0.5 && delta >= -1");
 
-                let dureeAction = 2000;
+                let dureeAction = 5000;
 
                 new Gpio(22, 'out');
 
@@ -857,7 +857,7 @@ let definitionDesActions = () => {
                 console.log(
                     "⭐ %c SUCCÈS ==> gestions Air ==> Action fermeture ==> delta < -1 && delta >= -1.5");
 
-                let dureeAction = 5000;
+                let dureeAction = 15000;
 
                 new Gpio(22, 'out');
 
@@ -889,7 +889,7 @@ let definitionDesActions = () => {
                 console.log(
                     "⭐ %c SUCCÈS ==> gestions Air ==> Action fermeture ==> delta < -1.5 && delta < -3");
 
-                let dureeAction = 15000;
+                let dureeAction = 40000;
 
                 new Gpio(22, 'out');
 
@@ -928,7 +928,7 @@ let definitionDesActions = () => {
                 console.log(
                     "⭐ %c SUCCÈS ==> gestions Air ==> Action fermeture ==> delta < -1.5");
 
-                let dureeAction = 15000;
+                let dureeAction = 40000;
 
                 new Gpio(22, 'out');
 

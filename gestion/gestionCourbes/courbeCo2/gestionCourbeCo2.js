@@ -149,6 +149,7 @@ const stockageConsigneCo2 = () => {
 //? Construction du graphique temperature air.
 
 let constructionDuGraphiqueCo2 = () => {
+
     return new Promise((resolve, reject) => {
 
         try {
@@ -230,7 +231,7 @@ let constructionDuGraphiqueCo2 = () => {
                 optionsCo2,
             };
 
-            const myChartCo2 = new Chart(ctxCo2, configCo2);
+            new Chart(ctxCo2, configCo2);
 
 
             console.log('🟢 SUCCESS CO2 4/4 ==> Construction graphique');

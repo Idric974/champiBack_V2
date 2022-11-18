@@ -18,6 +18,7 @@
     margin: 10px 0px 10px 0px;
     background: #f1f1f1;
     border-radius: 10px;
+
 }
 
 .container-onglets {
@@ -117,26 +118,27 @@
 }
 
 .boxButtonDemCycle {
+    /* border: solid red 1px; */
     width: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
 }
 
 .cont {
     /* border: solid green 1px; */
-    width: 100%;
+    width: 32.5%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-items: center;
     color: white;
     font-weight: bolder;
     text-align: center;
+    margin-left: 10px;
 }
 
-.cont1 {
-    /* border: solid green 1px; */
+/* .cont1 {
+    border: solid green 1px;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -146,11 +148,11 @@
     font-weight: bolder;
     font-size: 1.2rem;
     text-align: center;
-}
+} */
 
 .cont2 {
-    /* border: solid green 1px; */
-    width: 100%;
+    border: solid #e59500 1px;
+    width: 32.5%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -159,27 +161,30 @@
     font-weight: bolder;
     font-size: 1.2rem;
     text-align: center;
+    padding: 20px 5px 20px 5px;
+    border-radius: 10px;
 }
 
 .cont3 {
-    /* border: solid green 1px; */
-    width: 100%;
+    border: solid #e59500 1px;
+    width: 32.5%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-items: center;
-    color: black;
     color: #e59500;
     font-weight: bolder;
+    border-radius: 10px;
     font-size: 3.5rem;
     text-align: center;
+    padding: 1px 5px 1px 5px;
+    margin-right: 10px;
+
 }
 
 .demarrerCycleButton {
-    width: 90%;
-    padding: 10px 10px 10px 10px;
+    width: 100%;
+    padding: 15px 10px 15px 10px;
     background-color: #e59500;
-    margin: 10px;
+    margin: 10px 5px 10px 0px;
     color: white;
     font-weight: bolder;
     border-radius: 10px;
