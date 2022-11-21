@@ -19,9 +19,6 @@ const brocheRoutes = require('./routes/broche');
 // SMS
 const orderSmsRoutes = require('./routes/gestionSmsOrders');
 
-
-
-
 //! Utilisation de cors pour les connexions
 
 const cors = require('cors');

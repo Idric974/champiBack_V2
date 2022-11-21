@@ -1,4 +1,5 @@
 const mysql = require('mysql');
+const fs = require('fs');
 
 const con = mysql.createConnection({
     host: 'localhost',
@@ -6,7 +7,6 @@ const con = mysql.createConnection({
     password: 'Kup33uC4W6',
     database: 'champyresi',
 });
-
 
 //! Champs à modifier.
 

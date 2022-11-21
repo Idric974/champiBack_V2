@@ -882,7 +882,7 @@ let definitionDesActions = () => {
 
                 //! -----------------------------------------------
                 //
-            } else if (delta < -1.5 && delta < -3) {
+            } else if (delta < -1.5 && delta > -3) {
                 //
                 //! Condition à 5 secondes.
 

@@ -9,14 +9,14 @@ const con = mysql.createConnection({
 
 //* gestionAir.
 
-// let table = 'gestion_airs';
+let table = 'gestion_airs';
 // let table = 'gestion_airs_datas';
 // let table = 'gestion_airs_etalonnages';
 // let table = 'gestion_airs_etat_relays';
 
 //* gestion Hummidité.
 
-let table = 'gestion_hums';
+//let table = 'gestion_hums';
 // let table = 'gestion_hums_datas';
 // let table = 'gestion_hums_etalonnage_hums';
 // let table = 'gestion_hums_etalonnage_secs';
@@ -51,7 +51,7 @@ con.connect(function (err) {
     'SELECT * FROM ' + table + ' WHERE id=(SELECT max(id) FROM ' + table + ')',
     function (err, result) {
       if (err) throw err;
-      console.log(result);
+      console.log(result[0].temperatureAir);
     }
   );
 });
