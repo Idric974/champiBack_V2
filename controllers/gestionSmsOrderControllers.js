@@ -10,8 +10,7 @@ const gestionAirsModels = db.gestionAir;
 
 exports.postSmsOrder = (req, res) => {
 
-    let numSalleBrut = req.body.message.split(':')[1]
-    let numSalle = numSalleBrut;
+    let numSalle = req.body.numSalle;
     console.log('NUMERO DE LA SALLE :', numSalle);
 
     //!  les promesses.

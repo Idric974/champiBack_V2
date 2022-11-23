@@ -144,4 +144,42 @@ const recuperationTemperatureEtDeltat = () => {
     });
 }
 
-recuperationTemperatureEtDeltat();
+// recuperationTemperatureEtDeltat();
+
+const instructionStatut = 5;
+switch (instructionStatut) {
+    case 1:
+        numSalle = 1;
+        console.log('numSalle ====================> :', numSalle);
+        resolve();
+        break;
+    case 2:
+        numSalle = 2;
+        console.log('numSalle ====================> :', numSalle);
+        resolve();
+        break;
+    case 3:
+        numSalle = 3;
+        console.log('numSalle ====================> :', numSalle);
+        resolve();
+        break;
+    case 3:
+        numSalle = 4;
+        console.log('numSalle ====================> :', numSalle);
+        resolve();
+        break;
+    case 3:
+        numSalle = 6;
+        console.log('numSalle ====================> :', numSalle);
+        resolve();
+        break;
+    case 3:
+        numSalle = 6;
+        console.log('numSalle ====================> :', numSalle);
+        resolve();
+        break;
+    default:
+        console.log(`Pas de correspondance trouvée pour la valeur suivante : ${instructionStatut}.`);
+    //reject();
+}
+
