@@ -597,9 +597,9 @@ let definitionDesActions = () => {
                 console.log(
                     "🔺 %c SUCCÈS ==> gestions Air ==> ALERTE, le delta est supérieur à 3°C");
 
-                //  let temperatureDuMessage = 'le delta est supérieur à 3°C'
+                let temperatureDuMessage = 'le delta est supérieur à 3°C'
 
-                // sendSMS(temperatureDuMessage);
+                sendSMS(temperatureDuMessage);
 
                 //! Condition à 15 secondes.
 
@@ -919,9 +919,9 @@ let definitionDesActions = () => {
                 console.log(
                     "🔺 %c SUCCÈS ==> gestions Air ==> ALERTE, le delta est supérieur à -3°C");
 
-                // let temperatureDuMessage = 'le delta est inférieur à -3°C'
+                let temperatureDuMessage = 'le delta est inférieur à -3°C'
 
-                // sendSMS(temperatureDuMessage);
+                sendSMS(temperatureDuMessage);
 
                 //! Condition à 5 secondes.
 

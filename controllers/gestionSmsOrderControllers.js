@@ -5,6 +5,7 @@ const Sequelize = require('sequelize');
 const gestionAirsDataModels = db.gestionAirData;
 const gestionAirsModels = db.gestionAir;
 
+let pi = '10'
 
 //! RÉCUPÉRATION DES DATAS.
 
@@ -112,14 +113,15 @@ exports.postSmsOrder = (req, res) => {
 
                 //* Url de la master.
 
-                const url = 'http://192.168.1.7:4000/api/postSms/postSms'; //* Idric
-                // const url = 'http://192.168.1.6:4000/api/postSms/postSms'; //* Antoine
+                const url = `http://192.168.1.${pi}:4000/api/postSms/postSms`; //* Idric
+                // const url = 'http://192.168.0.10:4000/api/postSms/postSms'; //* Antoine
 
                 //* -------------------------------------------------
 
                 //* Paramétrage du message.
 
                 let message = `Salle = ${numSalle} | Temperature Air = ${temperatureAir} | Consigne Air = ${consigne} | Delta Air = ${deltaAir}`;
+                console.log('message :', message);
 
                 //* -------------------------------------------------
 
@@ -235,7 +237,7 @@ exports.newConsigne = (req, res) => {
                             })
                             .then((datatemperatureAir) => {
 
-                                getNewConsigne = datatemperatureAir['consigne']
+                                getNewConsigne = datatemperatureAir['consigneAir']
                                 console.log('New Consigne Air:', getNewConsigne);
 
                             }).then(() => {
@@ -258,11 +260,20 @@ exports.newConsigne = (req, res) => {
         return new Promise((resolve, reject) => {
             try {
 
-                //! Url de la master.
-                const url = 'http://192.168.1.7:4000/api/postSms/postSms'; //* Idric
-                // const url = 'http://192.168.1.6:4000/api/postSms/postSms'; //* Antoine
+                //* Url de la master.
 
-                let message = `Salle = ${numSalle} | Nouvelle Consigne Air = ${getNewConsigne}`
+                const url = `http://192.168.1.${pi}:4000/api/postSms/postSms`;; //* Idric
+                // const url = 'http://192.168.0.10:4000/api/postSms/postSms'; //* Antoine
+
+                //* -------------------------------------------------
+
+                //* Paramétrage du message.
+
+                let message = `Salle = ${numSalle} | Nouvelle Consigne Air = ${getNewConsigne}`;
+
+                //* -------------------------------------------------
+
+                //* Post du message. 
 
                 axios
                     .post(url, {
@@ -279,6 +290,8 @@ exports.newConsigne = (req, res) => {
                         console.log('ERROR AXIOS : Envoi des résultats de la requête get consigne par SMS', error);
 
                     });
+
+                //* -------------------------------------------------
 
             } catch (error) {
                 reject();
