@@ -53,7 +53,8 @@ let getTemperatureAir = () => {
     method: 'get',
   })
     .then((response) => {
-      console.log(response.data);
+
+      // console.log(response.data);
 
       temperatureAir = response.data.temperatureAir.temperatureAir;
 
