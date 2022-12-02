@@ -15,13 +15,13 @@ let consigneCourbeAir;
 
 //! Construction du graphique température air.
 
-//? Récupération des datas courbes air.
+//? Chargement des datas.
 
 let loopNumberAir;
 let loopNumberConsigne;
-let axiosResponse;
+let tailleTAbleau;
 
-const getDataCourbeAir = () => {
+const chargementDatas = () => {
     return new Promise((resolve, reject) => {
 
         axios({
@@ -29,52 +29,70 @@ const getDataCourbeAir = () => {
             method: 'get',
         })
             .then((response) => {
-
-                axiosResponse = response.status
-
-                //* Tempèrature air.
+                // console.log("Datas ==> ", response.data.temperatureAirCourbe);
 
                 dataCourbeAir = response.data.temperatureAirCourbe;
 
-                loopNumberAir = Object.keys(dataCourbeAir).map(function (cle) {
-                    return [Number(cle), dataCourbeAir[cle]];
-                });
-
-                // console.log('loopNumberAir :', loopNumberAir.length);
-
-                //* ---------------------------------------------------
-
-                //* Consigne air.
-
                 consigneCourbeAir = response.data.temperatureAirCourbe;
 
-                loopNumberConsigne = Object.keys(consigneCourbeAir).map(function (cle) {
-                    return [Number(cle), consigneCourbeAir[cle]];
-                });
+                tailleTAbleau = response.data.temperatureAirCourbe.length;
+                console.log("Total data à récupérer ===>", tailleTAbleau);
 
-                // console.log('loopNumberConsigne :', loopNumberConsigne.length);
+                let counter = 0;
 
-                //* ---------------------------------------------------
+                for (let i = 0; i < tailleTAbleau; i++) {
 
-                console.log('🟢 SUCCESS AIR 1/4 ==> Get datas :', response.data.temperatureAirCourbe.length);
+                    counter++;
+                    if (counter === tailleTAbleau) {
+                        console.log("Total data récupérée =====>", counter);
 
-            })
+                        console.log('🟢 SUCCESS AIR 1/5 ==> Chargement des datas.');
 
-            .then(() => {
-
-                if (axiosResponse === 200) {
-                    resolve();
-                } else {
-                    reject();
-                }
+                        resolve();
+                    }
+                };
             })
 
             .catch((error) => {
-
-                console.log('🔴 ERREUR AIR 1/4 ==> Get datas :', error);
-
+                console.log('🔴 ERREUR AIR 1/5 ==> Chargement des datas :', error);
                 reject();
             });
+    });
+}
+
+//? -------------------------------------------------
+
+//? Récupération des datas courbes air.
+
+let getDataCourbeAir = () => {
+    return new Promise((resolve, reject) => {
+
+        try {
+
+            //* Tempèrature air.
+
+            loopNumberAir = Object.keys(dataCourbeAir).map(function (cle) {
+                return [Number(cle), dataCourbeAir[cle]];
+            });
+
+            //* ---------------------------------------------------
+
+            //* Consigne air.
+
+            loopNumberConsigne = Object.keys(consigneCourbeAir).map(function (cle) {
+                return [Number(cle), consigneCourbeAir[cle]];
+            });
+
+            //* ---------------------------------------------------
+            console.log("🟢 SUCCESS AIR 2/5 ==> Récupération des datas courbes air.");
+
+            resolve();
+
+        }
+        catch (error) {
+            console.log("🔴 ERREUR AIR 2/5 ==> Récupération des datas courbes air :", error);
+            reject();
+        }
 
     });
 }
@@ -90,26 +108,27 @@ const stockageTempératureAir = () => {
 
         try {
 
-            dataCourbeAir.forEach((item, index) =>
+            dataCourbeAir.forEach((item, index) => {
                 valeurTemperatureAir.push({
-                    // x: item['createdAt'],
+
                     x: item['valeurAxeX'],
                     y: item['temperatureAir'],
-                })
+                });
+
+                if (tailleTAbleau === valeurTemperatureAir.length) {
+
+                    resolve();
+
+                    console.log('🟢 SUCCESS AIR 3/5 ==> Stockage valeures :', valeurTemperatureAir.length);
+
+                }
+            }
             );
 
-            resolve();
-
-            console.log('🟢 SUCCESS AIR 2/4 ==> Stockage valeures :', valeurTemperatureAir.length);
-
         } catch (error) {
-
-            console.log("🔴 ERREUR AIR 2/4 ==> Stockage valeures :", error);
-
+            console.log("🔴 ERREUR AIR 3/5 ==> Stockage valeures :", error);
             reject();
-
         }
-
     });
 }
 
@@ -133,16 +152,15 @@ const stockageConsigneAir = () => {
 
             resolve();
 
-            console.log('🟢 SUCCESS AIR 3/4 ==> Stockage consigne :', valeurConsigneAir.length);
+            console.log('🟢 SUCCESS AIR 4/5 ==> Stockage consigne :', valeurConsigneAir.length);
 
         } catch (error) {
 
-            console.log("🔴 ERREUR AIR 3/4 ==> Stockage consigne :", error);
+            console.log("🔴 ERREUR AIR 4/5 ==> Stockage consigne :", error);
 
             reject();
 
         }
-
     });
 }
 
@@ -208,13 +226,13 @@ let constructionDuGraphiqueTemperatureAir = () => {
 
             new Chart(ctxAir, configCo2);
 
-            console.log('🟢 SUCCESS CO2 4/4 ==> Construction graphique');
+            console.log('🟢 SUCCESS AIR 5/5 ==> Construction graphique.');
 
             resolve();
 
         } catch (error) {
 
-            console.log("🔴 ERREUR CO2 4/7 ==> Construction graphique :", error);
+            console.log("🔴 ERREUR AIR 5/5 ==> Construction graphique :", error);
 
             reject();
 
@@ -233,6 +251,7 @@ const handleMyPromise = async () => {
 
     try {
 
+        await chargementDatas();
         await getDataCourbeAir();
         await stockageTempératureAir();
         await stockageConsigneAir();

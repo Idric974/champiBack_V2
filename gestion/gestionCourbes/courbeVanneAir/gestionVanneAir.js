@@ -12,12 +12,13 @@ let dataCourbeAir;
 
 //! --------------------------------------------------------------
 
-//? Récupération des datas vanne air.
+//? Chargement des datas.
 
 let loopNumberVanne;
 let axiosResponse;
+let tailleTAbleau;
 
-const getDataVanneAir = () => {
+const chargementDatas = () => {
     return new Promise((resolve, reject) => {
 
         axios({
@@ -30,35 +31,56 @@ const getDataVanneAir = () => {
 
                 dataCourbeAirVanne = response.data.temperatureAirCourbe;
 
-                loopNumberVanne = Object.keys(dataCourbeAirVanne).map(function (cle) {
-                    return [Number(cle), dataCourbeAirVanne[cle]];
-                });
+                tailleTAbleau = response.data.temperatureAirCourbe.length;
 
-                // console.log('loopNumberVanne :', loopNumberVanne.length);
+                let counter = 0;
 
-                console.log('🟢 SUCCESS VANNE 1/3 ==> Get datas :', response.data.temperatureAirCourbe.length);
+                for (let i = 0; i < tailleTAbleau; i++) {
+
+                    counter++;
+                    if (counter === tailleTAbleau) {
+                        // console.log("Total data récupérée =====>", counter);
+
+                        console.log('🟢 SUCCESS VANNE 1/4 ==> Chargement des datas.');
+
+                        resolve();
+                    }
+                };
 
             })
-
-            .then(() => {
-
-                if (axiosResponse === 200) {
-
-                    resolve();
-
-                } else {
-                    reject();
-                }
-            })
-
-
 
             .catch((error) => {
 
-                console.log('🔴 ERREUR VANNE 1/3 ==> Get datas :', error);
+                console.log('🔴 ERREUR VANNE 1/4 ==> Get datas :', error);
 
                 reject();
             });
+
+    });
+}
+
+//? -------------------------------------------------
+
+//? Récupération des datas courbes air.
+
+let getDataVanneAir = () => {
+    return new Promise((resolve, reject) => {
+
+        try {
+
+            loopNumberVanne = Object.keys(dataCourbeAirVanne).map(function (cle) {
+                return [Number(cle), dataCourbeAirVanne[cle]];
+            });
+
+            console.log('🟢 SUCCESS VANNE 2/4 ==> Récupération des datas courbes air.');
+
+            resolve();
+
+        }
+        catch (error) {
+            console.log("🔴 ERREUR AIR 2/4 ==> Récupération des datas courbes air :", error);
+            reject();
+        }
 
     });
 }
@@ -85,11 +107,11 @@ const stockageDesValeuresVanne = () => {
 
             resolve();
 
-            console.log('🟢 SUCCESS VANNE 2/3 ==> Stockage valeures :', dataCourbeAirVanne.length);
+            console.log('🟢 SUCCESS VANNE 3/4 ==> Stockage valeures :', dataCourbeAirVanne.length);
 
         } catch (error) {
 
-            console.log("🔴 ERREUR VANNE 2/3 ==> Stockage valeures :", error);
+            console.log("🔴 ERREUR VANNE 3/4 ==> Stockage valeures :", error);
 
             reject();
 
@@ -160,13 +182,13 @@ let constructionDuGraphiqueVanneAir = () => {
 
             new Chart(ctxVanne, configVanne);
 
-            console.log('🟢 SUCCESS VANNE 3/3 ==> Construction graphique');
+            console.log('🟢 SUCCESS VANNE 4/4 ==> Construction graphique');
 
             resolve();
 
         } catch (error) {
 
-            console.log("🔴 ERREUR VANNE 3/3 ==> Construction graphique :", error);
+            console.log("🔴 ERREUR VANNE 4/4 ==> Construction graphique :", error);
 
             reject();
 
@@ -183,7 +205,7 @@ const handleMyPromise = async () => {
 
     try {
 
-        //* Graphique vanne air.
+        await chargementDatas();
         await getDataVanneAir();
         await stockageDesValeuresVanne();
         await constructionDuGraphiqueVanneAir();

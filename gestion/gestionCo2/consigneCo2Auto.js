@@ -5,6 +5,7 @@ require('dotenv').config();
 const sequelize = require('sequelize');
 const db = require('../../models');
 const gestionCo2sDataModels = db.gestionCo2Data;
+
 //*-------------------------------------
 
 //* Les variables.
@@ -13,160 +14,197 @@ let lastId;
 let consigne;
 let objectifCo2;
 let pasCo2;
-let palier;
 let newConsigne;
+let palier;
+
 //*-------------------------------------
 
-//! 1 ) ➖➖➖➖➖➖ Récupération de la dernière consigne➖➖➖➖➖➖
+//! Gestion des promesses.
 
-let derniereConsigne = () => {
-  gestionCo2sDataModels
-    .findOne({
-      attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
-      raw: true,
-    })
-    .then((id) => {
-      // console.log(id.maxid);
+//? Récupération de la dernière consigne.
+
+const recuperationDerniereConsigne = () => {
+  return new Promise((resolve, reject) => {
+    try {
 
       gestionCo2sDataModels
         .findOne({
-          where: { id: id.maxid },
+          attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
+          raw: true,
         })
-        .then((result) => {
-          // console.log(result);
+        .then((id) => {
 
-          lastId = result['id'];
-          // console.log('Id : ', lastId);
+          gestionCo2sDataModels
+            .findOne({
+              where: { id: id.maxid },
+            })
+            .then((result) => {
 
-          consigne = result['consigneCo2'];
+              try {
+                lastId = result['id'];
+                consigne = result['consigneCo2'];
+                pasCo2 = result['pasCo2'];
+                objectifCo2 = result['objectifCo2'];
+                deltaCo2 = result['deltaCo2'];
 
-          // console.log(
-          //   cyan,
-          //   '[ GESTION CO2 CONS AUTO ] Ancienne consigne : ',
-          //   consigne
-          // );
+                // console.log('result Co2 :',result);
 
-          pasCo2 = result['pasCo2'];
-          // console.log('pasCo2 : ', pasCo2);
+              } catch (error) {
+                console.log("🔴 ERROR : Récupération des datas");
+              }
 
-          objectifCo2 = result['objectifCo2'];
-          // console.log('objectifCo2 : ', objectifCo2);
+            })
+            .then(() => {
+              console.log(
+                jaune,
+                'Ancienne consigne : ',
+                consigne
+              );
 
-          deltaCo2 = result['deltaCo2'];
-          // console.log('deltaCo2 : ', deltaCo2);
+              if (lastId > 0) {
+                resolve();
+              }
+
+            });
         });
-    });
-};
-derniereConsigne();
 
-//! 2 ) ➖➖➖➖➖➖ Calcule de la nouvelle consigne ➖➖➖➖➖➖
+    } catch (error) {
+      console.log("🔴 ERROR : Récupération de la dernière consigne");
+      reject();
+    }
+  });
+}
 
-let gestionConsigne = () => {
-  //
-  //* Condition 1 ===> si consigne === objectifCo2.
+//? ------------------------------------------------
 
-  if (consigne === objectifCo2) {
-    newConsigne = objectifCo2;
-    // console.log(
-    //   cyan,
-    //   '[ GESTION CO2 CONS AUTO ] Action ======> Consigne = ObjectifCo2 | On ne fait rien'
-    // );
-  }
+//? Définition si consigne auto ou non.
 
-  //* Condition 2 ===> si consigne < objectifCo2.
+let definitionConsigneAuto = () => {
+  return new Promise((resolve, reject) => {
+    if (
 
-  if (consigne < objectifCo2) {
-    newConsigne = parseFloat(consigne + palier).toFixed(2);
+      pasCo2 == 0 ||
+      pasCo2 == '' ||
+      pasCo2 == null ||
+      objectifCo2 == 0 ||
+      objectifCo2 == '' ||
+      objectifCo2 == null
 
-    // console.log(
-    //   cyan,
-    //   '[ GESTION Co2 CONS AUTO ] Nouvelle consigne : ',
-    //   newConsigne
-    // );
+    ) {
+      console.log("Paramètre ===> Pas et Objectif non renseignés : GESTION CONSIGNE MANUELLE.");
 
-    let newConsigneValue = () => {
-      gestionCo2sDataModels
-        .update({ consigneCo2: newConsigne }, { where: { id: lastId } })
-        // .then(() =>
-        //   console.log(
-        //     cyan,
-        //     '[ GESTION Co2 CONS AUTO ] La consigne à été mis à jour'
-        //   )
-        // )
-        .catch((err) => console.log(err));
-    };
+      reject();
 
-    newConsigneValue();
+    } else if (
 
-    // console.log(
-    //   cyan,
-    //   '[ GESTION CO2 CONS AUTO ] Action ======> Gestion automatique de la consigne | On augmente la consigne à : ' +
-    //     newConsigne +
-    //     '°C'
-    // );
-  }
+      pasCo2 == 0 ||
+      pasCo2 == '' ||
+      pasCo2 == null ||
+      objectifCo2 == 0 ||
+      objectifCo2 == '' ||
+      objectifCo2 == null
 
-  //* Condition 3 ===> si consigne > objectifCo2.
+    ) {
 
-  if (consigne > objectifCo2) {
-    newConsigne = parseFloat(consigne - palier).toFixed(2);
+      console.log("Paramètre ===> Pas et Objectif renseignés : GESTION CONSIGNE AUTOMATIQUE.");
+      resolve();
 
-    // console.log(
-    //   cyan,
-    //   '[ GESTION Co2 CONS AUTO ] Nouvelle consigne : ',
-    //   newConsigne
-    // );
+    }
 
-    let newConsigneValue = () => {
-      gestionCo2sDataModels
-        .update({ consigneCo2: newConsigne }, { where: { id: lastId } })
-        // .then(() =>
-        //   console.log(
-        //     cyan,
-        //     '[ GESTION Co2 CONS AUTO ] La consigne à été mis à jour'
-        //   )
-        // )
-        .catch((err) => console.log(err));
-    };
+  });
+}
 
-    newConsigneValue();
+//? ------------------------------------------------
 
-    // console.log(
-    //   cyan,
-    //   '[ GESTION CO2 CONS AUTO ] Action ======> Gestion automatique de la consigne | On diminue la consigne à : ' +
-    //     newConsigne +
-    //     '°C'
-    // );
-  }
-};
-//-------------------------------------
+//? //! Définition de la condition.
 
-//! 3) ➖➖➖➖➖➖ Fonction qui décide de la consigne automatique ou manuelle ➖➖➖➖➖➖
+let DefinitionCondition = () => {
 
-setTimeout(() => {
   palier = pasCo2 / 12;
 
-  if (
-    pasCo2 == 0 ||
-    pasCo2 == '' ||
-    pasCo2 == null ||
-    objectifCo2 == 0 ||
-    objectifCo2 == '' ||
-    objectifCo2 == null
-  ) {
-    // console.log(
-    //   cyan,
-    //   '[ GESTION CO2 CONS AUTO ] Paramètre ===> (Pas et Objectif) non renseignés : GESTION CONSIGNE MANUELLE.'
-    // );
-    return;
-  }
-  if (pasCo2 !== 0 && objectifCo2 !== 0) {
-    // console.log(
-    //   cyan,
-    //   '[ GESTION CO2 CONS AUTO ] Paramètre ===> Pas et Objectif) renseignés : GESTION CONSIGNE AUTOMATIQUE.'
-    // );
-    gestionConsigne();
-  }
-}, 1000);
+  return new Promise((resolve, reject) => {
 
-setTimeout(() => {}, 1500);
+    //* Condition 1 ===> si consigne === objectifCo2.
+    if (consigne === objectifCo2) {
+
+      newConsigne = objectifCo2;
+
+      console.log(" Action ======> Consigne = ObjectifCo2 | On ne fait rien :", newConsigne);
+
+      resolve();
+
+      //* Condition 2 ===> si consigne <= objectifCo2.
+    } else if (consigne <= objectifCo2) {
+
+      newConsigne = parseFloat(consigne + palier).toFixed(2);
+
+      console.log(" Action ======> consigne <= objectifCo2 | Nouvelle consigne ➕ :", newConsigne
+      );
+
+      resolve();
+
+    }
+
+    //* Condition 3 ===> si consigne <= objectifCo2.
+    else if (consigne > objectifCo2) {
+
+      newConsigne = parseFloat(consigne - palier).toFixed(2);
+
+      console.log(" Action ======> consigne <= objectifCo2 | Nouvelle consigne ➖ :", newConsigne
+      );
+
+      resolve();
+    }
+
+    else {
+      console.log("🔴 ERROR : Définition de la condition");
+      reject();
+    }
+
+  });
+}
+
+//? ------------------------------------------------
+
+// ? Mise à jour de la consigne.
+
+const MiseAjourConsigne = () => {
+  return new Promise((resolve, reject) => {
+
+    gestionCo2sDataModels
+      .update({ consigneCo2: newConsigne }, { where: { id: lastId } })
+      .then((result) =>
+        console.log(" La consigne à été mis à jour Co2 :", result[0])
+      )
+      .then(() => {
+        resolve();
+      })
+      .catch((error) => {
+        console.log("🔴 ERROR : Mise à jour de la consigne Co2", error);
+        reject();
+      });
+  });
+}
+
+//? ------------------------------------------------
+
+//! ------------------------------------------------
+
+//! Exécution des promesses.
+
+let handleMyPromise = async () => {
+
+  try {
+    await recuperationDerniereConsigne();
+    await definitionConsigneAuto();
+    await DefinitionCondition();
+    await MiseAjourConsigne();
+  }
+  catch (err) {
+    console.log("🔺 ERROR : Exécution des promesses :", err);
+  }
+};
+
+handleMyPromise();
+
+//! ------------------------------------------------

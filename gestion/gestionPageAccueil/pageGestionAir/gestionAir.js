@@ -47,33 +47,38 @@ let temperatureAirLocalStorage;
 let deltaAir;
 let deltaAirLocalStorage;
 
-let getTemperatureAir = () => {
-  axios({
-    url: 'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/',
-    method: 'get',
-  })
-    .then((response) => {
+// let getTemperatureAir = () => {
+//   axios({
+//     url: 'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/',
+//     method: 'get',
+//   })
+//     .then((response) => {
 
-      // console.log(response.data);
+//       // console.log(response.data);
 
-      temperatureAir = response.data.temperatureAir.temperatureAir;
+//       temperatureAir = response.data.temperatureAir.temperatureAir;
 
-      localStorage.setItem('gestionAir ==> Tempèrature Air:', temperatureAir);
+//       localStorage.setItem('gestionAir ==> Tempèrature Air:', temperatureAir);
 
-      temperatureAirLocalStorage = localStorage.getItem(
-        'gestionAir ==> Tempèrature Air:'
-      );
+//       temperatureAirLocalStorage = localStorage.getItem(
+//         'gestionAir ==> Tempèrature Air:'
+//       );
 
-      document.getElementById('temperatureAir').innerHTML =
-        temperatureAirLocalStorage + '°C';
-    })
-    .catch((error) => {
-      console.log(error);
-      console.log(JSON.stringify(error));
-    });
-};
+//       document.getElementById('temperatureAir').innerHTML =
+//         temperatureAirLocalStorage + '°C';
+//     })
+//     .catch((error) => {
+//       console.log(error);
+//       console.log(JSON.stringify(error));
+//     });
+// };
 
-getTemperatureAir();
+// getTemperatureAir();
+
+
+
+
+
 
 setInterval(() => {
   getTemperatureAir();

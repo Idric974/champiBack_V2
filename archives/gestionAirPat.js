@@ -3,7 +3,7 @@
 const Gpio = require('onoff').Gpio;
 const sequelize = require('sequelize');
 const Sequelize = require('sequelize');
-const db = require('../../models');
+const db = require('../models');
 
 //! -------------------------------------------------- !
 

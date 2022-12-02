@@ -9,8 +9,8 @@ const con = mysql.createConnection({
 
 //* gestionAir.
 
-let table = 'gestion_airs';
-// let table = 'gestion_airs_datas';
+// let table = 'gestion_airs';
+let table = 'gestion_airs_datas';
 // let table = 'gestion_airs_etalonnages';
 // let table = 'gestion_airs_etat_relays';
 
@@ -51,7 +51,8 @@ con.connect(function (err) {
     'SELECT * FROM ' + table + ' WHERE id=(SELECT max(id) FROM ' + table + ')',
     function (err, result) {
       if (err) throw err;
-      console.log(result[0].temperatureAir);
+     // console.log(result[0].temperatureAir);
+        console.log(result);
     }
   );
 });

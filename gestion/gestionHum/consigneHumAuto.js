@@ -14,160 +14,197 @@ let lastId;
 let consigne;
 let objectifHum;
 let pasHum;
-let palier;
 let newConsigne;
+let palier;
+
 //*-------------------------------------
 
-//! 1 ) ➖➖➖➖➖➖ Récupération de la dernière consigne➖➖➖➖➖➖
+//! Gestion des promesses.
 
-let derniereConsigne = () => {
-  gestionHumsDataModels
-    .findOne({
-      attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
-      raw: true,
-    })
-    .then((id) => {
-      // console.log(id.maxid);
+//? Récupération de la dernière consigne.
+
+const recuperationDerniereConsigne = () => {
+  return new Promise((resolve, reject) => {
+    try {
 
       gestionHumsDataModels
         .findOne({
-          where: { id: id.maxid },
+          attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
+          raw: true,
         })
-        .then((result) => {
-          // console.log(result);
+        .then((id) => {
 
-          lastId = result['id'];
-          // console.log('Id : ', lastId);
+          gestionHumsDataModels
+            .findOne({
+              where: { id: id.maxid },
+            })
+            .then((result) => {
 
-          consigne = result['consigneHum'];
+              try {
+                lastId = result['id'];
+                consigne = result['consigneHum'];
+                pasHum = result['pasHum'];
+                objectifHum = result['objectifHum'];
+                deltaHum = result['deltaHum'];
 
-          // console.log(
-          //   magenta,
-          //   '[ GESTION HUM CONS AUTO ] Ancienne consigne : ',
-          //   consigne
-          // );
+                // console.log('result Hum :',result);
 
-          pasHum = result['pasHum'];
-          // console.log('pasHum : ', pasHum);
+              } catch (error) {
+                console.log("🔴 ERROR : Récupération des datas");
+              }
 
-          objectifHum = result['objectifHum'];
-          // console.log('objectifHum : ', objectifHum);
+            })
+            .then(() => {
+              console.log(
+                jaune,
+                'Ancienne consigne : ',
+                consigne
+              );
 
-          deltaHum = result['deltaHum'];
-          // console.log('deltaHum : ', deltaHum);
+              if (lastId > 0) {
+                resolve();
+              }
+
+            });
         });
-    });
-};
-derniereConsigne();
 
-//! 2 ) ➖➖➖➖➖➖ Calcule de la nouvelle consigne ➖➖➖➖➖➖
+    } catch (error) {
+      console.log("🔴 ERROR : Récupération de la dernière consigne");
+      reject();
+    }
+  });
+}
 
-let gestionConsigne = () => {
-  //
-  //* Condition 1 ===> si consigne === objectifHum.
+//? ------------------------------------------------
 
-  if (consigne === objectifHum) {
-    newConsigne = objectifHum;
-    // console.log(
-    //   magenta,
-    //   '[ GESTION HUM CONS AUTO ] Action ======> Consigne = ObjectifHum | On ne fait rien'
-    // );
-  }
+//? Définition si consigne auto ou non.
 
-  //* Condition 2 ===> si consigne < objectifHum.
+let definitionConsigneAuto = () => {
+  return new Promise((resolve, reject) => {
+    if (
 
-  if (consigne < objectifHum) {
-    newConsigne = parseFloat(consigne + palier).toFixed(2);
+      pasHum == 0 ||
+      pasHum == '' ||
+      pasHum == null ||
+      objectifHum == 0 ||
+      objectifHum == '' ||
+      objectifHum == null
 
-    // console.log(
-    //   magenta,
-    //   '[ GESTION Hum CONS AUTO ] Nouvelle consigne : ',
-    //   newConsigne
-    // );
+    ) {
+      console.log("Paramètre ===> Pas et Objectif non renseignés : GESTION CONSIGNE MANUELLE.");
 
-    let newConsigneValue = () => {
-      gestionHumsDataModels
-        .update({ consigneHum: newConsigne }, { where: { id: lastId } })
-        // .then(() =>
-        //   console.log(
-        //     magenta,
-        //     '[ GESTION Hum CONS AUTO ] La consigne à été mis à jour'
-        //   )
-        // )
-        .catch((err) => console.log(err));
-    };
+      reject();
 
-    newConsigneValue();
+    } else if (
 
-    // console.log(
-    //   magenta,
-    //   '[ GESTION HUM CONS AUTO ] Action ======> Gestion automatique de la consigne | On augmente la consigne à : ' +
-    //     newConsigne +
-    //     '°C'
-    // );
-  }
+      pasHum == 0 ||
+      pasHum == '' ||
+      pasHum == null ||
+      objectifHum == 0 ||
+      objectifHum == '' ||
+      objectifHum == null
 
-  //* Condition 3 ===> si consigne > objectifHum.
+    ) {
 
-  if (consigne > objectifHum) {
-    newConsigne = parseFloat(consigne - palier).toFixed(2);
+      console.log("Paramètre ===> Pas et Objectif renseignés : GESTION CONSIGNE AUTOMATIQUE.");
+      resolve();
 
-    // console.log(
-    //   magenta,
-    //   '[ GESTION Hum CONS AUTO ] Nouvelle consigne : ',
-    //   newConsigne
-    // );
+    }
 
-    let newConsigneValue = () => {
-      gestionHumsDataModels
-        .update({ consigneHum: newConsigne }, { where: { id: lastId } })
-        // .then(() =>
-        //   console.log(
-        //     magenta,
-        //     '[ GESTION Hum CONS AUTO ] La consigne à été mis à jour'
-        //   )
-        // )
-        .catch((err) => console.log(err));
-    };
+  });
+}
 
-    newConsigneValue();
+//? ------------------------------------------------
 
-    // console.log(
-    //   magenta,
-    //   '[ GESTION HUM CONS AUTO ] Action ======> Gestion automatique de la consigne | On diminue la consigne à : ' +
-    //     newConsigne +
-    //     '°C'
-    // );
-  }
-};
-//-------------------------------------
+//? //! Définition de la condition.
 
-//! 3) ➖➖➖➖➖➖ Fonction qui décide de la consigne automatique ou manuelle ➖➖➖➖➖➖
+let DefinitionCondition = () => {
 
-setTimeout(() => {
   palier = pasHum / 12;
 
-  if (
-    pasHum == 0 ||
-    pasHum == '' ||
-    pasHum == null ||
-    objectifHum == 0 ||
-    objectifHum == '' ||
-    objectifHum == null
-  ) {
-    // console.log(
-    //   magenta,
-    //   '[ GESTION HUM CONS AUTO ] Paramètre ===> (Pas et Objectif) non renseignés : GESTION CONSIGNE MANUELLE.'
-    // );
-    return;
-  }
-  if (pasHum !== 0 && objectifHum !== 0) {
-    // console.log(
-    //   magenta,
-    //   '[ GESTION HUM CONS AUTO ] Paramètre ===> Pas et Objectif) renseignés : GESTION CONSIGNE AUTOMATIQUE.'
-    // );
-    gestionConsigne();
-  }
-}, 1000);
+  return new Promise((resolve, reject) => {
 
-setTimeout(() => {}, 1500);
+    //* Condition 1 ===> si consigne === objectifHum.
+    if (consigne === objectifHum) {
+
+      newConsigne = objectifHum;
+
+      console.log(" Action ======> Consigne = ObjectifHum | On ne fait rien :", newConsigne);
+
+      resolve();
+
+      //* Condition 2 ===> si consigne <= objectifHum.
+    } else if (consigne <= objectifHum) {
+
+      newConsigne = parseFloat(consigne + palier).toFixed(2);
+
+      console.log(" Action ======> consigne <= objectifHum | Nouvelle consigne ➕ :", newConsigne
+      );
+
+      resolve();
+
+    }
+
+    //* Condition 3 ===> si consigne <= objectifHum.
+    else if (consigne > objectifHum) {
+
+      newConsigne = parseFloat(consigne - palier).toFixed(2);
+
+      console.log(" Action ======> consigne <= objectifHum | Nouvelle consigne ➖ :", newConsigne
+      );
+
+      resolve();
+    }
+
+    else {
+      console.log("🔴 ERROR : Définition de la condition");
+      reject();
+    }
+
+  });
+}
+
+//? ------------------------------------------------
+
+// ? Mise à jour de la consigne.
+
+const MiseAjourConsigne = () => {
+  return new Promise((resolve, reject) => {
+
+    gestionHumsDataModels
+      .update({ consigneHum: newConsigne }, { where: { id: lastId } })
+      .then((result) =>
+        console.log(" La consigne à été mis à jour Hum :", result[0])
+      )
+      .then(() => {
+        resolve();
+      })
+      .catch((error) => {
+        console.log("🔴 ERROR : Mise à jour de la consigne Hum", error);
+        reject();
+      });
+  });
+}
+
+//? ------------------------------------------------
+
+//! ------------------------------------------------
+
+//! Exécution des promesses.
+
+let handleMyPromise = async () => {
+
+  try {
+    await recuperationDerniereConsigne();
+    await definitionConsigneAuto();
+    await DefinitionCondition();
+    await MiseAjourConsigne();
+  }
+  catch (err) {
+    console.log("🔺 ERROR : Exécution des promesses :", err);
+  }
+};
+
+handleMyPromise();
+
+//! ------------------------------------------------

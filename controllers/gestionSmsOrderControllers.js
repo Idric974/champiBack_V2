@@ -262,7 +262,7 @@ exports.newConsigne = (req, res) => {
 
                 //* Url de la master.
 
-                const url = `http://192.168.1.${pi}:4000/api/postSms/postSms`;; //* Idric
+                const url = `http://192.168.1.${pi}:4000/api/postSms/postSms`; //* Idric
                 // const url = 'http://192.168.0.10:4000/api/postSms/postSms'; //* Antoine
 
                 //* -------------------------------------------------

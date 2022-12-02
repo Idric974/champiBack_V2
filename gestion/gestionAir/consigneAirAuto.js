@@ -1,9 +1,12 @@
 //* Les constantes.
+
 const jaune = '\x1b[33m';
 require('dotenv').config();
 const sequelize = require('sequelize');
+const { log } = require('winston');
 const db = require('../../models');
 const gestionAirsDataModels = db.gestionAirData;
+
 //*-------------------------------------
 
 //* Les variables.
@@ -12,163 +15,193 @@ let lastId;
 let consigne;
 let objectifAir;
 let pasAir;
-let palier;
 let newConsigne;
+let palier;
+
 //*-------------------------------------
 
-//! 1 ) Récupération de la dernière consigne.
+//! Gestion des promesses.
 
-let derniereConsigne = () => {
-  gestionAirsDataModels
-    .findOne({
-      attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
-      raw: true,
-    })
-    .then((id) => {
-      // console.log(id.maxid);
+//? Récupération de la dernière consigne.
+
+const recuperationDerniereConsigne = () => {
+  return new Promise((resolve, reject) => {
+    try {
 
       gestionAirsDataModels
         .findOne({
-          where: { id: id.maxid },
+          attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
+          raw: true,
         })
-        .then((result) => {
-          // console.log(result);
+        .then((id) => {
 
-          lastId = result['id'];
-          // console.log('Id : ', lastId);
+          gestionAirsDataModels
+            .findOne({
+              where: { id: id.maxid },
+            })
+            .then((result) => {
 
-          consigne = result['consigneAir'];
+              try {
+                lastId = result['id'];
+                consigne = result['consigneAir'];
+                pasAir = result['pasAir'];
+                objectifAir = result['objectifAir'];
+                deltaAir = result['deltaAir'];
 
-          // console.log(
-          //   jaune,
-          //   '[ GESTION AIR SOCKET IO ] Ancienne consigne : ',
-          //   consigne
-          // );
+                // console.log('result Air :', result);
 
-          pasAir = result['pasAir'];
-          // console.log('pasAir : ', pasAir);
+              } catch (error) {
+                console.log("🔴 ERROR : Récupération des datas");
+              }
 
-          objectifAir = result['objectifAir'];
-          // console.log('objectifAir : ', objectifAir);
+            })
+            .then(() => {
+              console.log(
+                jaune,
+                "Ancienne consigne : ",
+                consigne
+              );
 
-          deltaAir = result['deltaAir'];
-          // console.log('deltaAir : ', deltaAir);
+              if (lastId > 0) {
+                resolve();
+              }
+
+            });
         });
-    });
-};
 
-derniereConsigne();
+    } catch (error) {
+      console.log("🔴 ERROR : Récupération de la dernière consigne");
+      reject();
+    }
+  });
+}
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+//? ------------------------------------------------
 
-//! 2 ) Calcule de la nouvelle consigne.
+//? Définition si consigne auto ou non.
 
-let gestionConsigne = () => {
-  //
-  //* Condition 1 ===> si consigne === objectifAir.
+let definitionConsigneAuto = () => {
+  return new Promise((resolve, reject) => {
+    if (
 
-  if (consigne === objectifAir) {
-    newConsigne = objectifAir;
-    // console.log(
-    //   jaune,
-    //   '[ GESTION AIR CONS AUTO ] Action ======> Consigne = ObjectifAir | On ne fait rien'
-    // );
-  }
+      pasAir == 0 ||
+      pasAir == '' ||
+      pasAir == null ||
+      objectifAir == 0 ||
+      objectifAir == '' ||
+      objectifAir == null
 
-  //* Condition 2 ===> si consigne < objectifAir.
+    ) {
+      console.log("Paramètre ===> Pas et Objectif non renseignés : GESTION CONSIGNE MANUELLE.");
 
-  if (consigne < objectifAir) {
-    newConsigne = parseFloat(consigne + palier).toFixed(2);
+      reject();
 
-    // console.log(
-    //   jaune,
-    //   '[ GESTION AIR CONS AUTO ] Nouvelle consigne : ',
-    //   newConsigne
-    // );
+    } else if (pasAir !== 0 ||
+      pasAir !== '' ||
+      pasAir !== null ||
+      objectifAir !== 0 ||
+      objectifAir !== '' ||
+      objectifAir !== null) {
 
-    let newConsigneValue = () => {
-      gestionAirsDataModels
-        .update({ consigneAir: newConsigne }, { where: { id: lastId } })
-        // .then(() =>
-        //   console.log(
-        //     jaune,
-        //     '[ GESTION AIR CONS AUTO ] La consigne à été mis à jour'
-        //   )
-        // )
-        .catch((err) => console.log(err));
-    };
+      console.log("Paramètre ===> Pas et Objectif renseignés : GESTION CONSIGNE AUTOMATIQUE.");
+      resolve();
 
-    newConsigneValue();
+    }
 
-    // console.log(
-    //   jaune,
-    //   '[ GESTION AIR CONS AUTO ] Action ======> Gestion automatique de la consigne | On augmente la consigne à : ' +
-    //     newConsigne +
-    //     '°C'
-    // );
-  }
+  });
+}
 
-  //* Condition 3 ===> si consigne > objectifAir.
+//? ------------------------------------------------
 
-  if (consigne > objectifAir) {
-    newConsigne = parseFloat(consigne - palier).toFixed(2);
+//? //! Définition de la condition.
 
-    // console.log(
-    //   jaune,
-    //   '[ GESTION AIR CONS AUTO ] Nouvelle consigne : ',
-    //   newConsigne
-    // );
+let DefinitionCondition = () => {
 
-    let newConsigneValue = () => {
-      gestionAirsDataModels
-        .update({ consigneAir: newConsigne }, { where: { id: lastId } })
-        // .then(() =>
-        //   console.log(
-        //     jaune,
-        //     '[ GESTION AIR CONS AUTO ] La consigne à été mis à jour'
-        //   )
-        // )
-        .catch((err) => console.log(err));
-    };
-
-    newConsigneValue();
-
-    // console.log(
-    //   jaune,
-    //   '[ GESTION AIR CONS AUTO ] Action ======> Gestion automatique de la consigne | On diminue la consigne à : ' +
-    //     newConsigne +
-    //     '°C'
-    // );
-  }
-};
-//-------------------------------------
-
-//! 3) Fonction qui décide de la consigne automatique ou manuelle.
-
-setTimeout(() => {
   palier = pasAir / 12;
 
-  if (
-    pasAir == 0 ||
-    pasAir == '' ||
-    pasAir == null ||
-    objectifAir == 0 ||
-    objectifAir == '' ||
-    objectifAir == null
-  ) {
-    // console.log(
-    //   jaune,
-    //   '[ GESTION AIR CONS AUTO ] Paramètre ===> (Pas et Objectif) non renseignés : GESTION CONSIGNE MANUELLE.'
-    // );
-    return;
-  }
-  if (pasAir !== 0 && objectifAir !== 0) {
-    // console.log(
-    //   jaune,
-    //   '[ GESTION AIR CONS AUTO ] Paramètre ===> Pas et Objectif) renseignés : GESTION CONSIGNE AUTOMATIQUE.'
-    // );
-    gestionConsigne();
-  }
-}, 1000);
+  return new Promise((resolve, reject) => {
 
-//! ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    //* Condition 1 ===> si consigne === objectifAir.
+    if (consigne === objectifAir) {
+
+      newConsigne = objectifAir;
+
+      console.log(" Action ======> Consigne = ObjectifAir | On ne fait rien :", newConsigne);
+
+      resolve();
+
+      //* Condition 2 ===> si consigne <= objectifAir.
+    } else if (consigne <= objectifAir) {
+
+      newConsigne = parseFloat(consigne + palier).toFixed(2);
+
+      console.log(" Action ======> consigne <= objectifAir | Nouvelle consigne ➕ :", newConsigne
+      );
+
+      resolve();
+
+    }
+
+    //* Condition 3 ===> si consigne <= objectifAir.
+    else if (consigne > objectifAir) {
+
+      newConsigne = parseFloat(consigne - palier).toFixed(2);
+
+      console.log(" Action ======> consigne <= objectifAir | Nouvelle consigne ➖ :", newConsigne
+      );
+
+      resolve();
+    }
+
+    else {
+      console.log("🔴 ERROR : Définition de la condition");
+      reject();
+    }
+
+  });
+}
+
+//? ------------------------------------------------
+
+// ? Mise à jour de la consigne.
+
+const MiseAjourConsigne = () => {
+  return new Promise((resolve, reject) => {
+
+    gestionAirsDataModels
+      .update({ consigneAir: newConsigne }, { where: { id: lastId } })
+      .then((result) =>
+        console.log(" La consigne à été mis à jour :", result[0])
+      )
+      .then(() => {
+        resolve();
+      })
+      .catch((error) => {
+        console.log("🔴 ERROR : Mise à jour de la consigne", error);
+        reject();
+      });
+  });
+}
+
+//? ------------------------------------------------
+
+//! ------------------------------------------------
+
+//! Exécution des promesses.
+
+let handleMyPromise = async () => {
+
+  try {
+    await recuperationDerniereConsigne();
+    await definitionConsigneAuto();
+    await DefinitionCondition();
+    await MiseAjourConsigne();
+  }
+  catch (err) {
+    console.log("🔺 ERROR : Exécution des promesses :", err);
+  }
+};
+
+handleMyPromise();
+
+//! ------------------------------------------------

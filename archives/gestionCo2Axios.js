@@ -5,11 +5,11 @@ const cyan = '\x1b[36m';
 const http = require('http');
 const { resolve } = require('path');
 const sequelize = require('sequelize');
-const db = require('../../models');
+const db = require('../models');
 const gestionCo2Models = db.gestionCo2;
 const gestionCo2DataModels = db.gestionCo2Data;
 const axios = require('axios');
-const numSalle = require('../../configNumSalle');
+const numSalle = require('../configNumSalle');
 
 //! -----------------------------------------------------------
 
@@ -89,8 +89,8 @@ axios
               console.log(
                 cyan,
                 '[ GESTION CO2 CALCULES  ] Le taux de Co2 est de :' +
-                  data +
-                  'ppm'
+                data +
+                'ppm'
               );
               console.log(
                 cyan,

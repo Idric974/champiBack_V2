@@ -13,13 +13,13 @@ let consigneCourbeCo2;
 
 //! --------------------------------------------------------------
 
-//? Récupération des datas courbes.
+//? Chargement des datas.
 
 let loopNumberCo2;
 let loopNumberConsigne;
-let axiosResponse;
+let tailleTAbleau;
 
-const getDataCourbeAir = () => {
+const chargementDatas = () => {
     return new Promise((resolve, reject) => {
 
         axios({
@@ -28,51 +28,72 @@ const getDataCourbeAir = () => {
         })
             .then((response) => {
 
-                axiosResponse = response.status
-
-                //* Tempèrature air.
+                //  console.log("Datas ==> ", response.data);
 
                 dataCourbeCo2 = response.data.tauxCo2Courbe;
 
-                loopNumberCo2 = Object.keys(dataCourbeCo2).map(function (cle) {
-                    return [Number(cle), dataCourbeCo2[cle]];
-                });
-
-                // console.log('loopNumberCo2 :', loopNumberCo2.length);
-
-                //* ---------------------------------------------------
-
-                //* Consigne air.
-
                 consigneCourbeCo2 = response.data.tauxCo2Courbe;
 
-                loopNumberConsigne = Object.keys(consigneCourbeCo2).map(function (cle) {
-                    return [Number(cle), consigneCourbeCo2[cle]];
-                });
+                tailleTAbleau = response.data.tauxCo2Courbe.length;
 
-                // console.log('loopNumberConsigne :', loopNumberConsigne.length);
+                let counter = 0;
 
-                //* ---------------------------------------------------
+                for (let i = 0; i < tailleTAbleau; i++) {
 
-                console.log('🟢 SUCCESS CO2 1/4 ==> Get datas :', response.data.tauxCo2Courbe.length);
+                    counter++;
+                    if (counter === tailleTAbleau) {
+                        // console.log("Total data récupérée =====>", counter);
 
-            })
+                        console.log('🟢 SUCCESS CO2 1/5 ==> Chargement des datas.');
 
-            .then(() => {
+                        resolve();
+                    }
+                };
 
-                if (axiosResponse === 200) {
-                    resolve();
-                } else {
-                    reject();
-                }
             })
 
             .catch((error) => {
 
-                console.log('🔴 ERREUR CO2 1/4 ==> Get datas :', error);
+                console.log('🔴 ERREUR CO2 1/5 ==> Chargement des datas. :', error);
 
                 reject();
             });
+    });
+}
+
+//? -------------------------------------------------
+
+//? Récupération des datas courbes air.
+
+let getDataCourbeCo2 = () => {
+    return new Promise((resolve, reject) => {
+
+        try {
+
+            //* Tempèrature Co2.
+
+            loopNumberAir = Object.keys(dataCourbeCo2).map(function (cle) {
+                return [Number(cle), dataCourbeCo2[cle]];
+            });
+
+            //* ---------------------------------------------------
+
+            //* Consigne Co2.
+
+            loopNumberConsigne = Object.keys(consigneCourbeCo2).map(function (cle) {
+                return [Number(cle), consigneCourbeCo2[cle]];
+            });
+
+            //* ---------------------------------------------------
+            console.log("🟢 SUCCESS AIR 2/5 ==> Récupération des datas courbes air.");
+
+            resolve();
+
+        }
+        catch (error) {
+            console.log("🔴 ERREUR AIR 2/5 ==> Récupération des datas courbes air :", error);
+            reject();
+        }
 
     });
 }
@@ -97,11 +118,11 @@ const stockageValeuresCo2 = () => {
 
             resolve();
 
-            console.log('🟢 SUCCESS CO2 2/4 ==> Stockage valeures :', valeurTauxCo2);
+            console.log('🟢 SUCCESS CO2 3/5 ==> Stockage valeures :', valeurTauxCo2);
 
         } catch (error) {
 
-            console.log("🔴 ERREUR CO2 2/4 ==> Stockage valeures :", error);
+            console.log("🔴 ERREUR CO2 3/5 ==> Stockage valeures :", error);
 
             reject();
 
@@ -131,11 +152,11 @@ const stockageConsigneCo2 = () => {
 
             resolve();
 
-            console.log('🟢 SUCCESS CO2 3/4 ==> Stockage consigne :', valeurConsigneCo2);
+            console.log('🟢 SUCCESS CO2 4/5 ==> Stockage consigne :', valeurConsigneCo2);
 
         } catch (error) {
 
-            console.log("🔴 ERREUR CO2 3/4 ==> Stockage consigne :", error);
+            console.log("🔴 ERREUR CO2 4/5 ==> Stockage consigne :", error);
 
             reject();
 
@@ -234,13 +255,13 @@ let constructionDuGraphiqueCo2 = () => {
             new Chart(ctxCo2, configCo2);
 
 
-            console.log('🟢 SUCCESS CO2 4/4 ==> Construction graphique');
+            console.log('🟢 SUCCESS CO2 5/5 ==> Construction graphique');
 
             resolve();
 
         } catch (error) {
 
-            console.log("🔴 ERREUR CO2 4/7 ==> Construction graphique :", error);
+            console.log("🔴 ERREUR CO2 5/5 ==> Construction graphique :", error);
 
             reject();
 
@@ -257,8 +278,8 @@ const handleMyPromiseCo2 = async () => {
 
     try {
 
-        //* Graphique température air.
-        await getDataCourbeAir();
+        await chargementDatas();
+        await getDataCourbeCo2();
         await stockageValeuresCo2();
         await stockageConsigneCo2();
         await constructionDuGraphiqueCo2();

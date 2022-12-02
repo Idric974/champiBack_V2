@@ -250,7 +250,7 @@ let getJourDuCycle = () => {
   })
     //* Récupération du jour du cycle.
     .then((response) => {
-      // console.log('Jour du cycle : ', response.data.temperatureAir.jourDuCycle);
+      console.log('Jour du cycle : ', response.data.temperatureAir.jourDuCycle);
 
       jourDuCycle = response.data.temperatureAir.jourDuCycle;
 
