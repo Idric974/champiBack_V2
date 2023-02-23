@@ -149,4 +149,5 @@ CREATE USER 'idric'@'localhost' IDENTIFIED BY 'Kup33uC4W6';
 17. npm install onoff
 
 
-OK
+## Pour arrêter un programme
+xkill 
