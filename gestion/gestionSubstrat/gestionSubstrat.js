@@ -10,6 +10,7 @@ const gestionSubstratModels = db.gestionSubstrat;
 const gestionSubstratDataModels = db.gestionSubstratData;
 const gestionAirModels = db.gestionAir;
 const logger = require('../../src/logger');
+const numSalle = require('../../configNumSalle');
 const axios = require('axios');
 
 //! --------------------------------------------------
@@ -48,6 +49,32 @@ let miseAjourEtatRelay = () => {
 
 //? --------------------------------------------------
 
+//? Envoyer un SMS d’alerte.
+
+const sendSMS = (message) => {
+
+    console.log('Alerte message ==> ', message);
+
+    //! Url de la master.
+    // const url = 'http://192.168.1.11:4000/api/postSms/postSms'; //* Idric.
+    const url = 'http://192.168.1.10:5000/api/postSms/postSms'; //* Master.
+
+
+    axios
+        .post(url, {
+            message,
+        })
+        .then(function (response) {
+            console.log('🟢 SUCCESS : Reponse de SMS808 : ', response.data);
+        })
+        .catch(function (error) {
+            console.log("🔴 ERROR : Poste du message d'alerte", error);
+        });
+
+}
+
+//? --------------------------------------------------
+
 //! --------------------------------------------------
 
 //! Les fonctions synchrone. 
@@ -77,7 +104,7 @@ let recuperationDeEtalonage = () => {
                             etalonnage = result['etalonnageAir'];
 
                             console.log(
-                                "✅ %c SUCCÈS ==> gestions Substrat ==> Récupération de l'étalonage",
+                                "✅ %cSUCCÈS ==> Gestions Substrat ==> Récupération de l'étalonage",
                                 'color: green',
                                 etalonnage
                             );
@@ -89,7 +116,7 @@ let recuperationDeEtalonage = () => {
                 });
         } catch (error) {
             console.log(
-                "❌ %c ERREUR ==> gestions Substrat ==> Récupération de l'étalonage",
+                "❌ %c ERREUR ==> Gestions Substrat ==> Récupération de l'étalonage",
                 'color: orange',
                 error
             );
@@ -117,7 +144,6 @@ let getConsignesSubstrat = () => {
                 })
                 .then((id) => {
                     // console.log(id.maxid);
-
                     gestionSubstratDataModels
                         .findOne({
                             where: { id: id.maxid },
@@ -126,13 +152,12 @@ let getConsignesSubstrat = () => {
                             // console.log('gestConsignesSubstrat :', result);
 
                             consigneMaxDataSubstrat = result['consigneMaxDataSubstrat']
-
-                            // console.log('consigneMaxDataSubstrat :', consigneMaxDataSubstrat);
+                            console.log('✅ %cSUCCÈS ==> Gestions Substrat ==> Consigne Max Substrat :',
+                                'color: green', consigneMaxDataSubstrat);
 
                             consigneMinDataSubstrat = result['consigneMinDataSubstrat']
-
-                            // console.log('consigneMinDataSubstrat :', consigneMinDataSubstrat);
-
+                            console.log('✅ %cSUCCÈS ==> Gestions Substrat ==> Consigne Min Substrat :',
+                                'color: green', consigneMinDataSubstrat);
 
                         }).then(() => {
                             resolve()
@@ -142,7 +167,6 @@ let getConsignesSubstrat = () => {
             console.log('ERREUR : ', error);
             reject();
         }
-
     });
 }
 
@@ -173,24 +197,19 @@ let recuperationEtatRelay = () => {
 
                             etatVanneBDD = result['etatRelay'];
 
-                            // console.log(
-                            //     jaune,
-                            //     '[ GESTION gestions Substrat CALCULES  ] Dernier état vanne de la BDD : ',
-                            //     etatVanneBDD
-                            // );
-
-                            resolve();
+                            resolve(console.log(
+                                '✅ %cSUCCÈS ==> Gestions Substrat ==> Dernier état vanne de la BDD : ',
+                                'color: green',
+                                etatVanneBDD
+                            ));
                         });
                 });
         } catch (error) {
-            logger.info(
-                'Fchier source : gestions Substrat | Module : recuperation etatVanneBDD | Type erreur : ',
+            reject(logger.info(
+                'Fchier source : Gestions Substrat | Module : recuperation etatVanneBDD | Type erreur : ',
                 error
-            );
-
-            reject();
+            ));
         }
-
     });
 }
 
@@ -230,7 +249,7 @@ let constructionAxeX = () => {
                             // dateDemarrageCycle = result['dateDemarrageCycle'];
 
                             // console.log(
-                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X",
+                            //     "✅ %cSUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X",
                             //     'color: green', dateDemarrageCycle
                             // );
 
@@ -241,7 +260,7 @@ let constructionAxeX = () => {
                             dateDemarrageCycle = new Date(result['dateDemarrageCycle']);
 
                             // console.log(
-                            //     "✅ %c SUCCÈS ==> gestions Air ==> Date de démarrage du cycle ===>",
+                            //     "✅ %cSUCCÈS ==> gestions Air ==> Date de démarrage du cycle ===>",
                             //     'color: green', dateDemarrageCycle
                             // );
 
@@ -252,7 +271,7 @@ let constructionAxeX = () => {
                             dateDuJour = new Date();
 
                             // console.log(
-                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Date du jour",
+                            //     "✅ %cSUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Date du jour",
                             //     'color: green', dateDuJour
                             // );
 
@@ -265,7 +284,7 @@ let constructionAxeX = () => {
                             jourDuCycle = Math.round(nbJourBrut / (1000 * 3600 * 24)) + 1;
 
                             // console.log(
-                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Calcul du nombre de jour du cycle",
+                            //     "✅ %cSUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe X ===> Calcul du nombre de jour du cycle",
                             //     'color: green', jourDuCycle
                             // );
 
@@ -278,7 +297,7 @@ let constructionAxeX = () => {
                             heureMinute = heureDuCycle + 'h' + minuteDuCycle;
 
                             // console.log(
-                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Affichage de l'heure",
+                            //     "✅ %cSUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Affichage de l'heure",
                             //     'color: green', heureMinute
                             // );
 
@@ -288,10 +307,10 @@ let constructionAxeX = () => {
 
                             valeurAxeX = 'Jour ' + jourDuCycle + ' - ' + heureMinute;
 
-                            // console.log(
-                            //     "✅ %c SUCCÈS ==> gestions Air ==> Construction de la valeur de l'axe x ===> Valeure de l'axe X",
-                            //     'color: green', valeurAxeX
-                            // );
+                            console.log(
+                                "✅ %cSUCCÈS ==> Gestions Substrat ==> Valeure de l'axe X",
+                                'color: green', valeurAxeX
+                            );
 
                             //* --------------------------------------------------
                         })
@@ -377,7 +396,7 @@ let calculeDeLaTemperatureMoyenne = () => {
             temperatureSubstratMoyenne = Math.round((sumlistValAir / arrayLength) * 100) / 100;
 
             console.log(
-                "✅ %c SUCCÈS ==> gestions Substrat ==> Temperature substrat moyenne :",
+                "✅ %cSUCCÈS ==> Gestions Substrat ==> Temperature substrat moyenne :",
                 'color: green', temperatureSubstratMoyenne
             );
 
@@ -405,7 +424,7 @@ let definitionTemperatureAirCorrigee = () => {
                 temperatureSubstratMoyenne + etalonnage;
 
             console.log(
-                '✅ %c SUCCÈS ==> gestions Substrat ==> Définition de la température Substrat corrigée ===> ',
+                '✅ %cSUCCÈS ==> Gestions Substrat ==> Définition de la température Substrat corrigée ===> ',
                 'color: green',
                 temperatureCorrigee
             );
@@ -413,7 +432,7 @@ let definitionTemperatureAirCorrigee = () => {
             resolve();
         } catch (error) {
             console.log(
-                '❌ %c ERREUR ==> gestions Substrat ==> Définition de la température Substrat corrigée',
+                '❌ %c ERREUR ==> Gestions Substrat ==> Définition de la température Substrat corrigée',
                 'color: orange',
                 error
             );
@@ -429,47 +448,64 @@ let definitionTemperatureAirCorrigee = () => {
 
 const ouvertureRelay = 23;
 const fermetureRelay = 22;
+let date1 = new Date();
+
+let dateLocale = date1.toLocaleString('fr-FR', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric'
+});
 
 let definitionAction = () => {
     return new Promise((resolve, reject) => {
 
         try {
 
-            if (temperatureCorrigee >= consigneMaxDataSubstrat) {
+            if (temperatureCorrigee > consigneMaxDataSubstrat) {
 
-                console.log('🔺 Action sélectionnée ==> gestions Substrat ==> (temperatureCorrigee >= consigneMaxDataSubstrat)');
+                let deltaTemp = temperatureCorrigee - consigneMaxDataSubstrat;
 
-                //! Condition à 40 secondes.
+                let message = `ALERTE TEMPÉRATURE : la température de la salle ${numSalle} est supérieur de ${deltaTemp}° | Température relevée : ${temperatureCorrigee}° | Consigne Max Substrat : ${consigneMaxDataSubstrat}° | ${dateLocale}`
 
-                let preconisation = 40000;
+                sendSMS(message);
 
-                new Gpio(ouvertureRelay, 'out');
+                // console.log('🟠 Action ==> Gestions Substrat ==> (Temperature corrigée >= Consigne Max Substrat)');
 
-                console.log('🟢 DÉBUT ouverture du froid.');
+                // //! Condition à 40 secondes.
 
-                actionRelay = 1;
+                // let preconisation = 40000;
 
-                miseAjourEtatRelay();
+                // new Gpio(ouvertureRelay, 'out');
 
-                setTimeout(() => {
-                    //
-                    new Gpio(ouvertureRelay, 'in');
+                // console.log('🟢 OUVERTURE DU FROID');
 
-                    console.log('🔴 FIN Ouverture du froid.');
+                // actionRelay = 1;
 
-                    if (etatVanneBDD >= 100) {
-                        etatRelay = 100;
-                    } else {
-                        etatRelay = 100;
-                    }
+                // miseAjourEtatRelay();
 
-                    actionRelay = 0;
+                // setTimeout(() => {
+                //     //
+                //     new Gpio(ouvertureRelay, 'in');
 
-                    miseAjourEtatRelay();
-                    //
+                //     console.log('🔴 FERMETURE DU FROID');
 
-                    resolve();
-                }, preconisation);
+                //     if (etatVanneBDD >= 100) {
+                //         etatRelay = 100;
+                //     } else {
+                //         etatRelay = 100;
+                //     }
+
+                //     actionRelay = 0;
+
+                //     miseAjourEtatRelay();
+                //     //
+
+                //     resolve();
+                // }, preconisation);
 
                 //! -----------------------------------------------
 
@@ -477,56 +513,54 @@ let definitionAction = () => {
 
             if (temperatureCorrigee < consigneMinDataSubstrat) {
 
+                let deltaTemp = consigneMinDataSubstrat - temperatureCorrigee;
+
+                let message = `ALERTE TEMPÉRATURE : la température de la salle ${numSalle} est inférieure de ${deltaTemp}° | Température relevée : ${temperatureCorrigee}° | Consigne Min Substrat : ${consigneMinDataSubstrat}° | ${dateLocale}`
+
+                sendSMS(message);
+
                 //! Condition à 40 secondes.
 
-                console.log('🔺 Action sélectionnée ==> gestions Substrat ==> (temperatureCorrigee <= consigneMaxDataSubstrat)');
+                // console.log('🟠 Action sélectionnée ==> Gestions Substrat ==> (Temperature corrigée <= Consigne Min Substrat)');
 
-                let preconisation = 40000;
+                // let preconisation = 40000;
 
-                new Gpio(fermetureRelay, 'in');
+                // new Gpio(fermetureRelay, 'in');
 
-                console.log('🟢 DÉBUT fermeture du froid.');
+                // console.log('🟢 DÉBUT fermeture du froid.');
 
-                actionRelay = 1;
+                // actionRelay = 1;
 
-                miseAjourEtatRelay();
+                // miseAjourEtatRelay();
 
-                setTimeout(() => {
-                    //
-                    new Gpio(fermetureRelay, 'out');
+                // setTimeout(() => {
+                //     //
+                //     new Gpio(fermetureRelay, 'out');
 
-                    console.log('🔴 FIN Fermeture du froid.');
+                //     console.log('🔴 FIN Fermeture du froid.');
 
-                    if (etatVanneBDD <= 0) {
-                        etatRelay = 0;
-                    } else {
-                        etatRelay = 0;
-                    }
+                //     if (etatVanneBDD <= 0) {
+                //         etatRelay = 0;
+                //     } else {
+                //         etatRelay = 0;
+                //     }
 
-                    actionRelay = 0;
+                //     actionRelay = 0;
 
-                    miseAjourEtatRelay();
+                //     miseAjourEtatRelay();
 
-                    resolve();
+                //     resolve();
 
-                }, preconisation);
+                // }, preconisation);
 
                 //! -----------------------------------------------
 
             }
-
         } catch (error) {
-
             console.log("❌ %c ERREUR =====> Definition des actions delta",
                 'color: orange');
-
-            logger.info(
-                'Fchier source : gestions Substrat | Module : Définition des actions | Type erreur : ',
-                error
-            );
             reject();
         }
-
     });
 }
 
@@ -549,7 +583,7 @@ let enregistrementTemperature = () => {
             .then(function (result) {
 
                 console.log(
-                    "✅ %c SUCCÈS ==> gestions Substrat ==> Enregistrement des datas dans la base sous l'ID :",
+                    "✅ %cSUCCÈS ==> Gestions Substrat ==> Enregistrement des datas dans la base sous l'ID :",
                     'color: green', result["dataValues"].id
                 );
 
@@ -594,7 +628,7 @@ let handleMyPromise = async () => {
 
         await definitionTemperatureAirCorrigee();
 
-        // await definitionAction();
+        await definitionAction();
 
         await enregistrementTemperature();
     }

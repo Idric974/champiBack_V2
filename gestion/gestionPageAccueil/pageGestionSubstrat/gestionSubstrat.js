@@ -29,7 +29,7 @@ let getTemperatureSubstrat = () => {
   })
     .then((response) => {
 
-      // console.log(response.data.temperatureSubsrat.temperatureSubstrat);
+      console.log(response.data.temperatureSubsrat.temperatureSubstrat);
 
       temperatureSubstrat = response.data.temperatureSubsrat.temperatureSubstrat;
 
