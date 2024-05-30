@@ -1,4 +1,63 @@
-const axios = require('axios');
+//? switch Valve A/B.
+
+let vanneActive = "A";
+const switchValve = ()=>{
+  document.addEventListener("DOMContentLoaded", function () {
+  const buttonA = document.getElementById("switchValveA");
+  const buttonB = document.getElementById("switchValveB");
+
+  function toggleButtonA() {
+    buttonA.innerHTML = "ON";
+    buttonA.style.backgroundColor = "var(--orangeClic974)";
+
+    buttonB.innerHTML = "OFF";
+    buttonB.style.backgroundColor = "var(--greenColor)";
+  }
+
+  function toggleButtonB() {
+    buttonB.innerHTML = "ON";
+    buttonB.style.backgroundColor = "var(--orangeClic974)";
+
+    buttonA.innerHTML = "OFF";
+    buttonA.style.backgroundColor = "var(--greenColor)";
+  }
+
+  buttonA.addEventListener("click", function () {
+    toggleButtonA();
+    vanneActive = "a";
+    console.log("Vanne active", vanneActive);
+    saveVanneActive();
+  });
+  buttonB.addEventListener("click", function () {
+    toggleButtonB();
+    vanneActive = "b";
+    console.log("Vanne active", vanneActive);
+    saveVanneActive();
+  });
+});}
+
+switchValve()
+
+const saveVanneActive =()=>{
+  fetch('http://localhost:3003/api/gestionAirRoutes/postVanneActive/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      vanneActive
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log("postVanneActive => ",data);
+  })
+  .catch("postVanneActive error=> ",error => {
+    console.log(error);
+  });
+}
+
+//? -------------------------------------------------
 
 //! Afficher la date.
 
@@ -44,40 +103,42 @@ let temperatureAirLocalStorage;
 
 //* Consigne Air.
 
-let deltaAir;
+
 let deltaAirLocalStorage;
 
-// let getTemperatureAir = () => {
-//   axios({
-//     url: 'http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/',
-//     method: 'get',
-//   })
-//     .then((response) => {
+let getTemperatureAir = () => {
+  fetch('http://localhost:3003/api/gestionAirRoutes/getTemperatureAir/', {
+    method: 'GET',
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      // console.log("DATA BRUTE : temperatureAir =>",data);
 
-//       // console.log(response.data);
+      let temperatureAir = data.temperatureAir.temperatureAir;
+      //console.log("👉 temperatureAir =>",temperatureAir);
+      //console.log("👉 temperatureAir typeof =>",typeof temperatureAir);
 
-//       temperatureAir = response.data.temperatureAir.temperatureAir;
+      localStorage.setItem('gestionAir ==> Tempèrature Air:', temperatureAir);
 
-//       localStorage.setItem('gestionAir ==> Tempèrature Air:', temperatureAir);
+      let temperatureAirLocalStorage = localStorage.getItem(
+        'gestionAir ==> Tempèrature Air:'
+      );
 
-//       temperatureAirLocalStorage = localStorage.getItem(
-//         'gestionAir ==> Tempèrature Air:'
-//       );
+      document.getElementById('temperatureAir').innerHTML =
+        temperatureAirLocalStorage + '°C';
+    })
+    .catch(error => {
+      console.log(error);
+      console.log(JSON.stringify(error));
+    });
+};
 
-//       document.getElementById('temperatureAir').innerHTML =
-//         temperatureAirLocalStorage + '°C';
-//     })
-//     .catch((error) => {
-//       console.log(error);
-//       console.log(JSON.stringify(error));
-//     });
-// };
-
-// getTemperatureAir();
-
-
-
-
+getTemperatureAir();
 
 
 setInterval(() => {
@@ -100,21 +161,20 @@ let nbHeureAir;
 let getDernierConsigneAirEntree;
 let getdernierPasAirEntree;
 let getDernierObjectifAirEntree;
+let deltaAir;
 
 let getConsigneAir = () => {
-  axios({
-    url: 'http://localhost:3003/api/gestionAirRoutes/getDataAir/',
-    method: 'get',
+  fetch('http://localhost:3003/api/gestionAirRoutes/getDataAir/', {
+    method: 'GET'
   })
-    //
-    //* Récupération des données.
-
-    .then((response) => {
+    .then(response => response.json())
+    .then(data => {
       //* Consigne Air.
+       //console.log("DATA BRUTE : Consigne Air =>",data);
 
-      // console.log(response.data);
-
-      consigneAir = response.data.datatemperatureAir.consigneAir;
+      consigneAir = data.datatemperatureAir.consigneAir;
+      //console.log("👉 consigneAir =>",consigneAir);
+      //console.log("👉 consigneAir typeof =>",typeof consigneAir);
 
       localStorage.setItem('gestionAir ==> Consigne :', consigneAir);
 
@@ -128,7 +188,6 @@ let getConsigneAir = () => {
       //* -------------------------------------------------
 
       //* Affichage historique Consigne.
-
       getDernierConsigneAirEntree = localStorage.getItem(
         'gestionAir ==> Dernier consigne:'
       );
@@ -139,7 +198,6 @@ let getConsigneAir = () => {
       //* -------------------------------------------------
 
       //* Affichage historique Pas.
-
       getdernierPasAirEntree = localStorage.getItem(
         'gestionAir ==> Dernier Pas:'
       );
@@ -149,8 +207,7 @@ let getConsigneAir = () => {
 
       //* -------------------------------------------------
 
-      //* Affichage historique Objecif.
-
+      //* Affichage historique Objectif.
       getDernierObjectifAirEntree = localStorage.getItem(
         'gestionAir ==> Dernier Objectif:'
       );
@@ -160,11 +217,6 @@ let getConsigneAir = () => {
 
       //* -------------------------------------------------
     })
-
-    //* -------------------------------------------------
-
-    //* Durée de la descente Air.
-
     .then(() => {
       let CalculeNombreJour = () => {
         if (
@@ -179,7 +231,6 @@ let getConsigneAir = () => {
           getdernierPasAirEntree == null
         ) {
           //  console.log('Pas de paramètre pas de calcule des jours');
-
           return;
         } else {
           let dureeDescenteAir =
@@ -235,14 +286,11 @@ let getConsigneAir = () => {
         CalculeNombreJour();
       }, 120000);
     })
-
-    //* -------------------------------------------------
-
-    //* Stockage de la valeur delta.
-
     .then(() => {
-      deltaAir = parseFloat(temperatureAir - consigneAir).toFixed(2);
-      // console.log('delta Air Front', deltaAir);
+      deltaAir = temperatureAir - consigneAir;
+
+      //console.log("👉 delta Air =>",deltaAir);
+      //console.log("👉 delta Air typeof =>",typeof deltaAir);
 
       localStorage.setItem('Valeure delta Air : ', deltaAir);
 
@@ -250,20 +298,16 @@ let getConsigneAir = () => {
 
       document.getElementById('deltaAir').innerHTML =
         deltaAirLocalStorage + '°C';
+
+
     })
-
-    //* -------------------------------------------------
-
-    //* Catch des erreurs.
-
-    .catch((error) => {
+    .catch(error => {
       console.log(error);
-
       console.log(JSON.stringify(error));
     });
-
-  //* -------------------------------------------------
 };
+
+
 
 getConsigneAir();
 
@@ -274,7 +318,36 @@ setInterval(() => {
 
 //! -------------------------------------------------
 
-//! 3 Post consigne air dans la base.
+//! 3 Calcul du delta.
+
+// let deltaAir;
+const calculDuDelta =()=>{
+
+
+      // deltaAir = parseFloat(temperatureAir - consigneAir).toFixed(2);
+
+      deltaAir = temperatureAir - consigneAir;
+
+      console.log("👉 delta Air =>",deltaAir);
+      console.log("👉 delta Air typeof =>",typeof deltaAir);
+
+      localStorage.setItem('Valeure delta Air : ', deltaAir);
+
+      deltaAirLocalStorage = localStorage.getItem('Valeure delta Air : ');
+
+      document.getElementById('deltaAir').innerHTML =
+        deltaAirLocalStorage + '°C';
+
+
+
+}
+
+//calculDuDelta();
+
+//! -------------------------------------------------
+
+
+//!  Post consigne air dans la base.
 
 document
   .getElementById('validationConsigneAir')
@@ -287,16 +360,25 @@ document
 
     localStorage.setItem('gestionAir ==> Dernier consigne:', consigneAirForm);
 
-    const boutonValiderEtalAir = axios
-      .post('http://localhost:3003/api/gestionAirRoutes/postConsigneAir/', {
-        consigneAir: consigneAirForm,
+    const boutonValiderEtalAir = () => {
+      fetch('http://localhost:3003/api/gestionAirRoutes/postConsigneAir/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          consigneAir: consigneAirForm
+        })
       })
-      .then(function (response) {
-        console.log(response.data);
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
       })
-      .catch(function (error) {
+      .catch(error => {
         console.log(error);
       });
+    };
+    
   });
 
 //! Post des datas air dans la base.
@@ -324,17 +406,31 @@ document
 
     //* -------------------------------------------------
 
-    const boutonValiderEtalHum = axios
-      .post('http://localhost:3003/api/gestionAirRoutes/postDataAir/', {
-        pasAir: pasAirForm,
-        objectifAir: objectiAirForm,
+    const boutonValiderEtalHum = () => {
+      fetch('http://localhost:3003/api/gestionAirRoutes/postDataAir/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          pasAir: pasAirForm,
+          objectifAir: objectiAirForm
+        })
       })
-      .then(function (response) {
-        console.log(response.data);
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
       })
-      .catch(function (error) {
-        console.log(error);
+      .then(data => {
+        console.log(data);
+      })
+      .catch(error => {
+        console.error('There was a problem with your fetch operation:', error);
       });
+    };
+    
 
     window.location.reload();
   });

@@ -9,10 +9,11 @@ const con = mysql.createConnection({
 
 //* gestionAir.
 
-// let table = 'gestion_airs';
-let table = 'gestion_airs_datas';
+ //let table = 'gestion_airs';
+// let table = 'gestion_airs_datas';
 // let table = 'gestion_airs_etalonnages';
 // let table = 'gestion_airs_etat_relays';
+let table = 'gestion_vannes';
 
 //* gestion Hummidité.
 
@@ -33,7 +34,7 @@ let table = 'gestion_airs_datas';
 // let table = 'gestion_logs';
 
 //* Gestion des courbes
-// let table = 'gestion_courbes';
+ //let table = 'gestion_courbes';
 
 //* Gestion eau au sol
 // let table = 'relay_eau_au_sols';

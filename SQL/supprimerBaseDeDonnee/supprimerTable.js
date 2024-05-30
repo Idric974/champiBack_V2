@@ -14,6 +14,8 @@ var con = mysql.createConnection({
 // let table = 'gestion_airs_datas';
 // let table = 'gestion_airs_etalonnages';
 // let table = 'gestion_airs_etat_relay';
+let table = 'gestion_vannes';
+
 
 //! gestion Hummidité.
 // let table = 'gestion_hums';
@@ -32,7 +34,7 @@ var con = mysql.createConnection({
 // let table = 'gestion_logs';
 
 //! Gestion substrat
-let table = 'gestion_substrats'
+//let table = 'gestion_substrats'
 
 con.connect(function (err) {
   //

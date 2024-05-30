@@ -231,9 +231,17 @@ label {
 }
 
 :root {
-  --couleur1: green;
+  --greenColor: #008000;
   --shadow: 0px 0px 5px 0px #373964;
   --bgColor: #373964;
+  --bleuClic974: #361fdb;
+  --orangeClic974: #f44611;
+  --couleurDeFond: rgb(232, 232, 232);
+  --hauteurMenu: 10vh;
+  --primaryColor: rgb(17, 76, 214);
+  --secondaryColor: gold;
+  --grisAnthracite: #303030;
+  --whiteColor: #ffff;
 }
 
 .box {
@@ -246,7 +254,7 @@ label {
 }
 
 .boxMenu {
-  border: solid 1px black;
+/* background-color: #008000; */
   width: 15%;
   display: flex;
   flex-direction: column;
@@ -276,7 +284,7 @@ label {
   text-align: center;
   /* padding: 10px 0px 10px 0px ; */
   background-color: #146ec2;
-  border-bottom: solid black 1px;
+  /* border-bottom: solid black 1px; */
   color: white;
   margin-bottom: 5px;
 }

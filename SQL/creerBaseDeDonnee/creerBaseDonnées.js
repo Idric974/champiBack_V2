@@ -21,7 +21,7 @@ db.connect(function (err) {
 
 // CREATE USER 'idric'@'localhost' IDENTIFIED BY 'Kup33uC4W6';
 
-// CREATE DATABASE champyresi;
+// CREATE DATABASE 'champyresi';
 
 // GRANT ALL ON idric.\* TO 'idric'@'%' IDENTIFIED BY 'Kup33uC4W6' WITH GRANT OPTION;
 

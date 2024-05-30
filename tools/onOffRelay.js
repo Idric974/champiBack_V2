@@ -1,16 +1,19 @@
-let Gpio = require('onoff').Gpio;
-let relay = 27;
+const Gpio = require('onoff').Gpio; // Gpio class
 
-//! Activer un relay.
+try {
+  const relay = new Gpio(17, 'out'); // Use GPIO pin 17, and specify that it is an output
 
-// const relayOn = new Gpio(relay, 'out');
-// console.log('relayOn');
+  // Toggle the relay state every second
+  setInterval(() => {
+    const value = relay.readSync(); // 1 = on, 0 = off
+    relay.writeSync(value ^ 1);     // Toggle the state
+  }, 1000);
 
-//! --------------------------------------------------
-
-//! Déactiver un relay.
-
-// const relayOff = new Gpio(relay, 'in');
-// console.log('relayOff');
-
-//! --------------------------------------------------
+  // Clean up when exiting
+  process.on('SIGINT', () => {
+    relay.unexport();
+    process.exit();
+  });
+} catch (err) {
+  console.error('Failed to initialize GPIO', err);
+}

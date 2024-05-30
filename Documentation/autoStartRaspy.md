@@ -1,4 +1,4 @@
-# Procédure pour lancer champiBack_V2 automatiquement au démarrage du Raspberry Pi.
+# Procédure pour lancer champiBack_V3 automatiquement au démarrage du Raspberry Pi.
 
 ## I ) Modifier le fichier autostart du bureau LXDE
 
@@ -28,7 +28,7 @@
 #fi
 
 4) Ajouter la commande suivantes : 
-node /home/pi/Desktop/champiBack_V2/server.js 
+node /home/pi/Desktop/champiBack_V3/server.js 
 5) Appuyer sur les touches : Ctrl + x (Quitter et enregistrer le fichier).
 
 ## III) Rebooter le raspberry.

@@ -23,7 +23,7 @@ Préférence ⇒ Configuration du Raspberry Pi ⇒ Interface ⇒ SPI cocher Acti
 ## 2) Puller le code.
 
 1. ChampiBack V2.
-   https://github.com/Idric974/champiBack_V2.git
+   https://github.com/Idric974/champiBack_V3.git
 
 2. Champi Etalonnage.
    https://github.com/Idric974/champiEtalonnage.git

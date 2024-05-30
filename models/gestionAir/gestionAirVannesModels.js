@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-  const gestionCourbesModels = sequelize.define('gestion_courbes', {
+  const gestionAirVannesModels = sequelize.define('gestion_vannes', {
     id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
@@ -7,11 +7,12 @@ module.exports = (sequelize, Sequelize) => {
       primaryKey: true,
     },
 
-    dateDemarrageCycle: {
-      type: Sequelize.DATE,
+    vanneActive: {
+      type: Sequelize.TEXT,
       allowNull: false,
     },
+
   });
 
-  return gestionCourbesModels;
+  return gestionAirVannesModels;
 };

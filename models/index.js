@@ -61,6 +61,10 @@ db.gestionCourbes = require('./courbes/gestionCourbesModels')(
   Sequelize
 );
 
+// Vannes.
+db.gestionAirVannes =
+require('./gestionAir/gestionAirVannesModels')(sequelize, Sequelize);
+
 //* -----------------------------------------------------------------
 
 //? Gestion Humidité.
@@ -119,6 +123,9 @@ db.gestionSubstrat =
 
 db.gestionSubstratData =
   require('./gestionSubstrat/gestionSubstratDataModels')(sequelize, Sequelize);
+
+
+
 
 
 module.exports = db;

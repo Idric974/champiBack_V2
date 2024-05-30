@@ -79,17 +79,17 @@ app.get('/pageCourbes1.html', (req, res) => {
 
 //! Les images.
 
-app.use('/images', express.static('/home/pi/Desktop/champiBack_V2/images'));
+app.use('/images', express.static('/home/pi/Desktop/champiBack_V3/images'));
 //! --------------------------------------------------
 
 //! Le CSS.
 
-app.use('/styles', express.static('/home/pi/Desktop/champiBack_V2/styles'));
+app.use('/styles', express.static('/home/pi/Desktop/champiBack_V3/styles'));
 //! --------------------------------------------------
 
 //! Le Javascript.
 
-app.use('/', express.static('/home/pi/Desktop/champiBack_V2/'));
+app.use('/', express.static('/home/pi/Desktop/champiBack_V3/'));
 //! --------------------------------------------------
 
 //! Liste des routes.

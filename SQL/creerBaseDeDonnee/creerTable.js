@@ -187,4 +187,16 @@ db.connect(function (err) {
   // });
 
   //* -----------------------
+
+    //! Bouton des contôle des vannes.
+
+  // let tableLog =
+  //   'CREATE TABLE  gestion_vannes (id int auto_increment, vanneActive TEXT, createdAt DATE, updatedAt DATE, primary key(id))';
+
+  // db.query(tableLog, function (err, result) {
+  //   if (err) throw err;
+  //   console.log('Table gestion des vannes créé : ', result);
+  // });
+
+  //* -----------------------
 });

@@ -10,26 +10,8 @@ const numSalle = require('../../configNumSalle');
 
 //! -------------------------------------------------- !
 
-//! variable pour tests.
+// ! Les fonctions appelées.
 
-// let etatRelay;
-
-// let pas;
-// let objectif;
-
-// let etatVanneBDD;
-// let deltaAirPrecedent;
-
-// let temperatureCorrigee = 16.9
-// let consigne = 16;
-// let delta = temperatureCorrigee - consigne;
-// console.log('🟢 TEST | Delta ==> ', delta);
-
-// let difDelta = -0.3;
-
-//! -------------------------------------------------- !
-
-// ! Les fonctions appelées
 
 //? Mise à jour de l'état des relay.
 
@@ -105,6 +87,61 @@ const sendSMS = (temperatureDuMessage) => {
 //! --------------------------------------------------
 
 //! Les fonctions asynchrones.
+
+//? Recupération de la vanne à utiliser.
+
+let relayVanne;
+let vanneActive;
+
+const gestionAirVannesModels = db.gestionAirVannes;
+
+let recuperationDeLaVanneActive = () => {
+    return new Promise((resolve, reject) => {
+
+        try {
+            gestionAirVannesModels
+                .findOne({
+                    attributes: [[sequelize.fn('max', sequelize.col('id')), 'maxid']],
+                    raw: true,
+                })
+                .then((id) => {
+                    // console.log(id.maxid);
+
+                    gestionAirVannesModels
+                        .findOne({
+                            where: { id: id.maxid },
+                        })
+                        .then((result) => {
+                             console.log(result.vanneActive);
+                             vanneActive = result.vanneActive;
+                            
+                        })
+                        .then(() => {
+                            if (vanneActive === "a") {
+                                relayVanne = 23
+                                console.log("relayVanne ==> ",relayVanne);
+                                resolve();
+                             }
+                             
+                             if (vanneActive === "b") {
+                                relayVanne = 24
+                                 console.log("relayVanne ==> ",relayVanne);
+                                 resolve();
+                              }
+                            
+                        });
+                });
+        } catch (error) {
+
+            console.log("❌ %c ERREUR ==> gestions Air ==> Récupération de l'étalonage",
+                'color: orange', error);
+
+            reject();
+        }
+    });
+}
+
+//? --------------------------------------------------
 
 //? Récupération de la consigne.
 
@@ -318,7 +355,7 @@ let constructionAxeX = () => {
                         .then((result) => {
 
                             //* dade démarrage du cycle.
-
+                            // console.log("result => ",result);
                             dateDemarrageCycle = result['dateDemarrageCycle'];
 
                             // console.log(
@@ -608,7 +645,7 @@ let definitionDesActions = () => {
 
                 let dureeAction = 15000;
 
-                new Gpio(23, 'out');
+                new Gpio(relayVanne, 'out');
 
                 // console.log('Ouverture du froid');
 
@@ -624,7 +661,7 @@ let definitionDesActions = () => {
 
                 setTimeout(() => {
                     //
-                    new Gpio(23, 'in');
+                    new Gpio(relayVanne, 'in');
 
                     // console.log('FIN Ouverture du froid');
 
@@ -645,7 +682,7 @@ let definitionDesActions = () => {
 
                 let dureeAction = 15000;
 
-                new Gpio(23, 'out');
+                new Gpio(relayVanne, 'out');
 
                 // console.log('Ouverture du froid');
 
@@ -661,7 +698,7 @@ let definitionDesActions = () => {
 
                 setTimeout(() => {
                     //
-                    new Gpio(23, 'in');
+                    new Gpio(relayVanne, 'in');
 
                     // console.log('FIN Ouverture du froid');
 
@@ -682,7 +719,7 @@ let definitionDesActions = () => {
 
                 let dureeAction = 5000;
 
-                new Gpio(23, 'out');
+                new Gpio(relayVanne, 'out');
 
                 if (etatVanneBDD >= 100) {
                     etatRelay = 100;
@@ -695,7 +732,7 @@ let definitionDesActions = () => {
 
                 setTimeout(() => {
                     //
-                    new Gpio(23, 'in');
+                    new Gpio(relayVanne, 'in');
 
                     actionRelay = 0;
                     miseAjourEtatRelay();
@@ -715,7 +752,7 @@ let definitionDesActions = () => {
 
                 let dureeAction = 2000;
 
-                new Gpio(23, 'out');
+                new Gpio(relayVanne, 'out');
 
                 if (etatVanneBDD >= 100) {
                     etatRelay = 100;
@@ -728,7 +765,7 @@ let definitionDesActions = () => {
 
                 setTimeout(() => {
                     //
-                    new Gpio(23, 'in');
+                    new Gpio(relayVanne, 'in');
 
                     actionRelay = 0;
                     miseAjourEtatRelay();
@@ -747,7 +784,7 @@ let definitionDesActions = () => {
 
                 let dureeAction = 1000;
 
-                new Gpio(23, 'out');
+                new Gpio(relayVanne, 'out');
 
                 if (etatVanneBDD >= 100) {
                     etatRelay = 100;
@@ -760,7 +797,7 @@ let definitionDesActions = () => {
 
                 setTimeout(() => {
                     //
-                    new Gpio(23, 'in');
+                    new Gpio(relayVanne, 'in');
                     // console.log('ouverture  du froid');
                     actionRelay = 0;
                     miseAjourEtatRelay();
@@ -1022,6 +1059,14 @@ let enregistrementDatas = () => {
 
 //? --------------------------------------------------
 
+//? Affichage des datas
+
+
+
+
+
+//? --------------------------------------------------
+
 
 //! -------------------------------------------------- !
 
@@ -1030,6 +1075,8 @@ let enregistrementDatas = () => {
 let handleMyPromise = async () => {
 
     try {
+
+        await recuperationDeLaVanneActive();
 
         await recupérationDeLaConsigne();
 

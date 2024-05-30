@@ -10,13 +10,13 @@ const Sequelize = require('sequelize');
 
 // const newEtatRelay = majGestionAirModels
 //   .create({
-//     temperatureAir: 0,
-//     deltaAir: 0,
+//     temperatureAir: 25,
+//     deltaAir: 10,
 //     days: 0,
 //     heures: 0,
 //     actionRelay: 0,
 //     etatRelay: 0,
-//     consigne: '0',
+//     consigne: 15,
 //     valeurAxeX: '0',
 //     jourDuCycle: '1',
 //   })
@@ -33,20 +33,20 @@ const Sequelize = require('sequelize');
 
 //* Data.
 
-// const miseAJourGestionAirData = db.gestionAirData;
+const miseAJourGestionAirData = db.gestionAirData;
 
-// const newDataCo2 = miseAJourGestionAirData
-//   .create({
-//     consigneAir: 0,
-//     pasAir: 0,
-//     objectifAir: 0,
-//   })
-//   .then((result) => {
-//     console.log('Table mise à jour');
-//   })
-//   .catch((error) => {
-//     console.log('Table non mise à jour', error);
-//   });
+const newDataCo2 = miseAJourGestionAirData
+  .create({
+    consigneAir: 18,
+    pasAir: 15,
+    objectifAir: 11,
+  })
+  .then((result) => {
+    console.log('Table mise à jour');
+  })
+  .catch((error) => {
+    console.log('Table non mise à jour', error);
+  });
 
 //* -------------------------*
 
@@ -225,27 +225,20 @@ const Sequelize = require('sequelize');
 
 //* Courbes.
 
-// const miseAJourEtatRelay = db.gestionCourbes;
+// const miseAJourCourbe = db.gestionCourbes;
 
 // const newMAJ = miseAJourCourbe
-//   .findOne({
-//     attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
-//     raw: true,
+//   .create({
+//     dateDemarrageCycle: 0,
 //   })
-//   .then((id) => {
-//     // console.log('Le dernier id de gestionAir est : ', id);
-//     // console.log(id.maxid);
-//     lastId = id.maxid;
-
-//     miseAJourCourbe
-//       .update({ dateDemarrageCycle: 0 }, { where: { id: lastId } })
-
-//       .then(() => {
-//         console.log('Data Air enregitrées dans la base gestion_airs');
-//       })
-
-//       .catch((err) => console.log(err));
+//   .then((result) => {
+//     console.log('Table gestion Courbes mise à jour');
+//   })
+//   .catch((error) => {
+//     console.log('Table non mise à jour', error);
 //   });
+
+
 
 //! --------------------------------------------------
 
@@ -313,3 +306,18 @@ const Sequelize = require('sequelize');
 //* -------------------------*
 
 //! --------------------------------------------------
+
+//* Vannes.
+
+// const miseAJourVannes = db.gestionAirVannes;
+
+// const newMAJ = miseAJourVannes
+//   .create({
+//     vanneActive: 'a',
+//   })
+//   .then((result) => {
+//     console.log('Table gestion vannes', result);
+//   })
+//   .catch((error) => {
+//     console.log('Table gestion vannes non mise à jour', error);
+//   });

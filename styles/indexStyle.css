@@ -281,3 +281,121 @@
     top: 6px;
     color: white;
 }
+
+/** bouton valve **/
+
+
+.menu {
+    /* border: solid 1px red; */
+    width: 98%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+
+.switchValve {
+    /* border: solid 1px red; */
+    width: 98%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    justify-content: space-between;
+    cursor: pointer;
+    margin: 10px 0px 10px 0px ;
+  }
+  
+  .switchValveBoxOnTitle {
+    font-size: 1.3rem;
+    padding: 5px 0px 5px 0px;
+    text-align: center;
+  }
+  
+  .switchValveBoxOn,
+  .switchValveBoxOff {
+    /* border: solid 1px red; */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .switchValveVA {
+    width: 95%;
+    align-items: center;
+    appearance: none;
+    background-color: var(--orangeClic974);
+    border-radius: 5px;
+    border-width: 0;
+    box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,
+      rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #d6d6e7 0 -3px 0 inset;
+    box-sizing: border-box;
+    color: white;
+    cursor: pointer;
+    display: inline-flex;
+    height: 48px;
+    justify-content: center;
+    line-height: 1;
+    list-style: none;
+    overflow: hidden;
+    padding-left: 16px;
+    padding-right: 16px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    transition: box-shadow 0.15s, transform 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: nowrap;
+    will-change: box-shadow, transform;
+    font-size: 1.5rem;
+  }
+  
+  .switchValveVB {
+    width: 95%;
+    align-items: center;
+    appearance: none;
+    background-color: green;
+    border-radius: 5px;
+    border-width: 0;
+    box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,
+      rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #d6d6e7 0 -3px 0 inset;
+    box-sizing: border-box;
+    color: white;
+    cursor: pointer;
+    display: inline-flex;
+    height: 48px;
+    justify-content: center;
+    line-height: 1;
+    list-style: none;
+    overflow: hidden;
+    padding-left: 16px;
+    padding-right: 16px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    transition: box-shadow 0.15s, transform 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: nowrap;
+    will-change: box-shadow, transform;
+    font-size: 1.5rem;
+  }
+  
+  .switchValveVA:focus,
+  .switchValveVB:focus {
+    box-shadow: #d6d6e7 0 0 0 1.5px inset, rgba(45, 35, 66, 0.4) 0 2px 4px,
+      rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #d6d6e7 0 -3px 0 inset;
+  }
+  
+  .switchValveVA:active,
+  .switchValveVB:active {
+    box-shadow: #d6d6e7 0 3px 7px inset;
+    transform: translateY(2px);
+  }
+  
+  /** --------------------------- */

@@ -16,6 +16,9 @@
     <!-- ➖➖➖➖➖➖ 🟢 NAVIGATION 🟢 ➖➖➖➖➖➖ -->
 
     <div class="boxMenu">
+
+      <!-- Le Menu -->
+    <div class="menu">
       <p class="boxMenuTitle">Menu</p>
       <button class="boutonAccueil"><a href="/">Accueil</a></button>
       <button class="boutonAccueil">
@@ -24,6 +27,22 @@
       <button class="boutonAccueil">
         <a href="/pageCourbes.html">Courbe</a>
       </button>
+
+    </div>
+
+      <!-- Le control des valve -->
+      <div class="switchValve">
+        <div class="switchValveBoxOn">
+          <p class="switchValveBoxOnTitle">Vanne A</p>
+          <button class="switchValveVA" id="switchValveA">ON</button>
+        </div>
+
+        <div class="switchValveBoxOff">
+          <p class="switchValveBoxOnTitle">Vanne B</p>
+          <button class="switchValveVB" id="switchValveB">OFF</button>
+        </div>
+      </div>
+   
     </div>
 
     <!-- ➖➖➖➖➖➖ ❌ FIN NAVIGATION ❌ ➖➖➖➖➖➖ -->
@@ -370,21 +389,25 @@
 
   <script src="/gestion/reloadPage/bundle.js"></script>
 
+    <!-- Gestion du menu -->
+    <!-- <script src="/gestion/gestionPageAccueil/menu/bundle.js"></script> -->
+    <!-- browserify /home/pi/Desktop/champiBack_V3/gestion/gestionPageAccueil/menu/menu.js > /home/pi/Desktop/champiBack_V3/gestion/gestionPageAccueil/menu/bundle.js -->
+
   <!-- gestion Air. -->
   <script src="/gestion/gestionPageAccueil/pageGestionAir/bundle.js"></script>
-  <!-- browserify /home/pi/Desktop/champiBack_V2/gestion/gestionPageAccueil/pageGestionAir/gestionAir.js > /home/pi/Desktop/champiBack_V2/gestion/gestionPageAccueil/pageGestionAir/bundle.js -->
+  <!-- browserify /home/pi/Desktop/champiBack_V3/gestion/gestionPageAccueil/pageGestionAir/gestionAir.js > /home/pi/Desktop/champiBack_V3/gestion/gestionPageAccueil/pageGestionAir/bundle.js -->
 
   <!-- gestion substrat. -->
   <!-- <script src="/gestion/gestionPageAccueil/pageGestionSubstrat/bundle.js"></script> -->
-  <!-- browserify /home/pi/Desktop/champiBack_V2/gestion/gestionPageAccueil/pageGestionSubstrat/gestionSubstrat.js > /home/pi/Desktop/champiBack_V2/gestion/gestionPageAccueil/pageGestionSubstrat/bundle.js -->
+  <!-- browserify /home/pi/Desktop/champiBack_V3/gestion/gestionPageAccueil/pageGestionSubstrat/gestionSubstrat.js > /home/pi/Desktop/champiBack_V3/gestion/gestionPageAccueil/pageGestionSubstrat/bundle.js -->
 
   <!-- gestion Humidite. -->
   <script src="/gestion/gestionPageAccueil/pageGestionHumidite/bundle.js"></script>
-  <!-- browserify /home/pi/Desktop/champiBack_V2/gestion/gestionPageAccueil/pageGestionHumidite/gestionHumidite.js > /home/pi/Desktop/champiBack_V2/gestion/gestionPageAccueil/pageGestionHumidite/bundle.js -->
+  <!-- browserify /home/pi/Desktop/champiBack_V3/gestion/gestionPageAccueil/pageGestionHumidite/gestionHumidite.js > /home/pi/Desktop/champiBack_V3/gestion/gestionPageAccueil/pageGestionHumidite/bundle.js -->
 
   <!-- gestion Co2. -->
   <script src="/gestion/gestionPageAccueil/pageGestionCo2/bundle.js"></script>
-  <!-- browserify /home/pi/Desktop/champiBack_V2/gestion/gestionPageAccueil/pageGestionCo2/gestionCo2.js > /home/pi/Desktop/champiBack_V2/gestion/gestionPageAccueil/pageGestionCo2/bundle.js -->
+  <!-- browserify /home/pi/Desktop/champiBack_V3/gestion/gestionPageAccueil/pageGestionCo2/gestionCo2.js > /home/pi/Desktop/champiBack_V3/gestion/gestionPageAccueil/pageGestionCo2/bundle.js -->
 </body>
 
 </html>

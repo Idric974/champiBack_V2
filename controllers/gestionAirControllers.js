@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 const db = require('../models');
 const gestionAirsDataModels = db.gestionAirData;
 const gestionAirModels = db.gestionAir;
+const gestionAirVannesModels = db.gestionAirVannes;
 
 //* ➖ ➖ ➖ ➖ ➖ ➖ GET Température ➖ ➖ ➖ ➖ ➖ ➖ //
 exports.getTemperatureAir = (req, res) => {
@@ -95,6 +96,40 @@ exports.postDataAir = (req, res) => {
       gestionAirsDataModels
         .update(
           { pasAir: pasAir, objectifAir: objectifAir },
+          { where: { id: lastId } }
+        )
+
+        .then(() =>
+          res.status(200).json({
+            message: 'Data Air enregitrées dans la base gestion_airs_data',
+          })
+        )
+
+        .catch((err) => console.log(err));
+    });
+};
+
+//* ➖ ➖ ➖ ➖ ➖ ➖ POST Vanne active ➖ ➖ ➖ ➖ ➖ ➖ //
+
+exports.postVanneActive = (req, res) => {
+  let vanneActive = req.body.vanneActive;
+  console.log('Vanne active : ' + vanneActive);
+
+  let lastId;
+
+  gestionAirVannesModels
+    .findOne({
+      attributes: [[Sequelize.fn('max', Sequelize.col('id')), 'maxid']],
+      raw: true,
+    })
+    .then((id) => {
+      //console.log('Le dernier id de gestionAir est : ', id);
+     // console.log(id.maxid);
+      lastId = id.maxid;
+
+      gestionAirVannesModels
+        .update(
+          { vanneActive: vanneActive },
           { where: { id: lastId } }
         )
 
